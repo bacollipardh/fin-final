@@ -232,8 +232,8 @@ function pdfFromRequestRows({reqRow,items,approvals,watermark}) {
     const PDFDoc=new PDFDocument({size:"A4",margin:0,info:{Title:"Kërkesë për Lejim Financiar",Author:"Fin Approvals"}});
     const chunks=[];PDFDoc.on("data",c=>chunks.push(c));PDFDoc.on("end",()=>resolve(Buffer.concat(chunks)));PDFDoc.on("error",reject);
 
-    const fontReg=process.env.PDF_FONT_REG||process.env.PDF_FONT_REG||"/usr/share/fonts/dejavu/DejaVuSans.ttf";
-    const fontBold=process.env.PDF_FONT_BOLD||process.env.PDF_FONT_BOLD||"/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf";
+    const fontReg=process.env.PDF_FONT_REG||"/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf";
+    const fontBold=process.env.PDF_FONT_BOLD||"/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf";
     const hasReg=fs.existsSync(fontReg),hasBold=fs.existsSync(fontBold);
     if(hasReg)PDFDoc.registerFont("R",fontReg);
     if(hasBold)PDFDoc.registerFont("B",fontBold);
@@ -1246,6 +1246,13 @@ app.post("/approvals/:id/rejected",requireAuth,requireRole("team_lead","division
 
 /* ─── Start ─── */
 /* ─────────────── ADMIN SYNC ENDPOINT ─────────────── */
+
+
+
+  
+
+
+/* ------------------- OCR ------------------- */
 app.post("/ocr/lot", requireAuth, async (req, res) => {
   const { execFile } = await import("child_process");
   const { image } = req.body;
@@ -1271,7 +1278,6 @@ app.post("/ocr/lot", requireAuth, async (req, res) => {
     res.status(500).json({ error: "OCR deshtoi", detail: err.message });
   }
 });
-
 app.post("/admin/pb-sync", requireAuth, requireRole("admin"), async (req, res) => {
   try {
     console.log("[ADMIN] Manual PricingBridge sync triggered");
@@ -1306,3 +1312,14 @@ app.listen(PORT,()=>{
   // Warm threshold cache
   getThresholds().catch(()=>{});
 });
+
+
+
+
+
+
+
+
+
+
+
