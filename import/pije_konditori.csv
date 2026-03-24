@@ -1,0 +1,1336 @@
+SKU,NAME,sell_price,division_id
+ALK001,Liker Kruskovac 25% 1L Maraska/P6       ,7.44,10
+ALK002,Liker Kruskovac 25%  0.7L Maraska/P6    ,6.922,10
+ALK003,Liker bimor Pelinkovac 28% 1L Lagana/P6 ,7.805,10
+ALK004,Liker bimor Pelinkovac 28% 1L Retro/P6  ,8.11,10
+ALK005,Liker MARASCHINO 32% 1L Maraska/P6      ,10.14,10
+ALK006,Liker prej mjalte Medica 24% 1L Marsk/P6,8.759,10
+ALK007,Vodkë Cosmopolitan 37.5% 1L Maraska/P6  ,7.095,10
+ALK008,Vodkë Cosmopolitan 37.5% 0.7L Marska/P6 ,5.451,10
+ALK009,Raki Kumbulle Sljiovica 40% 1L Marask/P6,12.028,10
+ALK010,Raki Kumbulle Sljiovica 40% 0.7L Mara/P6,9.44,10
+ALK011,Pije alkool.Travarica 37.5% 1L Marka/P6 ,8.272,10
+ALK012,Shurup frutash Amarena 1L Maraska/P6    ,2.994,10
+ALK013,"Shurup Boronicë,mollë 1L Maraska/P6     ",2.923,10
+ALK014,Shurup Portokalli 1L Maraska/P6         ,2.507,10
+ALK015,Shirup vishnje Amarena Premium 0.75L/P6 ,5.836,10
+ALK016,"Lëng Boronicë,rrush i zi,mollë 1L Marask",1.37,10
+AMR001,Grissini Classico 125gr/P18             ,0.82,10
+AMR002,Grissini Rosmarino 125gr/P18            ,0.82,10
+AMR003,Grissini Pizza 125gr/P18                ,0.82,10
+AMR004,Grissini Sesamo 125gr/P18               ,0.82,10
+ANL001,Choco milk Pego  8gr (12x48)/P576       ,0.083,10
+ANL002,Choco milk PegoMax  18gr (12x24)/P288   ,0.214,10
+ANL003,Choco LEJTHI 220g/P12 LEXUS             ,2.416,10
+ANL004,Choco LAJTHI  500g/P12 LEXUS            ,3.201,10
+ANL005,Choco DREDHEZ 500g/P12 LEXUS            ,3.201,10
+ANL006,Choco KOKOS 500g Lexus/P12              ,3.201,10
+ANL007,Choco KAFE  500g/P12 LEXUS              ,3.201,10
+ANL008,Choco QERSHI  500g/P12 LEXUS            ,3.201,10
+ANL009,Choco PORTOKALL  500g/P12 LEXUS         ,3.201,10
+ANL010,Kinder ve HEROS 25gr  /P24x6            ,0.206,10
+ANL011,Kinder ve 25g SAFARI/P24x6              ,0.206,10
+ANL012,Kinder ve 25g CRAZY FRUIT/P24x6         ,0.206,10
+ANL013,Kinder ve 25g SPACE/P24x6               ,0.206,10
+ANL014,Kinder ve 25gr MY CHICK /P24x6          ,0.206,10
+ANL015,Kinder ve SUPER RACE 25gr P24x6         ,0.206,10
+ANL016,Kinder top CHAMPION  30gr /P24x6        ,0.258,10
+ANL017,Kinder top SUPER TRUTLES 34gr/P24x6     ,0.258,10
+ANL018,Kinder top CRAZY GIRLS  30gr /P24x6     ,0.258,10
+ANL019,Kinder ve 60g BUNDY/P24x3               ,0.52,10
+ANL020,Kinder ve 60g DINOS/P24x3               ,0.52,10
+ANL021,Kinder ve 60g BARBELLA/P24x3            ,0.52,10
+ANL022,Kinder ve ICE TEAM 60gr /P24x3          ,0.52,10
+ANL023,Kinder ve SAFARI 60gr /P24x3            ,0.52,10
+ANL024,Kinder ve 60g Magic ALADIN/P24x3        ,0.52,10
+ANL025,Choco LAJTHI 500g KUTI  /P12 LEXUS      ,3.201,10
+ANL026,Kinder ve DINO EGGS  115gr(4x9)/P36     ,0.991,10
+ANL028,Chocolate 18g MY CHICK /P36x10          ,0.109,10
+ANL029,Chocolate 18g/20g RABBIX/P36x10         ,0.109,10
+ANL030,Kinder ve 25g BARBELLA/P24x6            ,0.213,10
+ANL031,Kinder ve  ANIMAL WORLD 25g /P24x6      ,0.214,10
+ANL032,Kinder Ve 25g CARS/P24x6                ,0.214,10
+ANL033,Kinder Ve 25g CHOCO STARS/P24x6         ,0.214,10
+ANL034,Kinder Ve 25g PRINCESS/P24x6            ,0.214,10
+ANL035,Kinder Ve 60g CHOCO STARS/P24x3         ,0.52,10
+ANL036,Chocolate with PEANUT 500g(1x12) safari ,3.201,10
+ANL037,Choco FIGUR 55g LADY BIRD/P12x6         ,0.547,10
+ANL038,Choco PEANUT 2Kg/P6 DELUXE              ,10.067,10
+ANL039,Choco PEANUT CREAM 500G/P12 LEXUS       ,3.201,10
+ANL040,Choco PEANUT CREAM 500G/P12 DELUXE      ,3.201,10
+ANL041,Choco LAJTHI 500g/P12 DELUXE            ,3.201,10
+ANL042,Minicco Cornet Lajthi 25gr/P24x4        ,0.235,10
+ANL044,Minicco Cornet Kikirik 25gr/P24x4       ,0.235,10
+ANL045,Choco 15g Rabbix/P36x10                 ,0.083,10
+ANL046,Choco 15g Lio/P36x10                    ,0.083,10
+ANL047,Choco 15g Rex/P36x10                    ,0.083,10
+ANL048,Choco 15g Lady Bird/P36x10              ,0.083,10
+ANL049,Chocho Ball 15g/P36x10                  ,0.083,10
+ANL050,Choco Lajthi 250g Lexus/P12             ,1.467,10
+ANL051,Choko Peanut Crem 250g Lexus/P12        ,1.467,10
+ANL052,Lexus Krem Lajthie 150gr/P12            ,1.492,10
+ANL053,LEXUS LOVE Hazelnut 110g/P24            ,0.985,10
+ANL054,LEXUS 150gr Coffee/P12                  ,1.492,10
+ANL055,LEXUS 150gr Peanut/P12                  ,1.492,10
+ANL056,Kinder top 30g SUPER TURTLES/P24x6      ,0.236,10
+ANL057,Kinder Ve Peanut&Hazelnut 25gr Safar    ,0.2,10
+ANL058,Kinder Ve Peanut&Hazelnut 25gr Princ    ,0.2,10
+BAL001,Balocco Biskota Pasterfrolle 12/350g    ,1.73,10
+BAL002,Balocco Biskota Ciambelle 12/350g       ,1.73,10
+BAL003,Balocco Biskota Bastoncini 12/350g      ,1.73,10
+BAL004,Balocco Biskota Zuppole 12/350g         ,1.73,10
+BAL005,Biskota Balocco(012) Mondine 350g/P12   ,1.105,10
+BAL006,Balocco Biskota Girandole 12/350g       ,2.51,10
+BAL007,Balocco Biskota Gocciolloti 12/350g     ,2.51,10
+BAL008,Balocco Biskota Facine 12/350g          ,2.51,10
+BAL009,Biskota Balocco Facine 700g/P12         ,3.149,10
+BAL010,Biskota Balocco Girandole 700g/P12      ,3.149,10
+BAL011,Biskota Balocco Gocciollotti 700g/P12   ,3.149,10
+BAL012,"Biskota Balocco Vita Mia, pa sheqer 325g",1.99,10
+BAL013,Balocco Biskota Zero me Drithera pa sheq,2.04,10
+BAL014,Balocco Biskota Zero me Çokollate pa she,2.04,10
+BAL015,Balocco Balo Cruschelle me Fibra 12/350g,1.73,10
+BAL016,Biskota Bal(043)Crch.me drithera 300/P12,1.115,10
+BAL017,Biskota Bal(044)Crch.me drithera 300/P12,1.363,10
+BAL018,Biskota Bal(045)Crch.me drithera 275/P12,1.652,10
+BAL019,Biskota Vita Mia 290g/P10               ,1.73,10
+BAL020,Biskota Girandole 350g/P12              ,1.754,10
+BAL021,Balocco Biskota Novellini 10/350g       ,1.73,10
+BAL022,Biskota Breakfast me çokollatë dhe qumës,1.36,10
+BAL023,"Biskota Breakfast me drithëra, Balocco 3",1.73,10
+BAL024,Biskota Breakfast me drithëra dhe çokoll,1.73,10
+BAL025,"Biskota Breakfast me drithëra dhe fruta,",1.73,10
+BAL026,Biskota Breakfast me oriz dhe fruta të k,1.73,10
+BAL027,"Napolitankë kubëza me kakao, Balocco 250",1.48,10
+BAL028,"Napolitankë kubëza me lajthi, Balocco 25",1.675,10
+BAL029,"Napolitankë kubëza me qumësht vanile, Ba",1.48,10
+BAL030,"Savoiardi, Balocco 200gr/P15            ",1.15,10
+BAL031,"Sfogliatine e sheqerosur, Balocco 200gr/",1.2,10
+BAL032,"Sfogliatine Glazed, Balocco 200gr/P15   ",1.2,10
+BAL033,Biskota Balocco Cruschelle me fibra 700g,1.9,10
+BAL034,"Panettone, BALOCCO 750g/P12             ",5.35,10
+BAL035,"Pandoro, BALOCCO 750g/P12               ",5.99,10
+BAL036,Balocco Panettone Classico 12/750g      ,6.74,10
+BAL037,Balocco Panettone Pandoro 12/750g       ,8.05,10
+BAL038,Balocco Panettone Gocce 32/100g         ,1.9,10
+BAL039,Balocco - Mini Pannetone Tin Box 30/80g ,3.99,10
+BAL040,Balocco - Pannetone Gocciolotto 12/500g ,5.9,10
+BAL041,Balocco - Zuppa Inglese 12/650g         ,7.2,10
+BAL042,Balocco - Panna Cotta 12/650g           ,7.2,10
+BAL043,Balocco - Pand. Pistacchio&Nocci 12/800G,9.5,10
+BAL044,Balocco - Pandoro Lemondoro 12/800g     ,9.5,10
+BAL045,Balocco Biskota Risofrolle 12/350g      ,2.51,10
+BAL046,Balocco Biskota Saracene 12/350g        ,2.51,10
+BAL047,Balocco - Pandoro Star Gocce 32/80gr    ,1.9,10
+BAL048,Balocco - Torta Fiesta Festek 18/400gr  ,4.69,10
+BAL049,Balocco - Tora Fiesta Lemon 18/400gr    ,4.69,10
+BAL050,Balocco Tortino 12/650gr                ,7.39,10
+BAL051,Balocco Tiramisu 12/650gr               ,7.39,10
+BAL052,Balocco Maxiciok Caramel 12/800gr       ,9.59,10
+BAL053,Balocco - Pandoro Cookie 12/800         ,9.59,10
+BAL054,Balocco - Pandoro Ciocco Lampone 12/800g,9.59,10
+BAL055,Balocco - Pandoro Classic Basso 8/750gr ,11.2,10
+BAR001,Baronie Alpia Çokollate me Qumesht Alpin,1.1,10
+BAR002,Baronie Alpia Çokollate Qumesht Alpin&La,1.22,10
+BAR003,Baronie Alpia Çokollate e zeze 20/100g  ,0.64,10
+BAR004,Baronie Alpia Çokollate Qumesht Alpin&Fe,1.28,10
+BAR005,Baronie Sarotti Çokollate e Zeze me Port,1.62,10
+BAR006,Baronie Sarotti Çokollate e Zeze 72% 10/,1.66,10
+BAR007,Baronie Sarotti Çokollate e Zeze 85% 10/,1.99,10
+BUL001,Motta Kek me krem çokollate 12/276g     ,3.09,10
+BUL002,Motta Kek me krem kajsie 12/258g        ,2.59,10
+BUL003,Motta Kek me krem kakao 12/258g         ,2.59,10
+BUL004,Motta Kek me krem qershie 12/258g       ,2.59,10
+BUL005,Motta Kek Yo-Yo me çokollate 12/210g    ,2.45,10
+BUL006,Motta Kek girella me krem kakoje 12/280g,2.55,10
+BUL007,Motta Panettone Pandoro TRD 12/700g     ,9.19,10
+BUL008,Motta Panettone XI 16/1000g             ,10.89,10
+BUL009,Motta Panettone Tartufone V.Box 8/800g  ,8.79,10
+BUL010,Bauli Panettone Tartufone V.Box 8/800g  ,11.99,10
+BUL011,Bauli Panettone Tartufone Dolce Noir 12/,11.09,10
+CHW004,"Chips classic, CHIPS WAY 150g/P9        ",0.91,10
+CHW006,"Chips classic I brinjëzuar, CHIPS WAY 15",0.91,10
+CHW012,"Flips i pasur me proteina, CHIPS WAY 40g",0.161,10
+CHW013,"Flips krokodil, me kikirik, CHIPS WAY 40",0.169,10
+CHW014,"Flips krokodil, me kikirik, CHIPS WAY 15",0.59,10
+CHW015,"Flips Jumbo classic, CHIPS WAY 80g/P12  ",0.36,10
+CHW016,"Popcorn, CHIPS WAY 50g/P32              ",0.337,10
+CHW017,"Popcorn, CHIPS WAY 100g/P16             ",0.674,10
+CHW018,"GRICKO  i ëmbël, CHIPS WAY 50g/P36      ",0.36,10
+CHW019,"GRICKO me 32% kikirik, CHIPS WAY 40g/P33",0.171,10
+CHW020,"GRICKO me 32% kikirik, CHIPS WAY 150g/P1",0.59,10
+CHW025,Gricko sticks me shije domate dhe paprik,0.245,10
+CHW026,Gricko sticks me shije domate dhe paprik,0.59,10
+CHW027,"Flips me 32% kikirik 1+1 GRATIS,  CHIPS ",0.17,10
+CHW028,"Popcorn 100g + Popcorn 50g GRATIS , CHIP",0.67,10
+CHW029,Gricko sticks me shije domate dhe paprik,0.25,10
+CHW030,Flips me 32% kikirik  CHIPS WAY 40G 4+1 ,0.684,10
+COL001,Colussi Biskote mengjesi 12/400g        ,2.07,10
+COL004,Colussi Biskote me mjalte 10/300g       ,2.4,10
+COL005,Colussi Biskote me drithera 10/300g     ,2.05,10
+COL006,Colussi Biskote me çokollate 10/300g    ,2.22,10
+COL007,"Biskota me kakao dhe drithëra, COLUSSI, ",2.44,10
+COL008,Colussi Nic Nac Biskote 8/650g          ,3.422,10
+COL009,Colussi Oswego Biskote pa sheqer 24/250g,1.44,10
+COL010,Colussi Oswego Biskote pa sheqer 12/500g,2.21,10
+COL011,Colussi Biskote me Qumesht 24/250g      ,1.21,10
+COL012,Colussi Biskote me Qumesht 12/500g      ,2.24,10
+COL013,Colussi Feta Biskotash Integrale 12/320g,2.48,10
+COL014,Colussi Cracker me Kripe 20/250g        ,1.08,10
+COL015,Colussi Cracker Integrale 20/250g       ,1.08,10
+COL016,Colussi Cracker me Rozmarine 20/250g    ,1.28,10
+COL100,Colussi Biskota kakao & drithera 6/450g ,4.42,10
+CRA001,Croco Crackers Pizza Flavour 12/100g    ,0.45,10
+CRA002,Croco Crackers te njelmet 12/400g       ,1.45,10
+CRA003,Croco Crackers Mix & Brezel 12/250g     ,0.95,10
+CRA004,Croco Crackers Mix & Brezel 10/500g     ,1.73,10
+CRA005,Croco Brezel Maxi Croco 12/300g         ,0.97,10
+CRA006,CROCO-Shkopinjë te gjatë njelmë 80g/40  ,0.223,10
+CRA007,CROCO-Shkopinjë te gjate susam 80g/P40  ,0.223,10
+CRA008,Croco Shkopinjë te njelmët 250g/Pako 15 ,0.591,10
+CRA009,Coco-Shkopinjë te njel.te gjatë 250g/20 ,0.591,10
+CRA010,CROCO-Shkopinjë te njelmët 125g Tray /14,0.385,10
+CRA011,Croco Crackers me susam dhe fara 12/100g,0.48,10
+CRA012,Croco Crackers me Djath Flavour 12/400g ,1.55,10
+CRA013,Croco Crackers Pizza Flavour 12/400g    ,1.55,10
+CRA014,CROCO-Mini Sticks 100g/Pako 12          ,0.29,10
+CRA015,Croco Crackers Susam&Fara Lulekuqe 12/40,1.64,10
+CRA016,CROCO-Shkopinjë te njelmët 80g/Pako 12  ,0.223,10
+CRA017,Brezel me Susam dhe Fara 80g/Pako 12    ,0.229,10
+CRA018,Croco-Biskotë me krem kakao 25g/P120    ,0.069,10
+CRA019,Brezel Maxi Croco 750g/Pako 4           ,1.71,10
+CRA020,Shkopinjë të njelmët 40g Croco/Pako 46  ,0.114,10
+CRA021,Croco-Shkopinjë te njelmët 80g/Pako 21  ,0.208,10
+CRA022,Croco shkopinjë të njelmët 100g/P16     ,0.385,10
+CRA023,Crackers Mix&Berzel 500g+ Shkopinj 40g G,1.085,10
+CRA025,Croco Mix Crackers & Brezel 4/750g      ,2.73,10
+CRA026,Croco biskotë me kako 32g 40%/P88       ,0.097,10
+CRA027,Biskota Roco me krem kakao 150g/P23     ,0.425,10
+CRA028,Crackers te njelmët  2x400g/Pako 8      ,1.786,10
+CRA029,Biskota Petit Beurre me gjalpë 100g/P28 ,0.271,10
+CRA030,Biskota Petit Beurre me mjaltë 100g/P28 ,0.238,10
+CRA031,Croco Crackers Susame 12/150g           ,0.7,10
+CRA032,CROCO Grisinni me susam dhe fara lin 100,0.328,10
+CRA033,CROCO Grisinni qimon dhe susame 100g/P24,0.323,10
+CRA034,CROCO Grisinni me rosmarine dhe origano ,0.313,10
+CRA035,Croco Crackers Pizza 12/150g            ,0.67,10
+CRA036,Crckers susame 150g+Biscota 100g S.Cmim ,0.642,10
+CRA037,Croco crackers me kripe 150g/P15        ,0.457,10
+CRA038,Croco  crackers me sesame te bardhe 150g,0.49,10
+CRA039,Croco Special crackers digestiv 150g/P15,0.46,10
+CRA040,Croco Crackers Mini 750g/P2             ,1.99,10
+CRA041,Croco Crackers Top Pizza 12/150g        ,0.69,10
+CRA042,Croco Crackers Top Salt 12/150g         ,0.65,10
+CRA043,Croco Crackers Top Susame 12/150g       ,0.73,10
+CRA044,"Flips, CROCO 45g/P50                    ",0.2,10
+CRA045,"Flips, CROCO 85g/P30                    ",0.42,10
+CRA046,Croco cereal pillows me kako 200g/P16   ,0.45,10
+CRA047,"Shkopinje pereci, Croco 200g/P12        ",0.475,10
+CRA048,"Brusketa me shije të pices, Croco 80gr/P",0.3,10
+CRA049,Croco Bread Crisp Garlic Flavour 80gr/P1,0.3,10
+CRA050,"Flips me shije të pices, CROCO  75 g/P30",0.42,10
+CRA051,"Flips me shije të djathit,CROCO 75 g/P30",0.42,10
+CRA052,"Snacks pizza, CROCO 25g/P60             ",0.21,10
+CRA053,"Snacks proshutë, CROCO 25g/P60          ",0.21,10
+CRA060,CROCO BAGELS me kripë  100g/P12         ,0.28,10
+CRA061,Drithëra të mbushura me krem cokollate C,0.42,10
+ELS001,El Sabor Nacho Chips me Kripe 18/100g   ,0.726,10
+ELS002,El Sabor Nacho Chips Djeges 18/100g     ,0.726,10
+ELS003,El Sabor Nacho Chips me djathe 18/100g  ,0.726,10
+ELS004,El Sabor Nacho Chips Barbeque 18/100g   ,0.726,10
+ELS005,El Sabor Nacho Chips Djeges Jalapeno 18/,0.726,10
+ELS006,El Sabor Nacho Chips me Kripe 10/225g   ,1.41,10
+ELS007,El Sabor Nacho Chips Djeges 10/225g     ,1.41,10
+ELS008,El Sabor Nacho Chips Kripe&Salce 12/175g,1.79,10
+ELS009,El Sabor Nacho Chips Kripe&Salce&Djathe ,1.79,10
+ELS010,.                                       ,1.81,10
+ELS011,.                                       ,1.81,10
+ELS012,"Petë per dyner Tortilla 20cm , EL SABOR ",0.95,10
+ELS014,"Petë per dyner Tortilla 25cm,EL SABOR  -",3.85,10
+ELS015,Petë Tortillas Happy Time 25cm(18x4)/P18,1.09,10
+ELS017,El Sabor Taco Shells 12/150g            ,2.69,10
+ELS018,El Sabor Salce Djeges 12/300g           ,1.89,10
+ELS019,El Sabor Salce Djathi Jalapeno 12/300g  ,2.09,10
+ELS021,El Sabor Salce 6/1050g                  ,5.29,10
+ELS023,El Sabor Nacho Jalapenos 8/225g         ,1.72,10
+ELS024,El Sabor Salce Dip 12/315g              ,1.82,10
+ELS025,El Sabor Salce Cheddar 12/300g          ,2.09,10
+ELS026,El Sabor Fajita Kit (8 tortillas+erëzat+,4.49,10
+ELS027,El Sabor Nachos Chips me Kripe Big 10/20,1.39,10
+ELS028,El Sabor Taco Kit(12Taco+erëza+salcë) 12,4.75,10
+ELS029,El Sabor Pete Integrale 20CM 18/240g    ,1.39,10
+ELS031,"EL Sabor Taco Spice Mix 12/35g,         ",0.95,10
+ELS032,EL Sabor Fajita Spice Mix 12/35g        ,0.95,10
+ELS033,El Sabor Nacho Chips Kripe&Salce Domates,1.79,10
+ELS034,El Sabor Nachitos Jalapeno 18/100gr     ,0.77,10
+ELS035,El Sabor Nachitos BBQ 100/18gr          ,0.77,10
+ELS036,El Sabor Nachitos Nacho Cheese 18/100gr ,0.77,10
+ELS037,El Sabor - Pete Misri Gluten Free 20/208,2.45,10
+ELS038,El Sabor Nacho Chips - Sour Cream&Onion ,0.73,10
+ENG001,Hell Energy Drink 250ml/P24             ,0.508,10
+ENG002,Hell ED Apple CAN 250ml/P24             ,0.508,10
+ENG003,Hell ED Strong Red Grape CAN 250ml/P24  ,0.508,10
+EVN001,Evian Uje natyral 24/0.33L              ,0.5,10
+EVN002,Evian Uje natyral 24/0.5L               ,0.59,10
+EVN003,Evian Uje natyral 12/0.75L              ,0.9,10
+EVN004,Evian Uje natyral 6/1L                  ,0.95,10
+EVN005,Evian Uje natyral 6/1.5L                ,1.14,10
+EVN006,Evian Uje natyral (qelq) 20/0.33L       ,0.926,10
+EVN007,Evian Uje natyral (qelq) 12/0.75L       ,1.49,10
+FAR001,Farmers's Snack Hurme Natyral 10/200g   ,2.205,10
+FAR002,Raisins Weinbeeren 250g (45305)Snack/P10,1.755,10
+FAR003,Student Fitness Snack 40g(45873)Sna/P20 ,0.58,10
+FAR004,Farmer's Snack Student Fitness Snack 12/,2.49,10
+FAR005,Luxury Nut Mix arra 100g(45179)Snack/P10,2.91,10
+FAR006,Fistekë 150g (40029) F.Snack/P10        ,4.212,10
+FAR007,Farmer's Snack Student Trail Mix 10/200g,4.001,10
+FAR008,Farmer's Snack Fruit Mix me Brusnice Ext,4.193,10
+FAR009,Almonds Spiced 100g (40819)F.Snack/P10  ,2.075,10
+FAR010,Cashew Nuts salted 90g(40109)F.Snack/P10,2.127,10
+FAR011,Cashew Nuts Lime Chilli  90g(40149)/P10 ,2.075,10
+FAR012,Almonds Spanish Natural 175g(40806)/P12 ,4.05,10
+FAR013,Farmer's Snack Arra 13/100g             ,2.85,10
+FAR014,Farmer's Snack Fara te qeruara 10/250g  ,2.05,10
+FAR015,Fiq natyral 250g/P10                    ,3.776,10
+FAR016,Fara Chia 400g/P7                       ,5.065,10
+FAR017,Fruit Mix 200g/P10                      ,2.744,10
+FAR018,Xhenxhefil 200g F.Snack/P10             ,3.756,10
+FAR019,Arra 175g Farmer Snack/P12              ,4.481,10
+FAR020,Nut Mix Farmer Snack 100g/P12           ,2.6,10
+FAR021,Trial Mix Pina Colada 100g/P12          ,2.061,10
+FAR022,Trial Mix me chocholate 115g/P12        ,2.061,10
+FAR023,Trial Mix me shegë 140g/P10             ,3.538,10
+FAR024,Vishnje të thara 120g/P10               ,3.039,10
+FAR025,"Boronicë e kuqe, FARMERS SNACK 100gr /P7",1.79,10
+FAR026,Boronicë 200g/P10                       ,3.076,10
+FAR027,Mixed Berries 175g/P10                  ,3.039,10
+FAR028,Fara Liri Farmer Snack 400g/P7          ,2.585,10
+FAR029,Fara Quinoa 400g/P7                     ,4.357,10
+FAR030,Susame 400g Farmer Snack/P7             ,3.065,10
+FAR031,Boronicë e kuqe e thatë 125g/P10        ,2.762,10
+FAR032,Kokos i grirë Farmer Snack100g/P10      ,2.06,10
+FAR035,"Kajsia te thata 200g, F.snacks/P10      ",2.95,10
+FAR036,Fiq i thatë F.Snacks 200g/P10           ,3.35,10
+FAR037,Kumbulla të thata F.Snacks 200g/P10     ,3.25,10
+FAR038,Bajame F.Snacks 100g/P13                ,2.49,10
+FAR039,Farmer's Snack Feta Banane 10/150g      ,2.69,10
+FAR040,Farmer's Snack Brusnice Organike 12/100g,2.79,10
+FAR041,Farmer's Snack Badem 12/200g            ,4.73,10
+FAR042,Farmer's Snack Festek te pjekur me Kripe,4.499,10
+FAR043,Farmer's Snack Fara Kungulli 12/200g    ,3.15,10
+FAR045,Farmer's Snack Mix Arra Natyrale 10/100g,3.259,10
+FAR046,Farmer's Snack Kokos I grire 10/100g    ,2.153,10
+FAR048,Farmer's Snack - Nut Mix te pjekura dhe ,3.49,10
+FAR049,Farmer's Snack - Arra Indiane te pjekura,4,10
+FAR050,Farmer's Snack -Student Trail Mix 8/350g,5,10
+FAR051,Farmer's Snack - Kokos & Luleshtrydhe 10,3,10
+FAR052,Farmer's Snack - Medjool Hurma 7/500gr  ,8.59,10
+GEC001,"Crostata Kajsi , Gecchele 350g/P10      ",1.844,10
+GEC002,Gecchele Kek Ciambella me Jogurt 6/400g ,3.19,10
+GEC003,Gecchele Kek Ciambella Dy Ngjyreshe 6/40,3.19,10
+GEC004,Gecchele Embelsire Treccia me krem dhe c,3.19,10
+GEC005,"Kek Mr Plunk, Gecchele 350g/P9          ",2.246,10
+GEC006,Gecchele Kek Marble 9/300g              ,2.681,10
+GEC007,Gecchele Embelsire me Kakao 6/250g      ,3.19,10
+GEC008,"Ëmbëlsirë  Brownie, Gecchele 300g/P6    ",2.05,10
+GEC009,Gecchele Embelsire Torta Del Fornaio me ,3.23,10
+GEC010,Gecchele Tiramisu 8/300g                ,1.945,10
+GEC011,Gecchele Plumcake Goccioloso 9/300g     ,2.681,10
+GEC012,Gecchele Kek Rodon me çoko vanille 6/400,3.19,10
+GEC013,Gecchele Ciambella me Lemon 6/400g      ,3.19,10
+GEC014,Gecchele Embelsire Treccia me krem dhe R,3.19,10
+GEC015,Gecchele Kek Opla Straçatella 8/300g    ,2.468,10
+GEC016,Gecchele Kek Rodon Margherita 6/400g    ,3.19,10
+GEC017,Gecchele Kek Quadrone Variegato 6/400g  ,3.09,10
+GEC018,Gecchele Opla Tiramisu 8/300g           ,2.468,10
+GEC019,Gecchele Plumcake me Jogurt dhe Mjalte 8,2.671,10
+GIN001,Napolitankë të mbështjella me çokollatë ,0.522,10
+GIN002,Winter Magenbrot 600gr Gingerbread/P12  ,1.27,10
+GIN003,Winter Prefer 2 Types 600gr Gingerbread/,1.27,10
+GIN004,Biskota Gingerbread e mbushur me shije d,1.03,10
+GIN005,Biskota Gingerbread e mbushur me shije k,1.03,10
+GIN006,Biskota Kinkartz Gingerbread e mbushur m,0.84,10
+GIN007,Biskota Kinkartz Gingerbread me çokollat,0.9,10
+GIN008,Biskota Gingerbread me çokollatë qumësht,0.97,10
+GIN009,Biskota Gingerbread  me çokollatë të zez,0.97,10
+GIN010,"Biskota Gingerbread mix me  çokollatë , ",1.52,10
+GIN011,Biskota Gingerbread mix me  çokollatë qu,1.52,10
+GIN012,"Biskota mix Exquist,  LAMBERTZ , 200g/P1",1.45,10
+GIN013,"Biskota Gingerbread të akullta, LAMBERTZ",0.59,10
+GIN014,Biskota me çokollatë WEISS 500g/P11     ,1.32,10
+GOR001,"Biskota Tandem, GORDI, 600g/P8          ",3.33,10
+GOR002,"Biskota me Marmelatë, GORDI, 600g/P8    ",2.39,10
+GOR003,"Biskota me Vanille , GORDI, 350g/P8     ",1.46,10
+GOR004,"Biskota Sussuro , GORDI, 350g/P8        ",1.94,10
+GOR005,"Biskota Sussuro Çokollatë, GORDI, 350g/P",2.08,10
+GOR006,"Kek me Fruta, GORDI, 400g/P8            ",2.1,10
+GOR007,"Kek me Kakao, GORDI, 400g/P8            ",2.1,10
+GOR008,Kek me shije Portokalli dhe copëza të Ço,1.19,10
+GOR009,"Biskota të çajit, GORDI,700g/P8         ",1.55,10
+GOR010,"Biskota dhuratë me shije Vanille, GORDI,",1,10
+GOR011,"Biskota dhuratë EMA, GORDI, 1kg/P6      ",4.92,10
+GOR012,"Biskota dhuratë DAR, GORDI, 1kg/P6      ",4.92,10
+GRIS001,Grissini -Shkopinje buke me Kripe 12/125,1.12,10
+GRIS002,Grissini -Shkopinje buke me Rozmarine 12,1.12,10
+GRIS003,Grissini -Shkopinje buke me Pizza 12/125,1.12,10
+GRIS004,Grissini -Shkopinje buke me Susam 12/125,1.12,10
+JAF001,Tops Jaffa Keks 125gr/P24               ,0.488,10
+JAF002,Biskote Tops me cokollade 120g P24      ,0.488,10
+JAF003,Monte Petit Biscuit 400g/P10            ,0.534,10
+JAF004,Monte Petit Biscuit 700g/P6             ,0.985,10
+JAF005,Biskota bluara Tops duo (2x250g)500g/P12,0.934,10
+JAF006,Biskota te bluara Tops 300g/P20         ,0.581,10
+JAM001,Jamnica Uje Mineral 6/1.5L              ,0.55,10
+JAM002,Jamnica Uje Mineral 12/0.5L             ,0.405,10
+JAM003,Jana Uje Natyral 6/1.5L                 ,0.55,10
+JAM004,Jana Uje Natyral 12/0.5L                ,0.405,10
+JAM005,Jana Uje Natyral sport 0.5L/P6          ,0.405,10
+JAM006,Jana Uje Natyral 0.25l J.Sport cars/P6  ,0.249,10
+JAM007,Jana Lemon Lime 6/1.5L                  ,0.82,10
+JAM008,Jana Limon-Limeta 0.5l (2x3) Sport/P.6  ,0.453,10
+JAM009,Jana Blueberry Cranberry  6/1.5L        ,0.82,10
+JAM010,Jana Borovnice-Brusnica 0.5l (2x3) Jo ak,0.401,10
+JAM011,Jana Blueberry Cranberry  0.5L/P6       ,0.52,10
+JAM017,Juicy Fruits Portokall & Nektarina 6/1.5,0.9898,10
+JAM018,Juicy Fruits Portokall & Nektarina 12/0.,0.49,10
+JAM019,Juicy Fruits Multivitamin 6/1.5L        ,0.9898,10
+JAM020,Juicy Fruits Multivitamin 12/0.5L       ,0.49,10
+JAM021,Juicy Molle 50% 6/1L                    ,1.09,10
+JAM022,Juicy Dredhze Molle Nectar 1.0L 26%     ,1.52,10
+JAM023,Juicy Vishnje & Molle 6/1L              ,2.15,10
+JAM024,Jamnica Qaj i Ftohte Pjeshke 1.5l  Pako/,0.885,10
+JAM025,Jamnica Qaj i Ftohte Pjeshke 0.5l Sport ,0.484,10
+JAM026,JAM026                                  ,0.885,10
+JAM028,"Juicy Kajsi, pjeshke & molle 6/1L       ",1.22,10
+JAM029,Juicy Portokall 100% 6/1L               ,2.45,10
+JAM030,Juicy Multivitamin 6/1L                 ,1.09,10
+JAM031,Juicy Ribizell e zeze & Nektarina 6/1L  ,1.39,10
+JAM032,Juicy Ananas 100% 6/1L                  ,2.49,10
+JAM033,Juicy Portokall & Nektarina 6/1L        ,1.61,10
+JAM034,Jana Uje Natyral (qelq) 24/0.33L        ,0.49,10
+JAM035,Jana Uje Natyral (qelq) 12/0.75L        ,0.79,10
+JAM036,Jana Lemon Lime 6/0.5L                  ,0.52,10
+JAM037,Juicy Brusnica-Aronija Nectar 1L 30%/P6 ,1.776,10
+JAM039,JAM039                                  ,0.484,10
+JAM040,Juicy Molle & Nektarina 12/0.195L       ,0.69,10
+JAM041,"Juicy Vishnje, Molle 12/0.195L          ",0.69,10
+JAM042,"Juicy Pjeshke, Kajsi, Molle 12/0.195L   ",0.69,10
+JAM043,Juicy Dredhez 100% 12/0.195L            ,0.69,10
+JAM044,Juicy Portokall 100% 12/0.195L          ,0.69,10
+JAM045,Juicy Ribizell e zeze 12/0.195L         ,0.69,10
+JAM046,Jamnica Uje Mineral (qelq) 12/0.75L     ,0.89,10
+JAM047,Jamnica Uje Mineral (qelq) 24/0.25L     ,0.398,10
+JAM051,Jana Uje Natyral 5L/ Pako 2             ,1.858,10
+JAM052,JAM052                                  ,0.484,10
+JAM053,JAM053                                  ,0.885,10
+JAM054,Jamnica Qaj i ftohte Pjeshke 0.2LQelq/ P,0.495,10
+JAM055,Jamnica Qaj i ftohte Sh.Voqe-Brusnica 0.,0.495,10
+JAM056,"Juicy Portokall dhe Nektarina, JUICY, 0.",0.4,10
+JAM057,Juicy Fruits Limonade 6/1.5L            ,0.9898,10
+JAM058,Juicy Fruits Limonade 12/0.5L           ,0.49,10
+JAM060,Juicy Frutis ACE Limunada 0.25L Sport/P6,0.434,10
+JAM061,Jana Uje Natyral sport 6/1L             ,0.52,10
+JAM062,Jana Uje Natyral 6/1L                   ,0.52,10
+JAM065,Jana Uje Natyral 1l  5+1gratis /Pako 1  ,1.896,10
+JAM066,Juicy Fruits Ace Portokall i Kuq 1.5l/P6,0.919,10
+JAM067,Juicy Fruits Ace Portokall i kuq 0.5l/12,0.444,10
+JAM068,Jana Uje Natyral medo 6/1L              ,0.58,10
+JAM069,Jana uje Natyral 0.5l sport Frozen/6    ,0.2975,10
+JAM070,Jana Uje Natyral 0.25l SF/P6 jo aktiv   ,0.274,10
+JAM071,Jana  Uje                               ,0.279,10
+JAM072,Juicy Fruits ACE Mollë 1.5l 6%/P6       ,0.844,10
+JAM073,Juicy Fruits ACE Mollë 0.5l  6% /P12    ,0.413,10
+JAM074,Juicy Mollë 100% 6/1L                   ,1.32,10
+JAM075,Juicy Kajsi  Nektar 1L karton 40%/P6    ,1.411,10
+JAM076,Juicy Nar Aronija-sum.boronic 1L 12%/P6 ,1.373,10
+JAM077,Jana Limun Limeta 0.33l qelq/P24        ,0.474,10
+JAM078,Jana Ice Tea fruta mali 6/1.5L          ,1.05,10
+JAM079,Jana Ice Tea fruta mali 6/0.5L          ,0.59,10
+JAM080,Jana Ice Tea pjeshke 6/0.5L             ,0.59,10
+JAM081,Jana Ice Tea lemon 6/1.5L               ,1.05,10
+JAM082,Jana Ice Tea lemon 6/0.5L               ,0.59,10
+JAM083,Jana Ice Tea pjeshke 6/1.5L             ,1.05,10
+JAM084,Jana Ice Tea fruta mal-brusnic 0.2l/24  ,0.495,10
+JAM085,Jana Uje Natyral 1.5l 5+1gratis/P1      ,2.58,10
+JAM086,Jana Ice Tea fruta mali-brus.1.5L 5+1/P1,4.423,10
+JAM087,Jana Ice Tea pjeshke 0.2l qelq/P24      ,0.495,10
+JAM088,Jana Ice Tea pjeshke  1.5L 5+1gratis/P1 ,4.423,10
+JAM090,Jana Ice Tea fruta mal-brusnic 0.25l /24,0.42,10
+JAM091,Jana Ice Tea pjeshke 0.25L/24           ,0.42,10
+JAM092,Jana Ice Tea portokall mjaltë 1.5l/P6   ,0.99,10
+JAM093,Jana Ice Tea vishnje roibos1.5l/P6      ,0.99,10
+JAM094,Jana Mint Lime 6/1.5L                   ,0.758,10
+JAM095,Jana Menta Limeta 0.5l sport/P6         ,0.453,10
+JAM096,Juicy portokall 100% 4+2 gratis/P1      ,4.626,10
+JAM097,Juicy ananas 100% 4+2 gratis/P1         ,5.575,10
+JAM098,Jamnica PRO SPORT Orange 6/0.75L        ,1.15,10
+JAM099,Jamnica PRO SPORT Lemon 6/0.75L         ,1.15,10
+JAM100,Jamnica Sensation limeta-kiwano 1.5l/P6 ,0.761,10
+JAM101,Jamnica Sensation limeta-kiwano 0.5l/P12,0.436,10
+JAM102,Jamnica Sensation naranca-grejp 1.5l/P6 ,0.761,10
+JAM103,Jamnica Sensation naranca-grejp 0.5l/P12,0.436,10
+JAM104,Jamnica Sensation malina-marula 1.5l/P6 ,0.761,10
+JAM105,Jamnica Sensation malina-marula 0.5l/P12,0.436,10
+JAM107,Jana Menta-Limeta 0.5l/P6               ,0.453,10
+JAM108,Jana Vitamin 0.5l Activity Mollë&Malina/,0.523,10
+JAM109,Jana Vitamin Lemon 6/0.5L               ,0.6,10
+JAM110,Juicy Fruits Portokall 6/1.5L           ,0.9898,10
+JAM111,Juicy Fruits Molle e gjelber 6/1.5L     ,0.89,10
+JAM112,Juicy TO Molle nektar 1L 50% 1./P12     ,0.802,10
+JAM113,Juicy Fruits Portokall Nekt.1.5 4+2grati,3.378,10
+JAM114,Juicy Fruits ACE Multivitamin 1.5l 4+2gr,3.56,10
+JAM115,Juicy Fruits ACE Limonade 1.5L 4+2 grati,3.378,10
+JAM117,Juicy Fruits Portokall 1.5L 4+2gratis/P1,3.38,10
+JAM118,Juicy Fruits Green Apple 1.5L 4+2gratis/,3.378,10
+JAM119,Juicy TO Nektar Portokalli 1.0/P12      ,0.903,10
+JAM120,"Juicy TO Pjeshke, mollë, nektar portokal",0.893,10
+JAM121,Jana uje natyral 0.25l cars/P6          ,0.249,10
+JAM123,Juicy Fruits Sheqë& Mollë 12% 0.5L/P12  ,0.413,10
+JAM124,TO Nektar Portokall 1L + TO Molle nektar,1.807,10
+JAM125,"TO Pjeshke, mollë, nektar portokall 1L +",1.786,10
+JAM126,Jana Vitamin Lemon 6/1.5L               ,0.975,10
+JAM127,Jana vitamin activity mollë malina 1.5L/,0.857,10
+JAM128,Juicy Portokall nektar 50% 0.5L/P12     ,0.676,10
+JAM129,Juicy Mollë nektar 50% 12/0.5L          ,0.6,10
+JAM130,Juicy Multivitamin 50% 12/0.5L          ,0.66,10
+JAM131,Juicy Kids mollë 100% 0.2L/P24          ,0.257,10
+JAM132,Juicy Kids gusti 100% 0.2L/P24          ,0.257,10
+JAM133,Juicy Kids multivitamin 100% 0.2L/P24   ,0.257,10
+JAM134,TO portokall nektar 0.2L/P24            ,0.259,10
+JAM135,TO molle nektar 0.2L/P24                ,0.259,10
+JAM136,TO choco banana 0.2L/P24                ,0.244,10
+JAM137,C portokall 0.2L/P24                    ,0.244,10
+JAM138,Jana Ice tea Menta Limeta 1.5L/P6       ,0.885,10
+JAM139,Juicy Super fruta mali 100% 6/1L        ,2.05,10
+JAM140,Jana Uje Natyral kids 6/0.33L           ,0.38,10
+JAM141,Jana Vitamin Mint Lime 6/0.5L           ,0.6,10
+JAM142,Jana Vitamin Mint Lime 6/1.5L           ,0.975,10
+JAM143,Jana Vitamin Orange 6/1.5L              ,0.975,10
+JAM144,Jana Vitamin Orange 6/0.5L              ,0.6,10
+JAM145,Jana Vitamin lemon (qelq) 24/0.33L      ,0.7,10
+JAM146,Jana Vitamin orange (qelq) 24/0.33L     ,0.6,10
+JAM147,Juicy Fruits Portokall 12/0.5L          ,0.49,10
+JAM148,Juicy Fruits Molle e gjelber 12/0.5L    ,0.425,10
+JAM149,Juicy Ananas & nektarina 6/1L           ,1.79,10
+JAM150,Jana Ice Tea pjeshke (qelq) 24/0.33L    ,0.7,10
+JAM151,Jana Ice Tea fruta mali (qelq) 24/0.33L ,0.7,10
+JAM152,Juicy Fruits Portokall i kuq 6/1.5L     ,0.9898,10
+JAM153,Jana Vitamin Blackcurrant 6/1.5L        ,0.975,10
+JAM154,Jana Vitamin Blackcurrant 6/0.5L        ,0.6,10
+JAM155,Jamnica PRO SPORT Super fruits 6/0.75L  ,1.15,10
+JAM156,Jana Ice Tea hibiskus & mjeder 6/1.5L   ,1.05,10
+JAM157,Jana Ice Tea hibiskus & mjeder 6/0.5L   ,0.59,10
+JAM158,Jamnica Botanica Limon-Mentë 1L/P6      ,1.03,10
+JAM159,Jamnica Botanica Limon-Mentë 0.5L/P12   ,0.63,10
+JAM160,Jamnica Botanica Portokall 1L/P6        ,1.03,10
+JAM161,Jamnica Botanica Portokall  0.5L/P12    ,0.63,10
+JAM162,Barts Seltzer Limon lime  0.275 L/P12   ,1.18,10
+JAM163,Barts Seltzer Brusnicë  0.275 L/P12     ,1.18,10
+JAM164,Jana Ice Tea Lemon Zero 6/1.5L          ,1.05,10
+JAM165,Jana Ice Tea Lemon Zero 6/0.5L          ,0.59,10
+JAM166,Jana Ujë Natyral Baby PET 1.0/P6        ,0.515,10
+JAM167,Juicy Fruits Vishnje 6/1.5L             ,0.9898,10
+JAM168,"JuicyKajsi, molle, pjeshke 100% 6/1L    ",1.55,10
+JAM169,Juicy Multivitamin 100% 6/1L            ,1.73,10
+JAM170,Jana vitamin + Kafeine 6/0.5L           ,0.57,10
+JAM171,"Juicy Dredhez, molle & rrush 100% 6/1L  ",1.85,10
+JAM172,Jamnica Uje Mineral (qelq) 24/0.25L     ,0.398,10
+JAM173,Jamnica Uje Mineral (qelq) 12/1L        ,0.725,10
+JAM174,Jamnica PROGAME cherry 12/0.5L          ,0.75,10
+JAM175,Jamnica PROGAME mango & apricot 12/0.5L ,0.75,10
+JAM177,Jana TOCO Multivitamin 6/1.5L           ,1.09,10
+JAM178,"Jana TOCO Portokall, rrepe & avokado 6/1",1.09,10
+JAM179,"Jana TOCO Portokall, karrote & nektarine",1.09,10
+JAM180,Jana TOCO Multivitamin 6/0.5L           ,0.62,10
+JAM181,"Jana TOCO Portokall, rrepe & avokado 6/0",0.62,10
+JAM182,"Jana TOCO Portokall, karrote & nektarine",0.62,10
+JAM183,Jana Uje Natyral sport 6/0.75L          ,0.49,10
+JAM184,Jana Vitamin + Collagen 6/0.5L          ,0.6,10
+JAM185,Jana Ice Tea lemon (qelq) 0.33L/P24     ,0.7,10
+JAM186,Jana Ice Tea Pjeshke Zero 0.5 L/P6      ,0.59,10
+JAM187,Jana Ice Tea Lemon Zero 1.5 L/P6        ,1.05,10
+KAL001,Bonbone Kalfany përzierje frutash 150g/P,1.249,10
+KAL002,Bonbone Kalfany fruta mali 150g/P10     ,1.249,10
+KAL003,Bonbone Kalfany Citrus 150g/P10         ,1.249,10
+KAL004,Bonbone Kalfany vishnje 150g/P10        ,1.249,10
+KAL005,Bonbone Kalfany freskues 150g/P10       ,1.249,10
+KAL006,Bonbone Pulmoll mentol pa sheqer 45g/P10,1.043,10
+KAL007,Bonbone Pulmoll lemon pa sheqer 45g/P10 ,1.043,10
+KAL008,Bonbone Pulmoll vishnje pa sheqer 45g/P1,1.043,10
+KAL009,Bonbone Pulmoll ribizel pa sheqer 45g/10,1.043,10
+KAL010,Bonbone orange pa sheqer 45g/P10 Pulmoll,1.043,10
+KAL011,Bombona Kalfany green apple 150g/P10    ,1.249,10
+KAL012,Bonbone Kalfany Herb 150g/P10           ,1.249,10
+KAL013,Bombone Kalfany Cola 150g/P10           ,1.249,10
+KAL014,Bombone Kalfany Coffe 150g/P10          ,1.249,10
+KAL015,Kalfany Rapito Ultra Strong 150g/P10    ,1.249,10
+KAL016,Bombona Kalfany Crazy Drops Dredhez 50g/,1.04,10
+KAL017,Bombone Kalfany Red Berry Drops 50g/P10 ,1.04,10
+KAL018,Bombona Kalfany Winter Drops Molle 150g/,1.25,10
+KAN001,Bombona Qershie 100g Kandit/P30         ,0.426,10
+KAN002,Bombona te perzier 400g/Pako 12 Kandit  ,1.361,10
+KAN003,Fresh Mint Bombona 100g/Pako 30 Kandit  ,0.415,10
+KAN004,Kandit Bonbone Mentol i Gjelber 42/100g ,0.59,10
+KAN005,Karamela te Perzier 400g /Pako12 Kandit ,1.808,10
+KAN006,Karamela Classic Amela 100g/Pako30 Kandi,0.521,10
+KAN007,Karamela fruti Amela 100gr/Pako 30 Kandi,0.468,10
+KAN008,Karamela Fruti Amela 350g /Pako12 Kandit,1.574,10
+KAN009,Choko Banane 3(40x20g)/Pako 120         ,0.099,10
+KAN010,Qokolada Dado 100g /Pako 24 Kandit      ,0.562,10
+KAN011,Goga Qokollade 100g /Pako 24 Kandit     ,0.562,10
+KAN012,Praline Kek 500g/Pako 6 Kandit          ,2.159,10
+KAN013,Choko Banane 300g Kandit /Pako15        ,1.691,10
+KAN014,Kandit Rum Pllakez 96/3(32x45g)         ,0.39,10
+KAN015,Kandi Extra 3(32x30g)/ Pako 96 Kandit   ,0.202,10
+KAN016,Kandi Lajthi 3(32x40g) /Pako 96 Kandit  ,0.202,10
+KAN017,Kandi Kokos 3(40x40g) /Pako 120 Kandit  ,0.202,10
+KAN018,Qokolada me Lajthi 200g /Pako 12 Kandit ,1.415,10
+KAN019,Qokollada me  Lajthi 100g /Pako 24 Kandi,0.702,10
+KAN020,Extra Fruti Qokollada 500g/ Pako8 Kandit,3.977,10
+KAN021,Extra Fruti Qokollada 200gKandit/Pako12 ,1.415,10
+KAN022,Extra Fruti Qokollada 100g /Pako 24 Kand,0.702,10
+KAN023,Riki Qokollada me oriz 4(39x30g)/Pako156,0.234,10
+KAN024,Qokollada me Lajthi 500g/Pako 8 Kandit  ,4.063,10
+KAN025,Riki Qokollada me oriz 100g/P16 Kandit  ,0.77,10
+KAN026,Kandit Riki Çokollate me Oriz 10/200g   ,2.69,10
+KAN027,Kandit Riki Çokollate me Oriz 8/300g    ,3.85,10
+KAN028,Qokollade me qumeshte 75g /Pako 28 Kandi,0.468,10
+KAN029,Kandit Confettino Drazhe 36/(36x30g)    ,0.59,10
+KAN030,Qokollade Pllakez Idila Kakao100g/Pako24,0.503,10
+KAN031,Qok.Pllakez Idila Kakao 2(45x50g)/P90   ,0.255,10
+KAN032,Jelly Kandit  500g /Pako 6   Kandit     ,2.105,10
+KAN033,Kandi Jelly  200g /Pako 16 Kandit       ,0.819,10
+KAN034,Kandit Rum Pllakez (20% GRATIS) 32/54g  ,0.39,10
+KAN035,Jelly Praline vish 200g /Pako 16 Kandit ,0.819,10
+KAN036,Choko Jelly 200g /Pako 16 Kandit        ,0.787,10
+KAN037,Kandit Kakao Pluhur 12/100g             ,2.25,10
+KAN038,Kandit Çokollate Pluhur 12/100g         ,2.25,10
+KAN039,Kandit Bonbone Mentol Cool 42/100g      ,0.59,10
+KAN040,Karamela Clas. Lajthi Amela 350g/P12    ,1.776,10
+KAN041,Praline Choco 200g Kandit/Pako 16       ,0.831,10
+KAN042,Qokollate e Zeze per zierje 200g/Pako 14,1.202,10
+KAN043,Kandit Çokollate e zeze zierje 24/100g  ,1.64,10
+KAN044,Bombonjere For You 120g Kandit /Pako 12 ,2.819,10
+KAN045,Qok. e zeze per zierje 20% gr.200g/P14  ,1.202,10
+KAN046,Qok.e zeze per zierje 300g(100g gr)/P17 ,1.202,10
+KAN047,Kandi Extra 36g Maxi Pack/Pako 32       ,0.234,10
+KAN048,Bombona Mentol gjelbërt 120g Kandit/P36 ,0.373,10
+KAN049,Rum Pllakëz Box (4x45g) 180g/Pako 26    ,1.085,10
+KAN050,Kandit Bonbone Mentol Lemon 42/100g     ,0.59,10
+KAN051,Bombonjer Saga 215g/Pako 8              ,3.318,10
+KAN052,Kandit Krem Banana 300g/Pako 15         ,1.382,10
+KAN053,Kandi Extra 4Pack 120g /Pako 26         ,0.606,10
+KAN054,Riki qokollada me oriz 200g 20%gra/P10  ,1.351,10
+KAN055,Riki qokollada me oriz 100g 20%grat/P16 ,0.692,10
+KAN056,Kandit Zele Neresci 100g/Pako 36        ,0.545,10
+KAN057,Kandit Zele Naresci 200g/Pako 20        ,0.744,10
+KAN058,Kandit Jelly me fruta 250g/P12          ,1.011,10
+KAN059,Kandit Mini Choco Banana 150g/Pako 18   ,0.766,10
+KAN060,Kandit Confettino me ngjyra 50g/P80     ,0.383,10
+KAN061,Kandit Choco Banane (3x40x17g)/Pako 120 ,0.092,10
+KAN062,Kandit Choco Banana 17g 2+1gratis/P14   ,0.183,10
+KAN063,Bombona Bonko Frtuta Mix 100g/P30 Kandit,0.489,10
+KAN064,Bombona Bonko Fruta Mix 350g/P12 Kandit ,1.595,10
+KAN065,Bombona Bonko Vocne Karamele 100g/P24   ,0.489,10
+KAN066,Bonbona Bonko Vocne Karamele 350g/P12   ,1.595,10
+KAN067,Bombona Bonko Vishnje Karamele 100g/P24 ,0.526,10
+KAN068,Bombona Bonko Karamel Lajthi 80g/Pako 24,0.489,10
+KAN069,Bombona Bonko Magic Duo Karamel 100g/P24,0.489,10
+KAN070,Qokollate Nugasso 90g/Pako 26 Kandit    ,0.66,10
+KAN071,"Qokollate Kandi me Biskote, KANDIT 80g/P",0.87,10
+KAN072,Qokollate Dragee Badem 200g/P12Kandit   ,2.819,10
+KAN073,Kandit Çokollate Kandi Conffetino 25/100,1.05,10
+KAN074,Kandit Çokollate Kandi me Qumesht 29/80g,0.82,10
+KAN075,Qokollate Kakao per embelsira 950g/P9 Ka,5.636,10
+KAN076,Rum Pllakez  2+1gratis/Pako 33          ,0.62,10
+KAN077,Kandit Dragee Finest Collection 200g/P12,2.819,10
+KAN078,Kandit Dragee Lajthi 200g/Pako 12       ,2.819,10
+KAN079,Kandit Çokollate Kandi me Lajthi 2/80g  ,0.98,10
+KAN080,Kandit Qokollata Tutti Frutti 100g/P25  ,0.702,10
+KAN081,Mini Rum Pllakëz 182g/Pako 15           ,1.127,10
+KAN082,Qokollate me Lajthi 200g Kandit/P12     ,1.415,10
+KAN083,Qokollada me Lajthi 250g/Pako15         ,2.181,10
+KAN084,Qokollada Tutti Fruti 250g Kandti/P15   ,2.181,10
+KAN085,"Qokollate Kandi me Qumesht, KANDIT 220gP",2.31,10
+KAN086,Qokollada per zierje 100g(20%gratis)/P24,0.66,10
+KAN087,Kandit Milky Plus Qoko 90g/Pako 26      ,0.711,10
+KAN088,Qokollate Kandit Goga 90g/P26           ,0.585,10
+KAN089,Qokollate Kandit Dado 90g/P26           ,0.521,10
+KAN090,Kandit Choco Banana cherry jelly 204g/12,0.957,10
+KAN091,Kandit Qokollate Tutti Fruti 200g/P12   ,1.415,10
+KAN092,Kandit Kandi Lajthi 96/(32x35g)         ,0.31,10
+KAN093,Kandit Kandi Kikirik 96/(32x35g)        ,0.31,10
+KAN094,Kandit Kandi Kokos 96/(32x30g)          ,0.31,10
+KAN095,Kandit Kandi Extra 96/(32x30g)          ,0.31,10
+KAN096,Kandit Çokollate Tutti Frutti 27/80g    ,0.98,10
+KAN097,Kandi Lajthi (3 X32g) 2+1gratis /Pako12 ,0.404,10
+KAN098,Kandi Kikirik (3x35g) 2+1 gratis/Pako12 ,0.404,10
+KAN099,Kandi Kokos (3X30g) 2+1gratis/P42       ,0.404,10
+KAN100,Kandi Extra (3X30g) 2+1 gratis/Pako12   ,0.404,10
+KAN101,Qokolladë Let's Party 250g/P14 Kandit   ,2.181,10
+KAN102,Qokolladë me lajthi 100g/P21 Kandit     ,0.798,10
+KAN103,Kandit Riki Çokollate me Oriz 12/75g    ,1.11,10
+KAN104,Qokolladë Idila riso 75g/P16 Kandit     ,0.425,10
+KAN105,Qokolladë Winter Sensation 250g/P14 Kand,2.181,10
+KAN106,Qokolladë Idila 90g/P20 Kandit          ,0.495,10
+KAN107,Kandit Zhele Kocke 7/320g               ,2.16,10
+KAN108,Bombon Kandit 100gr 2+1gratis Mentol Gje,1,10
+KAN109,Praline Choco 350g Kandit/P9            ,1.474,10
+KAN110,Qokolladë mjaltë dhe grur 230g Kandit/10,1.818,10
+KAN111,Kandit Bonbone Mentol I Zi 42/100g      ,0.67,10
+KAN112,Kandit Çokollate e zeze per zierje 20/30,4.59,10
+KAN113,Kandit Çokollate e zeze per zierje 14/20,3.08,10
+KAN114,"Qokollate Kandi me Lajthi, KANDIT 220g/P",2.79,10
+KAN115,"Qokollate Kandi Tutti Frutti, KANDIT 22 ",2.79,10
+KAN116,Qokollada me Kikirik 220g Kandit/P15    ,2.181,10
+KAN117,Qokolladë Idila 75g 2+1 GRATIS/P6 Kandit,0.849,10
+KAN118,Kandit choco banana Magic Moments 300g  ,1.691,10
+KAN119,Riki qokolladë me oriz 75g 3+1 GRATIS /4,1.691,10
+KAN120,Kandit Sweet Mix 305g spring edition    ,2.181,10
+KAN121,Kandit Pllakez Amarena 96/45g (3x32)    ,0.39,10
+KAN122,Kandit pllakëz Mente (3x32) 45g/P96     ,0.29,10
+KAN123,Kandit pllakëz Portokalli (3x32) 45g/P96,0.277,10
+KAN124,Kandit Lepur 195g spring edition/P12    ,1.17,10
+KAN125,Kandit choco banana 300g spring edition ,1.691,10
+KAN126,Kandit Milk chocolate 250g spring editio,1.818,10
+KAN127,Kandit cokollade qumeshti Spr.Edit 90g/P,0.5,10
+KAN128,Kandit cokollade qumeshti Spr.Edit 200g ,1.021,10
+KAN129,Riki qokolladë me oriz 2x75g/P8 Kandit  ,1.094,10
+KAN130,Riki qokolladë me oriz 3x75g 2+1 grat/P6,1.094,10
+KAN131,Kandit Prestige dark choco alm&org 90g  ,1.342,10
+KAN132,Kandit Prest.white choco cocoa-pear 220g,2.602,10
+KAN133,Kandit Prestige dragee almonds 100g/P9  ,1.962,10
+KAN134,Kandit Prestige dragee hazelnuts 100g/P9,1.962,10
+KAN135,Kandit prestige white choc&cocoa 90g/P11,1.342,10
+KAN136,Kandit Prest.dark choco croca-pear 220g ,2.602,10
+KAN137,Kandit Prestige choco noisette duo 110g ,1.342,10
+KAN138,Kandit Prest.dark choco croca-pear 90g  ,1.342,10
+KAN139,Kandit sovica 192g/P8                   ,1.45,10
+KAN140,Kandit Laps 127g/P12                    ,1.147,10
+KAN141,Kandit Choco Banana 120/17g             ,0.15,10
+KAN142,Bom.Laringo ananas&xhenxhefil 80g/P42   ,0.751,10
+KAN143,Bom.Laringo portokall-xhenxhefil 80g/P42,0.751,10
+KAN144,Bom.Laringo dredhëz-biber 80g/P42       ,0.751,10
+KAN145,Bom.Laringo vishnje-chilli 80g Kandit/42,0.751,10
+KAN146,Bom.Bonko karamel cryzy bubbles 100g/P24,0.648,10
+KAN147,Bom.Laringo original karamele 100g/P24  ,0.65,10
+KAN148,Bom.Laringo pepermint-kadulja 100g/P24  ,0.65,10
+KAN149,Bom.Bonko cola karamel 100g Kandit/P24  ,0.55,10
+KAN150,Qokollade Conffetino 100g/P30 Kandit    ,0.782,10
+KAN151,Conffetino 50g/P24 Kandit               ,0.46,10
+KAN152,Kokos Pllakez 45g Kandit/P96            ,0.278,10
+KAN153,Bom.Frozen Romance Laringo orig.200g/P12,1.117,10
+KAN154,Kandit crunch brunch dredhez/P42        ,0.386,10
+KAN155,Kandit crunch brunch lajthi/P42         ,0.386,10
+KAN156,Kandit crunch brunch qumesht/P42        ,0.386,10
+KAN157,Kandit crunch brunch kokos/P42          ,0.386,10
+KAN158,Kandit crunch brunch black cookies/P42  ,0.386,10
+KAN159,Qokollade kek me xhenxhefil 220g/P16 Kan,2.152,10
+KAN160,Bombona frozen rom.Conffetino 200g/P15  ,1.401,10
+KAN161,Kandit qokollade frozen romance 80g/P29 ,0.558,10
+KAN162,Bombonjere Frozen Rom.120g/P8 Kandit    ,2.872,10
+KAN163,Idila qoko lajthi 90g 2+1gratis/P8      ,1.005,10
+KAN164,Bonbon mentol i gjelber 100gr SUPERCMIM ,0.893,10
+KAN165,Qokollate Kandit Tutti Frutti 80g 2+1gra,1.74,10
+KAN166,Qokollate Kandit 80g 2+1gratis Qumesht  ,1.157,10
+KAN167,Kandi qokolladë Nugaso 230g/P14         ,2.182,10
+KAN168,Kandi qokolladë Milky Plus 230g/P14     ,2.182,10
+KAN169,"Qokollate Kandi me Lajthi te plote, KAND",3.05,10
+KAN170,Kandi qokolladë Crunchy Coco 220g/P15   ,2.335,10
+KAN180,"Qokollate Kandi me Badem, KANDIT 220g/P1",3.05,10
+KAN181,Kandi Prestige Almond Crunchy karamel 22,2.47,10
+KAN182,Bonbona Laringo eukaliptus 100g Kandit/P,0.65,10
+KAN183,Bombona Laringo Kandit 100gr 2+1/P8     ,1.238,10
+KAN184,Bonko Citrus Duo 100g /P24              ,0.55,10
+KAN185,Jelly Kick Fruit Candy mix 100g /P36    ,0.56,10
+KAN189,FINA Qokolada per kuzhine 350g/P18      ,1.595,10
+KAN190,Bonko Sweet Double 100g/P24             ,0.55,10
+KAN191,Fina qokolloade per zierje 200g/P13     ,1.066,10
+KAN192,FINA çokollatë qumështi 100g/P21        ,0.509,10
+KAN193,FINA çokollatë biskotë 100g/P20         ,0.477,10
+KAN194,Kandi Rice&Coconut 200g/P10             ,1.38,10
+KAN195,Choco Bannana prestige 300g/P15         ,1.797,10
+KAN196,Choco Banana orange 300g/P15            ,1.878,10
+KAN197,Qoko Kandi white 220g breaks.Biscuit/P15,2.137,10
+KAN199,Qoko Kandi 220g breaks.Biscuit/P15      ,1.98,10
+KAN200,Kandit Choco Banana Original 15/280g    ,2.49,10
+KAN201,Kandit Çokollate e bardhe 13/200g       ,3.79,10
+KAN202,Rum qoko white 48g/P96                  ,0.31,10
+KAN203,Kandit Praline Choco 7/280g             ,2.39,10
+KAN204,Zhele kocke limeta maracuja 330g/P7     ,1.457,10
+KAN205,Qoko me oriz Riki 21g/P36               ,0.216,10
+KAN206,Choco banana original mega pack 544g/P3 ,2.7,10
+KAN207,Bombon Mentol Vishnje  Kandit 100gr/ 42 ,0.45,10
+KAN208,Kandit Kandi Almond Çokollate pa sheqer ,2.29,10
+KAN209,Kandit Kandi Dark Çokollate pa sheqer 14,2.29,10
+KAN210,Qokollatë pa sheqer KANDI MILK  80gr/P11,1.35,10
+KAN212,Çokollatë me qumësht Kandit 80gr 3+1 gra,1.674,10
+KAN213,"Çokollatë me Manaferrë me më pak sheqer,",0.855,10
+KAN214,"Çokollatë me Kikirik me më pak sheqer, K",0.855,10
+KAN215,"Kandi Çokollatë me fruta manaferrash ,KA",0.72,10
+KAN216,"Kandi çokollatë Crunchy Kokos,KANDIT,90G",0.72,10
+KAN217,"Praline Kokos dhe Fruta manaferrash,KAND",1.39,10
+KAN218,"Choco Banane me fruta manaferrash ,KANDI",1.83,10
+KAN219,"Zhele Kocke me fruta manaferrash ,KANDIT",1.57,10
+KAN220,Kandit Kandi Çokollate Tutti Frutti 13/2,3.39,10
+KAN221,Kandit Kando Prestige Çokollate Lajthi 1,3.39,10
+KAN222,Kandit Çokollate me Lajthi 13/210g      ,3.29,10
+KAN223,Kandit Çokollate me Qumesht 13/220g     ,2.85,10
+KAN224,Kandit Bonbone Mentol 24/200g           ,1.02,10
+KAN225,Kandit Choco Banana Original Mini 18/120,1.54,10
+KES003,Keks paris per qaj 320gr Koestlin /P12  ,1.311,10
+KES004,Keks Karat 250g 12/1/Pako12             ,1.693,10
+KES005,Napol.Nugat 500g 12/1/Pako12            ,2.044,10
+KES006,Napol.Nugat 200g  /Pako30               ,0.878,10
+KES007,Napol.Nugat 100g 42/1/ Pako 42          ,0.434,10
+KES008,Napol.Mocca 500g /Pako12                ,1.621,10
+KES009,Napol.Lejthi 500g 12/1/Pako12           ,1.972,10
+KES011,Shkopinjë të njelmët 50g Koest./Pako 40 ,0.155,10
+KES013,Napolitank Mocca 100g 42/1/Pako42       ,0.341,10
+KES016,Napolitank Mocca 200g/Pako30            ,0.661,10
+KES017,Shkopinjë të njelmët  250g Koest./Pako12,0.599,10
+KES018,Slani pereci 60g Koest./Pako40          ,0.196,10
+KES019,Keks Princeza 250g Koest./Pako12        ,1.311,10
+KES020,Koestlin Keks Paris Original 12/300g    ,1.55,10
+KES022,Petit Beurre 920g Koest./Pako8          ,2.395,10
+KES023,Slani pereci 250g Koest./Pako12         ,0.599,10
+KES026,Flips me kikirik 40g Koest./Pako48      ,0.165,10
+KES027,Keks qajni kolutiqi 800g Koest./Pako6  H,2.715,10
+KES028,Napolitank me qokolad 230g Koest./Pako12,1.311,10
+KES030,Keks Qajni Kolutiqi 320g/Pako12         ,1.084,10
+KES031,Napolitank Voqne 500g/Pako12            ,2.075,10
+KES037,Keks Paris me Qoko. 340g/Pako12         ,1.549,10
+KES044,Koestlin Biskota Petit Beure 12/460g    ,2.07,10
+KES046,Vafel Keks 1/1/Pako 6                   ,3.614,10
+KES050,Keks qaji Speculaas 200g/P12            ,0.944,10
+KES051,Keks Piknik 230g /Pako 20               ,0.578,10
+KES052,Keks Piknik pa Sheqer 240g/Pako 20      ,0.795,10
+KES053,Flips me kikirik 130gr Koest./ Pako 31  ,0.578,10
+KES057,Napolitank Maraska 230g/ Pako12         ,1.538,10
+KES059,Keks Petit Beurre Wholemeal 270g/Pako 20,1.064,10
+KES060,Mini Paris Vanilla 220g(4X55g)/Pako 12  ,1.125,10
+KES061,Mini Paris Cocoa 220g(4x55g)/Pako 12    ,1.125,10
+KES062,Mini Paris Peanut 220g(4x55g)/Pako 12   ,1.125,10
+KES063,Napolit.Lajthi 500g  1+1gratis/P6       ,1.972,10
+KES064,Napolitank Lajthi Koestlin 450g/P12     ,1.89,10
+KES065,Napolitanik Vanille 800g/Pako 8         ,3.211,10
+KES066,Napolitank Cappuccino 300g/Pako 12      ,1.187,10
+KES067,Napolitank Nougat 450g/Pako 12          ,1.89,10
+KES068,Napolitank Vanille 450g/Pako 12         ,1.487,10
+KES069,Napolitank Qokollate 450g/Pako 12       ,1.487,10
+KES070,Keks Speculaas 250g/Pako 12             ,1.084,10
+KES071,Keks Petit Beurre 690g/Pako 8           ,1.786,10
+KES072,Keks Butter K 900g/Pako 6               ,2.757,10
+KES073,Keks Baby ZOO me Banane 180g/P10        ,1.002,10
+KES074,Keks Baby  ZOO me Mollë 180g/Pako 10    ,1.002,10
+KES075,Keks Baby ZOO me Vanillë 180g/Pako 10   ,1.002,10
+KES076,Biskotë Koexi Choco 250g/Pako 12        ,1.187,10
+KES077,Keks për Qaj 700g/Pako 6                ,2.364,10
+KES078,Napolitank me kakao  Mignon 230g/P12    ,1.445,10
+KES079,Rum Kocke 250g/Pako 12                  ,1.187,10
+KES080,Napolitank me Rum 250g/Pako 12          ,1.332,10
+KES081,Napolitank me Qokolladë  800g/Pako 8    ,3.211,10
+KES082,Napolitank Voqne Kocke 1kg/Pako 6       ,4.037,10
+KES083,Napolitank Voqne Kocke 200g/P30         ,0.795,10
+KES094,Keks Princesa 230g/P12                  ,1.188,10
+KES095,Keks Princesa Integrale 230g/P12        ,1.187,10
+KES096,Keks Princesa Kakao 230g/P12            ,1.187,10
+KES097,Napol.Mocca 500g + Mocca 100g GRATIS/P9 ,1.621,10
+KES098,Shkopinjë të njelmët 250g+50g GRATIS/P10,0.599,10
+KES099,Keks Princeza 200g/P12                  ,0.909,10
+KES100,Shkopinjë te njelmet Beer 45g/P40       ,0.175,10
+KES101,Koestlin Saltas Shkopinje te Njelmet 12/,0.85,10
+KES102,Koestlin Saltas Shkopinje te Njelmet 42/,0.22,10
+KES103,Koestlin Saltas Slani Pereci 12/200g    ,0.81,10
+KES104,Koestlin Keks Paris me Çokollate 12/300g,1.55,10
+KES105,Saltas shkopinje te njelmet pivski 120g ,0.392,10
+KES106,Koestlin Keks Paris me Lemon 12/300g    ,1.54,10
+KES107,Koestlin Biskote Mengjesi me Drithera dh,1.06,10
+KES108,Koestlin Biskote Mengjesi me Drithera dh,1.06,10
+KES109,Koestlin Biskote Mengjesi me Drithera Nu,1.06,10
+KES110,Koestlin Biskote Mengjesi me Drithera dh,1.06,10
+KES111,Napolitank mocca 180g/P20               ,0.639,10
+KES112,Koestlin Keks Paris me Kakao 12/300g    ,1.51,10
+KES113,Saltas Sir paprika 40g/P50              ,0.289,10
+KES114,Saltas kikiriki (3+1) 160g/P12          ,0.588,10
+KES115,.                                       ,0.186,10
+KES116,Napolitank voqne kocke 800g Koestlin/P8 ,4.037,10
+KES117,Napolitank qoko 740g Koestlin/P6        ,3.036,10
+KES118,Napolitank qoko 370g Koestlin/P16       ,1.35,10
+KES119,Koestlin Lajthi Napolitanke 16/370g     ,2.04,10
+KES120,Napolitank mocca 370g Koestlin/P16      ,1.279,10
+KES121,Koestlin Nougat Napolitanke 16/370g     ,1.09,10
+KES122,Koestlin Vonqe Napolitanke Kocke 20/180g,0.95,10
+KES123,Koestlin Nougat Napolitanke 16/370g     ,2.09,10
+KES124,Saltas shkop. te njelmët 220g+Pereci200g,1.156,10
+KES125,Biskota mengjesi 2+1 gratis Koestlin/P6 ,1.827,10
+KES126,Koestlin Biskote Mengjesi me Kokos dhe Ç,1.12,10
+KES127,Biskote mengjesi drithera dhe kumbulla 1,0.914,10
+KES128,Koestlin Biskote Mengjesi me Drithera dh,1.12,10
+KES129,Biskote mengjesi drithera dhe qumshte   ,0.914,10
+KES130,Biskotë qoko origjinal 200g/P12 Koestlin,0.863,10
+KES131,Biskotë qoko kokos 200g/P12 Koestlin    ,0.863,10
+KES132,Biskotë qoko cripsy 200g/P12 Koestlin   ,0.863,10
+KES133,Napolitankë Koestlin e mbeshtjellur me ç,0.84,10
+KES134,Napolitankë Koestlin e mbeshtjellur me ç,0.84,10
+KES135,Napolitankë Koestlin e mbeshtjellur me ç,0.84,10
+KES136,Napolitankë Koestlin e mbeshtjellur me ç,0.84,10
+KES137,Shkopinjë të njelmët garlic 40g/P50     ,0.173,10
+KES138,Koestlin Chocolate Napolitanke 16/370g  ,2.02,10
+KES139,Koestlin Biskote Mengjesi me Çokollate 1,1.12,10
+KES140,Koestlin Classic Napolitanke 16/370g    ,1.85,10
+KES141,Koestlin Fruits Napolitanke 16/370g     ,1.82,10
+KES142,Napolitankë Lemon & Lime 370g Koestlin/P,1.82,10
+KES150,Koestlin Saltas me Kikirike 50/40g      ,0.22,10
+KES151,Koestlin Saltas me Kikirike 21/100g     ,0.52,10
+KSL001,Kiseljak Uje mineral 12/0.5L            ,0.31,10
+KSL002,Kiseljak Uje mineral 6/1.5L             ,0.48,10
+KSL003,"Pije e gazuar Sensation Limeta Kiwano, 0",0.38,10
+KSL004,"Pije e gazuar Sensation Limeta Kiwano, 1",0.58,10
+KSL005,Kiseljak Sky Cola 6/0.5L                ,0.4,10
+KSL006,"Sky Cola , 1.5L/P6                      ",0.61,10
+KSL007,Kiseljak Sky Cola 6/2L                  ,0.99,10
+KSL008,Kiseljak Sky Orange 6/0.5L              ,0.45,10
+KSL009,Kiseljak Sky Orange 6/2L                ,1.15,10
+KSL010,Kiseljak Sky Lemon 6/0.5L               ,0.45,10
+KSL011,Kiseljak Sky Lemon 6/2L                 ,1.15,10
+KSL012,Kiseljak Sky Cola CAN 12/0.33L          ,0.42,10
+KSL013,Kiseljak Sky Cola Zero CAN 12/0.33L     ,0.42,10
+KSL014,Kiseljak Sara Uje Natyral 6/1.5L        ,0.45,10
+KSL015,Kiseljak Sara Uje Natyral 6/0.5L        ,0.29,10
+KUM001,Agranela Kumbulla te thara 14/200g      ,1.79,10
+KUM002,Agranela Kumbulla te thara te buta 14/20,1.85,10
+KUM003,Agranela Kumbulla te thara 12/500g      ,4.05,10
+KUM004,Kumbulla të thara super soft 400g Agran ,2.73,10
+KUM005,Kumbulla të thara me bërthamë 200g Agran,1.005,10
+KUM006,Pemë të thata të perziera 200g Agra/P14 ,1.786,10
+KUM007,Vishnje të thata 150g Agranella/P14     ,1.701,10
+KUM008,Kumbulla BIO ORGANIKE të thara pa bertha,2.09,10
+KUM009,Agranela - HRB kajsi dhe kakao 15/144gr ,2.39,10
+KUM010,Agranela - HRB Hurma dhe kakao 15/144gr ,2.39,10
+MAT006,Jamnica Cader e diellit                 ,0.118,10
+MES001,"Cornet Vanilla, MESSORI 4 (24x25g)/P24  ",0.352,10
+MES002,"Cornet Karamel, MESSORI 4 (24x25g)/P24  ",0.352,10
+MES003,"Cornet Lajthi, MESSORI 4 (24x25g/ P24   ",0.352,10
+MES004,"Cornet Parties, MESSORI 4 (24x25g)/P24  ",0.352,10
+MISU001,Misura Biskota Fibrextra 12/330g        ,2.17,10
+MISU002,Misura Biskota me mjalte 12/400g        ,2.6,10
+MISU003,Misura Biskota me jogurt 12/400g        ,2.6,10
+MISU004,Misura Biskota integrale 12/120g        ,0.96,10
+MISU005,Misura Biskota integrale 12/120g        ,0.96,10
+MISU006,Misura Biskota me 4 Drithera 12/120g    ,0.96,10
+MISU007,Misura Biskota Fibrextra Musli 10/230g  ,1.88,10
+MISU008,Misura Biskota Cereale 10/300g          ,1.88,10
+MISU009,Misura Biskota me cope çokollate 12/290g,2,10
+MISU010,Misura Biskota Multi Cereale 12/330g    ,1.88,10
+MISU011,Misura Biskota me Çokollate 8/260g      ,3.06,10
+MISU012,Misura Biskota me Kakao 12/290g         ,2.03,10
+MISU013,Misura Biskota me cope çokollate 12/290g,2.2,10
+MISU014,Misura Feta Integrale Fibrextra 12/320g ,2.65,10
+MISU015,Misura Feta Fibrextra 12/320g           ,2.65,10
+MISU016,Misura Crackers Integral 12/385g        ,1.98,10
+MISU017,Misura Biskota me Fruta Mali 8/260g     ,3.05,10
+MISU018,Misura Biskota Portokall&Kungull&Karrote,3.05,10
+MISU019,Misura Kroasant me qokollate 8/298g     ,3.041,10
+MISU020,Misura Kroasant me Kajsi 8/298g         ,3.041,10
+MISU021,Misura Kroasant me Qershi 8/298g        ,3.4,10
+MISU022,Misura Kroasant me Mjalte 8/308g        ,3.4,10
+MIT001,Xhem Dredhëze 620g/P12 Venac            ,1.8961,10
+MIT002,Xhem Mjedre 620g/P12 Venac              ,1.8961,10
+MIT003,Xhem Manaferre 620g/P12 Venac           ,1.8961,10
+MIT004,Xhem Kajsie 620g/P12 Venac              ,1.6245,10
+MIT005,Xhem Pjeshke 620g/P12 Venac             ,1.6245,10
+MIT006,Xhem Kumbulle 620g/P12 Venac            ,1.6245,10
+MIT007,Xhem Vishnje 620g/P12 Venac             ,1.8443,10
+MIT008,Xhem Fruta mali 620g/P12 Venac          ,1.8961,10
+MIT009,Xhem Mollë 620g/P12 Venac               ,1.6245,10
+MIT010,Pekmez Kumbulle 600g/P12 Venac          ,1.771,10
+MIT011,Reçel Mjedre 410g/P12 Venac             ,1.9694,10
+MIT012,Reçel Manaferre 410g/P12 Venac          ,1.9694,10
+MIT013,Reçel Kajsie 410g/P12 Venac             ,1.5818,10
+MIT014,Reçel Vishnje 410g/P12 Venac            ,1.771,10
+MIT015,Xhem Dredhëz light 300g/P12 Venac       ,0.7863,10
+MIT016,Xhem Mjedre light 300g/P12 Venac        ,0.7863,10
+MIT017,Xhem Manaferre light 300g/P12 Venac     ,0.7863,10
+MIT018,Xhem Kajsie light 300g/P12 Venac        ,0.7233,10
+MIT019,Xhem Kumbulle light 300g/P12 Venac      ,0.7233,10
+MIV001,"Ujë i gazuar MG Mivela, 1.5L/P6         ",0.49,10
+MIV002,"Ujë lehtë i gazuar MG Mivela, 1.5L/P6   ",0.49,10
+MIV003,"Ujë natyral MG Mivela, 1.5L/P6          ",0.49,10
+MIV004,Mg Mivela Uje mineral i gazuar 12/0.5L  ,0.33,10
+MIV005,Mg Mivela Uje mineral lehte i gazuar 12/,0.33,10
+MIV006,Mg Mivela Uje mineral natyral 12/0.5L   ,0.33,10
+MIV007,Mg Mivela Uje i gazuar 6/1.35L          ,0.49,10
+MIV008,Mg Mivela Uje lehte i gazuar 6/1.35L    ,0.49,10
+MIV009,Mg Mivela Uje natyral 6/1.35L           ,0.49,10
+MORA001,Morato-Brusketa me Vaj Ulliri 10/150gr` ,1.49,10
+MORA002,Morato-Brusketa me Rozmarine 10/150gr   ,1.49,10
+MORA003,Morato-Brusketa me Hudher&Bazilik 10/150,1.49,10
+MORA004,Morato-Brusketa Domate&Bazil 10/150gr   ,1.49,10
+NAT001,"Krem lajthie duo, Pralinutta 400g/P12   ",1.68,10
+NAT002,"Krem lajthie, Pralinutta 400g/P12       ",1.68,10
+NAT003,"Krem lajthie, Pralinutta 750g/P6        ",2.79,10
+NECT001,NECTAR - Family Nectar Fruit Mix 8/1.5L ,1.66,10
+NECT002,NECTAR - Family Nectar Qershi 8/1.5L    ,1.57,10
+NECT003,NECTAR - Family Nectar Pjeshke 8/1.5L   ,1.69,10
+NECT004,NECTAR - Family Nectar Pjeshke 12/1L    ,1.13,10
+NECT005,NECTAR - Family Nectar Boronice 12/1L   ,1.25,10
+NECT006,NECTAR - Family Nectar Fruit Mix 12/1L  ,1.25,10
+NECT007,NECTAR - Family Nectar Portokall 12/1L  ,1.69,10
+NECT008,NECTAR - Life Premium Nectar Molle 12/1L,1.36,10
+NECT009,NECTAR-Life Premium Nectar Pjeshke 12/1L,1.58,10
+NECT010,NECTAR-Life Premium Necta Boronice 12/1L,2.09,10
+NECT011,NECTAR -Life Premium Nectar Ananas 12/1L,2.2,10
+NECT012,NECTAR - Vocne Kapi Pjeshke 27/200ml    ,0.25,10
+NECT013,NECTAR - Vocne Kapi Molle 27/200ml      ,0.25,10
+NECT014,NECTAR - Vocne Kapi Fruta Mali 27/200ml ,0.25,10
+NECT015,NECTAR - Vocne Kapi Pjeshke 12/1L       ,0.79,10
+NECT016,NECTAR - Vocne Kapi Molle 12/1L         ,0.75,10
+NECT018,NECTAR - Vocne Kapi Portokall 6/2L      ,1.3,10
+NECT019,NECTAR - Vocne Kapi Molle&Pjeshke 6/2L  ,1.18,10
+NECT020,NECTAR - Vocne Kapi Fruta Mali 6/2L     ,1.18,10
+NECT021,NECTAR - Vocne Kapi Molle 6/2L          ,1.18,10
+NECT022,NECTAR - Family Nectar Dredhez 12/1L    ,1.14,10
+NECT023,NECTAR - Family Nectar ACE 12/1L        ,1.27,10
+NECT024,NECTAR - Family Nectar Molle 12/1L      ,1.18,10
+NECT025,NECTAR - Family Nectar Pjeshke 24/200ml ,0.35,10
+NECT026,NECTAR - Family Nectar Fruta Mali 24/200,0.35,10
+NIM029,Jana uje nat 0.5l+Lion 42g Super cmim/30,0.275,10
+NIP001,Nippon - Cokollate me Oriz 24/200gr     ,2.42,10
+NIP002,Nippon - Cokollate e bardhe me oriz 24/2,2.42,10
+OB001,Orangina 1.5L Pet/ Pako 6               ,1.48,10
+OB002,Orangina Regular 12/0.5L                ,0.81,10
+OB003,Orangina Tangerine 1.25l/Pako 6         ,1.146,10
+OB004,Orangina Tangerine 0.5l/Pako 12         ,0.619,10
+OB005,Limon 0.33l/Pako 12 OBALA               ,0.59,10
+OB006,Orangina Regular 1.25l/Pako 6           ,1.146,10
+OB007,Limon  1L/Pako 6 OBALA                  ,1.043,10
+OB009,Orangina Regular 1.25 + 20%l gratis/P6  ,1.146,10
+OB010,Limona 6/1.25L                          ,1.15,10
+OB011,Limona 12/0.5L                          ,0.62,10
+OB012,Orangina Regular CAN 24/0.33L           ,0.89,10
+OB013,Limona 0.33l CAN/P24                    ,0.515,10
+OB014,Orangina (qelq) 20/0.25L                ,0.75,10
+OB015,Limona (qelq) 20/0.25L                  ,0.65,10
+OB016,Limona elder 1.5L/P6                    ,1.06,10
+OB017,Limona shtog (qelq) 20/0.25L            ,0.5,10
+OB018,Limona mente 1.5L/P6                    ,1.1,10
+OB019,Limona mint (qelq) 20/0.25L             ,0.5,10
+OB020,Spezi 6/1.25L                           ,1.15,10
+OB021,Spezi (qelq) 20/0.25L                   ,0.65,10
+OB022,Spezi 12/0.5L                           ,0.6,10
+OB023,Orangina Regular 6/1.25L                ,1.69,10
+OB024,Orangina Rouge (qelq) 12/0.25L          ,0.75,10
+OB025,Obala Spezi Can 24/0.33l                ,0.89,10
+OKF001,"Coconut drink (pa sheqer), OKF 500ml/P20",0.962,10
+OKF002,"Aloe Vera King ( Ananas/Pa sheqer), OKF ",1.02,10
+OKF003,"Aloe Vera King ( Shegë/Pa sheqer), OKF  ",1.02,10
+OKF004,"Aloe Vera King ( Mango/Pa sheqer), OKF  ",1.02,10
+OKF005,"Aloe Vera King ( Dredhëz/Pa sheqer), OKF",1.02,10
+OKF006,"Aloe Organic, OKF  500ml/P20            ",1.14,10
+OKF007,"Aloe Vera King natyral ( Dredhëz), OKF  ",0.49,10
+OKF008,"Aloe Vera King natyral ( Ananas), OKF  2",0.49,10
+OKF009,"Aloe Vera King ( Original/Pa sheqer), OK",1.02,10
+OKF010,"Aloe Vera King natyral ( Original), OKF ",0.49,10
+OKF011,"Aloe Vera King natyral ( Rrush), OKF  24",0.49,10
+OKF012,"Smoothie Purple, OKF  500ml/P20         ",1.09,10
+OKF013,"Smoothie Orange, OKF  500ml/P20         ",1.09,10
+OKF014,"Smoothie Yellow, OKF  500ml/P20         ",1.09,10
+OKF015,"Smoothie Red, OKF  500ml/P20            ",1.09,10
+OKF016,"Smoothie Green, OKF  500ml/P20          ",1.09,10
+OKF017,Aloe Vera King Grappe 500ml/P20         ,1.09,10
+OKF018,Aloe Vera King Original Kids 350ml/P20  ,0.741,10
+OND001,"Biskota Medenjak, ONDINA, 400gr/P10     ",1.1,10
+OND002,"Biskota Medenjak, ONDINA, 150gr/P25     ",0.59,10
+OND003,"Biskota Medenjak e madhe, ONDINA, 400gr/",1.1,10
+OND004,"Biskota Medenjak e madhe, ONDINA, 50gr/P",0.24,10
+OND005,"Biskota Medenjak Integrale, ONDINA, 400g",1.19,10
+OND006,"Biskota Medenjak Integrale, ONDINA, 150g",0.66,10
+OND007,"Biskota Medenjak e sheqerosur, ONDINA, 4",1.55,10
+OND008,"Biskota Medenjak e sheqerosur, ONDINA, 1",0.76,10
+OND009,"Biskota Medenjak me xhem kajsie, ONDINA,",0.92,10
+OND010,"Biskota Medi me Kakao dhe Mjaltë, ONDINA",1.17,10
+OND011,"Biskota Medi me Kakao dhe Portokall, OND",1.34,10
+OND012,"Biskota Medi me Kakao, Rum dhe rrush të ",1.34,10
+OND013,"Biskota Medi me Kakao e sheqerosur, ONDI",1.27,10
+PIA001,Piasten Big Ben Kikirik Confettino 50/10,0.65,10
+PIA002,Piasten Big Ben Kikirik Çokollate 50/100,0.65,10
+PIA003,Piasten Big Ben Confettino 40/150g      ,1.1,10
+PIA004,"Big Ben Lajthi me Çokollatë, PIASTEN 200",2.1,10
+PIA005,"Big Ben Lajthi me Çokollatë të zezë, PIA",2.1,10
+PIA006,"Big Ben Kikirik me Çokollatë të zezë, PI",1.47,10
+PIA007,Piasten Praline Esprit Beige Brown 8/180,1.46,10
+PIA008,Piasten Praline Nobliee Red/Black 8/180g,1.46,10
+PIA009,Piasten Praline Nobliee Red/Black 12/400,3.03,10
+PIA010,Piasten Praline Dark/Light 8/400g       ,3.03,10
+PIA011,Piasten Treets Gjalpe Kikiriku 90%  8/34,2.77,10
+PIA012,Piasten Treets Gjalpe Kikiriku 50%  8/34,3.03,10
+POC005,Poco Loco Chips Natyral Tortilla 20/125g,0.96,10
+POC008,Poco Loco Chips Chili Tortilla 20/125g  ,1.07,10
+POC025,Poco Loco Salce Dip Medium 12/260g      ,1.55,10
+POC026,Poco Loco Salca Dip Hot 12/260g         ,1.55,10
+POC039,Poco Loco Tortilla Djeges 12/125g       ,1.2,10
+POC040,Poco Loco Tortilla me domate 12/125g    ,1.23,10
+REP001,Gold Muesli me kajsi 25g/P24            ,0.215,10
+REP002,Gold Muesli me lajthi 25g/P24           ,0.215,10
+REP003,Gold Muesli me kumbulla 25g/P24         ,0.215,10
+REP004,Gold Muesli me kokos 25g/P24            ,0.215,10
+REP005,Corn flakes kako 300g/P12               ,0.801,10
+REP006,Corn flakes classic 300g/P12            ,0.687,10
+REP007,"Mogador Dobra oatmeal, Mjedër dhe Vanill",0.54,10
+REP008,"Mogdor Dobra oatmeal, Cokollatë 20/60gr ",0.54,10
+REP009,Mogador Dobra oatmeal Fruta Mali 20/60gr,0.54,10
+REP010,Mogador Dobra oatmeal Kumbull 20/60gr   ,0.54,10
+REP011,Mogador Dobra oatmeal Brusnicë 20/60gr  ,0.54,10
+REP012,Mogador Dobra oatmeal Kokos dhe Rrush 20,0.54,10
+REP013,Qullë tërshëre me kumbulla 260g/P10     ,1.555,10
+REP014,Qullë me probiotik Millet 180g/P5       ,2.304,10
+REP015,Qullë me Qokollade 260g/P10             ,1.555,10
+REP016,Qullë me fruta mali 260g/P10            ,1.555,10
+REP017,Qullë me mjeder dhe vanille 260g/P10    ,1.555,10
+REP018,Qullë me koks dhe rrush 260g/P10        ,1.555,10
+REP019,Qullë me boronica te kuqe 260g/P10      ,1.555,10
+REP020,Qullë me probiotik natyral 180g/P5      ,2.132,10
+REP021,Qullë me probiotik qokolladë 180g/P5    ,2.304,10
+REP022,Qullë me probiotik Helda 180g/P5        ,2.304,10
+REP024,Mogador Dobra oatmeal Fara Chia dhe Dred,0.54,10
+REP025,"Mogador Dobra oatmeal Fara Chia, Boronic",0.58,10
+REP026,"Mogador Dobra Oatmel Acai,Aronia&Chia 20",0.58,10
+REP027,Mogador Dobra oatmeal Çokollatë dhe Qers,0.58,10
+REP028,"Mogador Dobra oatmeal, Cokollate Belgjik",0.54,10
+REP029,Mogador Dobra Muesli Çokollatë 15/300gr ,1.95,10
+REP030,Mogador Dobra Muesli 35% fruta 15/300gr ,2.04,10
+REP031,Mogador Dobra Muesli Mjaltë dhe Lajthi 1,1.95,10
+REP032,Mogador Dobra Muesli Mjedër dhe Vanillë ,2.12,10
+REP033,Mogador Dobra Muesli Fruta Mali 15/300gr,2.32,10
+REP034,Dobra Muesli me oriz dhe Çokollate 55g/2,0.54,10
+REP035,Dobra Muesli me oriz dhe Vanille 55g/20 ,0.54,10
+RET001,"Jamnica Ambalazh 0,25L/P24              ",0.15,10
+RET002,"Jamnica Gajbe 0,25L/P1                  ",3.54,10
+RET003,Jamnica Ambalazh 1L/P12                 ,0.15,10
+RET004,Jamnica Gajbe 1L/P1                     ,3.54,10
+ROB002,Roberto Grocchini Rozmarine 14/250g     ,1.57,10
+ROB003,Roberto Grocchini me Kripe 10/250g      ,1.57,10
+ROB004,Roberto Grocchini me Sesam 14/250g      ,1.6,10
+ROB005,Roberto Grocchini Mignon Rozmarine 10/15,1.03,10
+ROB006,Roberto Grocchini Mignon Pizza 10/150g  ,1.03,10
+ROB007,Roberto Grocchini Mignon Sesam 10/150g  ,1.03,10
+ROB008,"Grocchini Mignon me kripë, ROBERTO 150g/",1.21,10
+ROB023,Roberto Brusketa me Vaj Ulliri Extra Vir,1.01,10
+ROB024,Roberto Brusketa me Rozmarine dhe Bime A,1.01,10
+ROB025,Roberto Brusketa me Hudher dhe Borzilok ,1.01,10
+ROB026,Roberto Brusketa me Domate dhe Borzilok ,1.01,10
+SAR001,Saray SeviLop Lëpiza me fruta120 10g*6/ ,0.0315,10
+SAR002,Saray SeviGum Lëpiza me fruta 10g120*6/ ,0.0315,10
+SAR004,Saray Cikilop -Sandviç Biskiut 240g/ P12,0.9257,10
+SAR007,Saray Nut Gold Biskota me mjeder 137g/ P,0.6917,10
+SAR008,Saray Bistella Mozaik me krem 66g 24*9/ ,0.1862,10
+SAR009,Saray Bistella Mozaik me krem 185g/ Pako,0.5778,10
+SAR010,Saray Bistella Biskota te mbushura me kr,0.5778,10
+SAR011,Saray Biskota Choco Cake 50g 24*6/ P.144,0.1444,10
+SAR012,Saray Finger Biscuit 900g/ Pako 8       ,1.3916,10
+SAR016,Saray Rogo bar me qokollade 25g 6*24/ Pa,0.0773,10
+SAR017,Saray Sorf me karamel dhe nougat 25g 6*2,0.0773,10
+SAR023,Saray Stick with susame 50g/ Pako 40    ,0.1394,10
+SAR024,Saray Peyk Jelly and granular Biscuits 1,0.3459,10
+SAR026,Saray Collection Milky Chocolate 40g 24*,0.1353,10
+SAR027,Saray Pastella Hazelnut biscuit 150g/ Pa,0.5768,10
+SAR030,Saray Petitbeurre Biscuit 1kg/ Pako 8   ,1.7802,10
+SAR031,Saray Tatlim biscuits with Strawberry 80,0.1729,10
+SAR034,Saray Milky compound chocolate 3.20g 150,0.0254,10
+SAR035,Saray Cikilopcuk cocoa Marshmallow Crema,0.5798,10
+SAR036,Saray Dalila Choc.wafers with hazelnut 1,0.8647,10
+SAR037,Saray Cikilop smart w Cake40g 18*8/ Pako,0.1587,10
+SAR039,Saray Prens sand. cream biscuit 300g/ Pa,0.7019,10
+SAR042,Cikilop cuk 48gr/ Pako 24               ,0.1628,10
+SAR047,Chocopower Coconut and white sanwich 42g,0.1628,10
+SAR048,Crunch Bombonjer me lejthi 300gr/ Pako 6,2.0335,10
+SAR050,Crunch Bombonjer me Kokos 300gr/ Pako 6 ,2.0335,10
+SAR051,SARAY holley biskote me djathe 70g 2+1gr,0.4578,10
+SNC001,"Chips Classic, SAN CARLO 180g/P16       ",1.33,10
+SNC002,"Chips Croccante, SAN CARLO 180g/P16     ",1.33,10
+SNC003,"Chips Classic, SAN CARLO 50g/P20        ",0.531,10
+SNC004,Chips Piu Gusto vivace 150g(279201)/P16 ,1.404,10
+SNC005,Chips Piu Gusto Pomo 150g(279202)/P16   ,1.404,10
+SNC006,"Chips Piu Gusto Mint & Chili, SAN CARLO ",1.23,10
+SNC007,Chips Piu Gusto vivace 50g (305001)/P20 ,0.619,10
+SNC008,Chips Piu Gusto pomo 50g (305002)/P20   ,0.619,10
+SNC009,Chips Piu Gusto lime 50g (305004)/P20   ,0.619,10
+SNC010,Crostini Rusticicubici  75g(3861)/P14   ,0.599,10
+SNC011,Chips Trattoria oliva 150g(3125)/P17    ,1.704,10
+SNC012,Chips Trattoria romana 150g(3126)/P17   ,1.704,10
+SNC013,Chips Trattoria genovese 150g(3127)/P17 ,1.704,10
+SNC014,Chips Trattoria romana 40g(3898)/P28    ,0.723,10
+SNC015,Bruscheti olivenere 50g(3133)/P40       ,0.898,10
+SNC016,Bruscheti peperoring 50g(3134)/P40      ,0.898,10
+SNC017,Bruscheti pomo bas(3135)  50g/P40       ,0.898,10
+SNC018,Chips Rustica bar 50g(3052)/P20 San Carl,0.578,10
+SNC019,"Chips Croccante, SAN CARLO 50g/P20      ",0.531,10
+SNC020,"Chips Piu Gusto Paprika, SAN CARLO 150g/",1.23,10
+SNC021,"Chips Piu Gusto Tomatto, SAN CARLO 150g/",1.23,10
+SNC022,"Chips Piu Gusto Lime & Pink pepper, SAN ",1.23,10
+SNC024,"Chips Piu Gusto Ginger, SAN CARLO 150g/P",1.23,10
+SNC033,"Chips Piu Gusto Paprika, SAN CARLO 50g/P",0.531,10
+SNC034,"Chips Piu Gusto Tomatto, SAN CARLO 50g/P",0.531,10
+SNC035,"Chips Piu Gusto Lime & Pink pepper, SAN ",0.531,10
+TAD001,"Fara luledielli e zezë, TADIM,175g/P12  ",1.29,10
+TAD002,"Fara luledielli me shumë kripë , TADIM, ",0.74,10
+TAD003,"Fara luledielli e zezë me shumë kripë,TA",1.29,10
+TAD004,"Badem, TADIM, 40g/P22                   ",0.9,10
+TAD005,"Badem, TADIM, 90g/P12                   ",2.95,10
+TAD006,"Lajthi, TADIM, 90g/P12                  ",1.95,10
+TAD007,"Arra indiane, TADIM, 75g/P12            ",2.59,10
+TAD008,"Miser, TADIM, 90g/P12                   ",0.89,10
+TAD009,"Leblebi e pjekur, TADIM, 180G/P12       ",1.99,10
+TAD010,"Perzierje frutash klasik, TADIM, 90g/P12",1.59,10
+TAD011,"Perzierje frutash me manaferra, TADIM, 7",1.993,10
+TAD012,"Kikirika të pjekur me kripë, TADIM, 180g",1.46,10
+TAD013,"Kikirika me kripë, TADIM, 180g/P12      ",1.46,10
+TED001,Tedesco Biskota me Çokollate 12/700g    ,2.19,10
+TED002,Tedesco Biskota me Krem 12/700g         ,2.19,10
+TED003,Tedesco Biskota me Krem&Lajthi 12/700g  ,2.19,10
+TED004,Tedesco Biskota Integrale 12/700g       ,2.19,10
+TED005,Tedesco Biskota me Drithera&Fibra 12/250,1.2,10
+TED006,Tedesco Biskota me drithera&fruta 12/250,1.38,10
+TED007,Tedesco Biskota me Drithera te perziera ,1.7,10
+TED008,"Biskota të mbushura me krem molle, TEDES",1.33,10
+TED009,Biskota të mbushura me krem të frutave t,1.33,10
+TED010,"Biskota të mbushura me krem lajthie, TED",1.33,10
+TED011,"Biskota të mbushura me krem kakao, TEDES",1.33,10
+TED012,Biskota me kakao dhe copëza çokollatë qu,1.2,10
+TED013,Tedesco Biskota Digestive 12/250g       ,1.2,10
+TED014,Tedesco Biskota me Drithera dhe Fibra Or,2.28,10
+TED015,Tedesco Biskota Drithera&Fruta Mali 12/2,1.38,10
+TED016,Tedesco Biskota me Drithera&Çokollate 12,2.17,10
+TED017,"Tedesco Biskota me Drithera, Mjalte dhe ",1.725,10
+TED018,"Tedesco Biskota me Drithera, Mjalte dhe ",1.725,10
+TED019,Tedesco - Biskota me Portokall 12/250GR ,1.38,10
+TED020,Voglia Di Extra-Biskota me coko dhe fik ,1.95,10
+TED021,Voglia Di Extra - Biskota me fruta mali ,1.73,10
+TED022,Brezza D'Oriente - Biskota me xhenxhefil,1.38,10
+TOM001,Tomatello - Salce Domatesh 12/0.5L      ,0.66,10
+TOM002,Tomatello - Salce Domtesh Baz&Ori 12/0.5,0.66,10
+TOM003,Tomatello - Salce Domatesh Classic 12/1L,1.2,10
+VIN001,Vicenzi Biskote Vicenzovo 12/200g       ,1.78,10
+VIN002,Vicenzi Biskote Vicenzovo 6/400g        ,3.47,10
+VIN003,"MiniSnack  me krem lajthi, VICENZI 125gr",1.47,10
+VIN005,Biskotë Amareti (3100) 200g/Pako 12     ,2.132,10
+VIN006,Biskotë  Vicenzovo Catering (3011) 2400g,12.241,10
+VIN007,Biskotë kokërr Amareti (3600)4kg        ,33.009,10
+VIN008,Vicenzi Biskote Grisbi me Kakao 12/135g ,2.19,10
+VIN009,Vicenzi Biskote Grisbi me Lajthi 12/135g,2.19,10
+VIN010,Vicenzi Biskote Grisbi me Limon 12/135g ,2.19,10
+VIN011,Biskotë Grisbi Qershi Amarena (2010)150g,1.6,10
+VIN012,Biskotë Grisbi Portoka Arancia(2011)150g,1.6,10
+VIN013,Mr.Day muffin chocolate (6x42g) 2436/P10,2.406,10
+VIN014,Mr.Day muffin classic (6x42g) 2437/P10  ,2.263,10
+VIN015,Plumcake class.with yog (6x31g) 2406/P12,1.523,10
+VIN016,Ciambella classic (8x38g) 2401/P8       ,2.152,10
+VIN017,Biskotë  Vicenzovo Catering 200g/P12    ,1.105,10
+VIN018,Vicenzi Biskote Grisbi me Kokos 12/135g ,2.19,10
+VIN019,"AMARETTINO ""Vicenzino"" tiny macaroon 100",0.985,10
+VIN020,MINI VOGLIE assorted 300g pastries bag/P,2.459,10
+VIN021,MINI VOGLIE finger 100g biscuits/P24    ,1.216,10
+VIN022,MINICANTUCCINI ALMONDS 90g/P12          ,1.777,10
+VIN023,SPONGE CAKE base (Round shape) 400g/P8  ,3.63,10
+VIN024,Ciambelle shortpastry with butter 200g/P,1.901,10
+VIN025,"Ciambelle w. Citrus, hazelnut and almond",1.901,10
+VIN026,Cialdine di Matilde - wafer rolls cocoa ,2.842,10
+VIN027,Cialdine di Matilde - wafer rolls hazeln,2.842,10
+VIN028, MINIVOGLIE TIN assorted pastries 500g/P,7.278,10
+VIN029,MILLEFOGLIE TIN 330g - 4 pastries/P6    ,8.998,10
+VIN030,Biskotë Vincenzo g.f Ladyfingers 125g/12,2.03,10
+VIN031,Vicenzi Biskote Grisbi Gluten Free Choco,3.11,10
+VIN032,Vicenzi Biskote Grisbi Gluten Free Lemon,3.11,10
+VIN033,"MiniVoglie me krem kakao, VICENZI 225gr/",1.64,10
+VIN034,"MiniVoglie me krem pasta, VICENZI 225gr/",1.64,10
+VIN035,"MiniSnack  me çokollatë, VICENZI 125gr/P",1.31,10
+VIN036,"MiniSnack  me krem qumështi, VICENZI 125",1.31,10
+VIN038,"Mini Grisbi çokollatë, VICENZI 1000gr   ",14,10
+VIN039,Vicenzovo Breakfast 300gr/P8            ,1.62,10
+VIN040,Grisbi Gluten Free Chocolate 150g/P12   ,2.33,10
+VIN041,Vicenzi Biskote Grisbi me Festek 12/135g,2.19,10
+VIN042,Biskote Grisbi me Qokollade 250gr/P10   ,3.2,10
+VIN046,Grisbi - Biskote Kit Kat                ,2.29,10
+WIT001,Praline çokollatë qumështi cereale VITOR,2.47,10
+WIT002,Praline çokollatë qumështi lajthie  VITO,2.47,10
+WIT003,Praline me çokollatë të errët 72% VITORS,2.47,10
+WIT004,Praline çokollatë e errët  qershi dhe li,2.54,10
+WIT005,Praline Gianduiotto mix VITORS 200g/P12 ,2.71,10
+WIT006,Praline Selection mix VITORS 250g/P12   ,2.71,10
+WIT007,Krem VITORS 360g/P6                     ,3.99,10
+WIT008,Krem lajthie VITORS 360g/P6             ,3.99,10
+WIT009,Praline Premium çokollatë qumështi cerea,2.61,10
+WIT010,Praline Premium çokollatë qumështi krem ,2.61,10
+WIT011,Praline Premium çokollatë të errët 72% V,2.61,10
+WIT012,Praline Premium çokollatë të errët qersh,2.68,10
+WIT013,"Praline mix, VITORS, 300g/P6            ",7.25,10
+WIT014,"Praline mix piramide, VITORS, 300g/P6   ",4.74,10
+YAD001,Fara luledielli djeges 60g Maltay/P30   ,0.65,10
+YAD002,Fara luledielli Nr.1 50g Maltay/P24     ,0.34,10
+YAD003,Maltay Fara Luledielli Extra Kripe 24/50,0.48,10
+YAD004,Maltay Fara Luledielli 18/100g          ,0.68,10
+YAD005,Maltay Fara Luledielli Extra Kripe 18/10,0.68,10
+YAD006,Maltay Fara Luledielli 12/130g          ,0.828,10
+YAD007,Maltay Fara Luledielli Extra Kripe 12/13,0.81,10
+YAD008,Maltay Fara Luledielli 12/120g          ,0.99,10
+YAD009,Maltay Fara Luledielli Djeges 12/120g   ,1.17,10
+YAD010,Maltay Fara Luledielli Thraki 12/120g   ,0.81,10
+YAD011,Maltay Fara Luledielli Djeges Thraki 12/,1.22,10
+YAD012,Fara luledielli Maltay 250g/P12         ,1.55,10
+YAD013,Fara luledielli Thraki 200g/P12         ,1.22,10
+YAD014,Miser me salce Maltay 60g/P5            ,0.56,10
+YAD015,Kikirike te pjekur Maltay 75g/P5        ,0.6,10
+YAD016,Kikirike te pjekur Maltay 65g/P5        ,0.446,10
+YAD017,Maltay Bajame 5/80g                     ,2.31,10
+YAD018,Maltay Lajthi 5/80g                     ,2.25,10
+YAD019,Kikirike te kriposur Maltay 80g/P5      ,0.59,10
+YAD020,Maltay Fisteke 5/80g                    ,2.69,10
+YAD021,Maltay Fara Kungulli 5/80g              ,1.78,10
+YAD022,Maltay Fruta Mix 5/80g                  ,1.93,10
+YAD023,Fruta mix Maltay 80gr/P5                ,1.61,10
+YAD024,Maltay Fara Kungulli 12/200g            ,4.23,10
+YAD025,Maltay Bajame 12/200g                   ,5.77,10
+YAD026,Maltay Festek 12/200g                   ,6.71,10
+YAD027,Maltay Lajthi 12/200g                   ,6.23,10
+YAD028,Salted Peanuts Maltay 200gr/P12         ,1.27,10
+YAD029,Fruta mix Maltay  200gr/P12             ,2,10
+YAD030, Peanuts in shell Maltay 150gr/P12      ,1.31,10
+YAD032,Maltay Fara Luledielli me Kripe Thraki 2,0.42,10
+YAD033,Maltay Fara Luledielli me Kripe Thraki 1,1.92,10
+YAD034,Maltay Fara te zeza Luledielli me Kripe ,0.42,10
+YAD035,Maltay Fara te zeza Luledi me Kripe 24/1,0.954,10
+YAD036,Maltay Fara te zeza Luledielli me Kripe ,1.37,10
+YAD037,Maltay Fara Luledielli Djeges Thraki 20/,0.65,10
+YAD038,Maltay Kikirik I pjekur I Njelmet Thraki,0.68,10
+YAD039,Maltay Kikirik me Salce Djeges Thraki 3/,0.68,10
+YAD040,Maltay Kikirik me Salce BBQ Thraki 3/75g,0.68,10
+YAD041,Maltay Kikirik me Salce Djeges 36/60g   ,0.52,10
+YAD042,Maltay Kikirik me Salce Barbeque 36/60g ,0.52,10
+YAD043,Maltay Miser me Salce Djeges Thraki 36/6,0.44,10
+YAD044,Maltay Miser me Salce BBQ Thraki 36/60g ,0.44,10
+YAD045,Maltay Leblebi me Salce Djeges Thraki 36,0.54,10
+YAD046,Maltay Leblebi me BBQ Thraki 36/60g     ,0.54,10
+YAD047,"Maltay Fara luledielli pa kripe 12/120g,",0.89,10
+YAD048,"Maltay Fara luledielli te zeza 12/120g, ",0.89,10
+YAD049,"Maltay Fara luledielli te zeza 12/180g, ",1.25,10
+YAD050,Maltay Fara luledielli Extra Kripe 120gr,0.78,10
+YAD051,Maltay Badem 10/40gr                    ,1.29,10
+YAD052,Maltay Lejthi 10/45gr                   ,1.47,10
+YAD053,Maltay Festek 10/45gr                   ,1.65,10
+YAD054,Maltay Fara te bardha 10/45gr           ,0.78,10
+YAD055,Maltay Arra Indiane 10/45gr             ,2.16,10
+YAD056,Maltay -Fara luledielli të zeza me kripe,1.2,10
+YAD057,Maltay - Fara luledielli Dakota të zeza ,1.58,10
+YAD058,Maltay - Fara luledielli Dakota me kripe,1.58,10
+ZTL006,"Biskota me copëza çokollate, Zhito Luks,",0.95,10
+ZTL007,"Biskota me kakao dhe copëza çokollate,Zh",0.95,10
+ZTL008,"Biskota me  çokollatë dhe lajthi,Zhito L",1.04,10
+ZTL009,Biskota të buta me copëza çokollate tri ,1.35,10
+ZTL010,"Biskota të me copëza çokollate të errët,",1.35,10
+ZTL011,"Biskota të buta me copëza çokollatë, Zhi",1.35,10
+ZTL012,Biskota të buta me copëza çokollate tri ,0.338,10
+ZTL013,"Biskota të me copëza çokollate të errët,",0.338,10
+ZTL014,"Biskota të buta me copëza çokollatë, Zhi",0.338,10
+ZTL015,"Biskota me krem kakao, Zhito Luks 200gr/",0.86,10
+ZTL016,"Biskota me krem vanille, Zhito Luks 200g",0.86,10

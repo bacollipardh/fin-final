@@ -1,0 +1,15 @@
+$fixScript = @'
+const fs = require('fs');
+let c = fs.readFileSync('/app/server.js', 'utf8');
+const marker = 'if(it.lot_kod){PDFDoc.fontSize(7.5).fillColor("#1d4ed8");PDFDoc.y=rowY+18;PDFDoc.text("Lot: "+cl(it.lot_kod),cx+3,rowY+18,{width:TW[1]-6,lineBreak:false,ellipsis:true});}';
+const replacement = 'if(it.lot_kod){PDFDoc.fontSize(7.5).fillColor("#1d4ed8");PDFDoc.text(" | Lot: "+cl(it.lot_kod),{continued:false,lineBreak:false});}';
+if(c.includes(marker)){
+  c = c.replace(marker, replacement);
+  fs.writeFileSync('/app/server.js', c);
+  console.log('DONE');
+} else {
+  console.log('NOT FOUND - marker missing');
+}
+'@
+$fixScript | Out-File -FilePath "fix.js" -Encoding UTF8
+Write-Host "fix.js created"

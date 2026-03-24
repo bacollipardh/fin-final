@@ -1,0 +1,16 @@
+DATABASE_URL=postgres://postgres:postgres@db:5432/lejimet
+JWT_SECRET=-D$PHb21dR7X(02S{1+sNtBw%RT{olVudrlGe(=av(_\ieE?7GZxH|@k<794H->H
+PORT=8080
+ALLOWED_ORIGINS=http://localhost:18080,http://10.10.69.2:18080
+APP_URL=http://10.69.69.2:18080
+
+# PricingBridge â€” vendos URL-nÃ« e serverit tuaj
+PRICING_BRIDGE_URL=http://localhost:3000
+
+# Email (opsionale, le bosh nÃ«se nuk ke)
+SMTP_HOST=108.167.156.143
+SMTP_PORT=587
+SMTP_USER=lejimetbp@migros-group.com
+SMTP_PASS=SfLz?bzNM2{U
+MAIL_FROM=lejimetbp@migros-group.com
+JWT_REFRESH_SECRET=kRHjrQrdgqnUIjjc[nTy_FBcWmUcQZstXgllv]WLoeTQi_n^ZyMEPXon]gDRb^uS

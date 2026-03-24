@@ -1,0 +1,71 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       lejimet
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+      - ./backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d lejimet"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: ./server
+    restart: unless-stopped
+    env_file:
+      - server/.env
+    ports:
+      - "${API_HOST_PORT:-8083}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - uploads:/app/uploads   # PERSISTED — survives container restarts/rebuilds
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  web:
+    build:
+      context: ./client
+      args:
+        - VITE_API_URL=/api
+    restart: unless-stopped
+    ports:
+      - "0.0.0.0:${WEB_HOST_PORT:-18080}:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+
+  # Daily DB backup at 02:00 (keeps last 7 days)
+  db-backup:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      PGPASSWORD: postgres
+    volumes:
+      - ./backups:/backups
+    entrypoint: >
+      sh -c "
+        while true; do
+          sleep 86400;
+          FNAME=/backups/lejimet-$$(date +%Y%m%d-%H%M).sql.gz;
+          pg_dump -h db -U postgres lejimet | gzip > $$FNAME;
+          echo \"Backup: $$FNAME\";
+          find /backups -name '*.sql.gz' -mtime +7 -delete;
+        done
+      "
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  dbdata:
+  uploads:    # Named volume — NEVER deleted on 'docker compose down', only on 'docker compose down -v'

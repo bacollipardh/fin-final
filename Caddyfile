@@ -1,0 +1,30 @@
+fin.migrosks.com {
+
+  # Kompresim & HSTS bazë
+  encode zstd gzip
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+  }
+
+  # API -> fin-api:8080
+  @api path /api/* 
+  handle @api {
+    reverse_proxy api:8080
+  }
+  # Nëse fronti thërret /api pa slash (rrallë)
+  @api2 path /api
+  handle @api2 {
+    reverse_proxy api:8080
+  }
+
+  # Gjithë pjesa tjetër -> fin-web (SPA)
+  handle {
+    reverse_proxy web:80
+  }
+
+  log {
+    output stdout
+    format console
+    level INFO
+  }
+}
