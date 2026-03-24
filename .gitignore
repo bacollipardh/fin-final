@@ -8,3 +8,5 @@ build/
 backups/*.sql.gz
 *.log
 nginx/certs/
+*.bak
+*.original
