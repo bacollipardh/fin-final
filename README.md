@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Fin Approvals
 MVP: Postgres + Node/Express + React/Tailwind + JWT role-based approvals.
 
@@ -24,3 +25,6 @@ Login users:
 - div@local  / div123
 - dir@local  / dir123
 - agent@local / agent123
+=======
+# fin-final
+>>>>>>> 766c39a1bdc7984f96c9b8052c2b208147fbd84d
