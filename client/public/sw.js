@@ -1,4 +1,4 @@
-const CACHE_NAME = "fin-approvals-v1774342297";
+const CACHE_NAME = "fin-approvals-v2-202603270813";
 const STATIC_ASSETS = ["/"];
 
 self.addEventListener("install", e => {
@@ -34,7 +34,7 @@ self.addEventListener("fetch", e => {
     return; // nuk bejme asnje gje - browseri e menaxhon vete
   }
 
-  // Kurrë mos cache-o: API, uploads, HTML
+  // KurrÃƒÂ« mos cache-o: API, uploads, HTML
   if (
     url.pathname.startsWith("/api/") ||
     url.pathname.startsWith("/uploads/") ||
@@ -43,11 +43,11 @@ self.addEventListener("fetch", e => {
     url.pathname === "/index.html" ||
     url.pathname.endsWith(".html")
   ) {
-    e.respondWith(fetch(e.request));
+    e.respondWith(fetch(e.request).catch(err => new Response(JSON.stringify({error:"offline"}), {status:503, headers:{"Content-Type":"application/json"}})));
     return;
   }
 
-  // Navigation - gjithmonë network first
+  // Navigation - gjithmonÃƒÂ« network first
   if (e.request.mode === "navigate") {
     e.respondWith(
       fetch(e.request).catch(() => caches.match("/"))

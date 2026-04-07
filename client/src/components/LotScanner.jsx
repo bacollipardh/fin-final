@@ -1,6 +1,6 @@
 // client/src/components/LotScanner.jsx
-// Komponenti për skanim të Lot Kodit me kamerë + OCR server-side
-// Përdorim: <LotScanner onResult={(text) => setLotCode(text)} />
+// Komponenti pÃƒÂ«r skanim tÃƒÂ« Lot Kodit me kamerÃƒÂ« + OCR server-side
+// PÃƒÂ«rdorim: <LotScanner onResult={(text) => setLotCode(text)} />
 
 import { useState, useRef, useCallback } from 'react';
 
@@ -17,7 +17,7 @@ export default function LotScanner({ onResult, disabled = false }) {
   const videoRef  = useRef(null);
   const canvasRef = useRef(null);
 
-  // Hap kamerën
+  // Hap kamerÃƒÂ«n
   const openCamera = useCallback(async () => {
     setError('');
     setResult('');
@@ -26,7 +26,7 @@ export default function LotScanner({ onResult, disabled = false }) {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: 'environment', // kamera e pasme në telefon
+          facingMode: 'environment', // kamera e pasme nÃƒÂ« telefon
           width:  { ideal: 1280 },
           height: { ideal: 720 },
         }
@@ -45,16 +45,16 @@ export default function LotScanner({ onResult, disabled = false }) {
 
     } catch (err) {
       if (err.name === 'NotAllowedError') {
-        setError('Kamera u bllokua. Lejo aksesin në browser settings.');
+        setError('Kamera u bllokua. Lejo aksesin nÃƒÂ« browser settings.');
       } else if (err.name === 'NotFoundError') {
-        setError('Kamera nuk u gjet në këtë pajisje.');
+        setError('Kamera nuk u gjet nÃƒÂ« kÃƒÂ«tÃƒÂ« pajisje.');
       } else {
         setError(`Gabim: ${err.message}`);
       }
     }
   }, []);
 
-  // Mbyll kamerën
+  // Mbyll kamerÃƒÂ«n
   const closeCamera = useCallback(() => {
     if (stream) {
       stream.getTracks().forEach(t => t.stop());
@@ -66,7 +66,7 @@ export default function LotScanner({ onResult, disabled = false }) {
     setError('');
   }, [stream]);
 
-  // Kap foto dhe dërgo për OCR
+  // Kap foto dhe dÃƒÂ«rgo pÃƒÂ«r OCR
   const captureAndProcess = useCallback(async () => {
     if (!videoRef.current || !canvasRef.current) return;
 
@@ -78,7 +78,7 @@ export default function LotScanner({ onResult, disabled = false }) {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0);
 
-    // Preprocessing: kontrast më i lartë për OCR më të mirë
+    // Preprocessing: kontrast mÃƒÂ« i lartÃƒÂ« pÃƒÂ«r OCR mÃƒÂ« tÃƒÂ« mirÃƒÂ«
     ctx.filter = 'contrast(1.4) brightness(1.1)';
     ctx.drawImage(video, 0, 0);
 
@@ -109,17 +109,17 @@ export default function LotScanner({ onResult, disabled = false }) {
       if (data.text) {
         setResult(data.text);
       } else {
-        setError(data.message || 'Nuk u gjet tekst. Provo sërish.');
+        setError(data.message || 'Nuk u gjet tekst. Provo sÃƒÂ«rish.');
       }
 
     } catch (err) {
-      setError(`OCR dështoi: ${err.message}`);
+      setError(`OCR dÃƒÂ«shtoi: ${err.message}`);
     } finally {
       setIsProcessing(false);
     }
   }, []);
 
-  // Konfirmo rezultatin → dërgoje prindërit
+  // Konfirmo rezultatin Ã¢â€ â€™ dÃƒÂ«rgoje prindÃƒÂ«rit
   const confirmResult = useCallback(() => {
     if (result && onResult) {
       onResult(result);
@@ -127,7 +127,7 @@ export default function LotScanner({ onResult, disabled = false }) {
     }
   }, [result, onResult, closeCamera]);
 
-  // Provo sërish
+  // Provo sÃƒÂ«rish
   const retryCapture = useCallback(() => {
     setPreview(null);
     setResult('');
@@ -145,7 +145,7 @@ export default function LotScanner({ onResult, disabled = false }) {
                    bg-blue-600 hover:bg-blue-700 text-white rounded-lg 
                    disabled:opacity-50 disabled:cursor-not-allowed
                    transition-colors duration-150"
-        title="Skano Lot Kodin me kamerë"
+        title="Skano Lot Kodin me kamerÃƒÂ«"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -163,8 +163,8 @@ export default function LotScanner({ onResult, disabled = false }) {
             
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 bg-gray-900 text-white">
-              <h3 className="font-semibold text-sm">📷 Skano Lot Kodin</h3>
-              <button onClick={closeCamera} className="text-gray-400 hover:text-white text-xl leading-none">×</button>
+              <h3 className="font-semibold text-sm">Ã°Å¸â€œÂ· Skano Lot Kodin</h3>
+              <button onClick={closeCamera} className="text-gray-400 hover:text-white text-xl leading-none">Ãƒâ€”</button>
             </div>
 
             {/* Video ose Preview */}
@@ -178,11 +178,11 @@ export default function LotScanner({ onResult, disabled = false }) {
                     muted
                     className="w-full h-full object-cover"
                   />
-                  {/* Udhëzues vizual */}
+                  {/* UdhÃƒÂ«zues vizual */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="border-2 border-yellow-400 rounded-lg w-64 h-20 opacity-70" />
                     <p className="absolute bottom-4 text-yellow-300 text-xs font-medium">
-                      Vendos lot kodin brenda kornizës
+                      Vendos lot kodin brenda kornizÃƒÂ«s
                     </p>
                   </div>
                 </>
@@ -199,13 +199,13 @@ export default function LotScanner({ onResult, disabled = false }) {
               )}
             </div>
 
-            {/* Canvas i fshehur për capture */}
+            {/* Canvas i fshehur pÃƒÂ«r capture */}
             <canvas ref={canvasRef} className="hidden" />
 
             {/* Rezultati */}
             {result && (
               <div className="mx-4 mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-xs text-green-600 font-medium mb-1">✅ Teksti i gjetur:</p>
+                <p className="text-xs text-green-600 font-medium mb-1">Ã¢Å“â€¦ Teksti i gjetur:</p>
                 <p className="text-lg font-bold text-green-800 font-mono tracking-wider">{result}</p>
               </div>
             )}
@@ -213,7 +213,7 @@ export default function LotScanner({ onResult, disabled = false }) {
             {/* Error */}
             {error && (
               <div className="mx-4 mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600">⚠️ {error}</p>
+                <p className="text-sm text-red-600">Ã¢Å¡Â Ã¯Â¸Â {error}</p>
               </div>
             )}
 
@@ -226,7 +226,7 @@ export default function LotScanner({ onResult, disabled = false }) {
                   className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold 
                              rounded-xl transition-colors disabled:opacity-50"
                 >
-                  📸 Kap Foto
+                  Ã°Å¸â€œÂ¸ Kap Foto
                 </button>
               ) : (
                 <>
@@ -235,7 +235,7 @@ export default function LotScanner({ onResult, disabled = false }) {
                     className="flex-1 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 
                                font-semibold rounded-xl transition-colors"
                   >
-                    🔄 Provo Sërish
+                    Ã°Å¸â€â€ž Provo SÃƒÂ«rish
                   </button>
                   {result && (
                     <button
@@ -243,7 +243,7 @@ export default function LotScanner({ onResult, disabled = false }) {
                       className="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white 
                                  font-semibold rounded-xl transition-colors"
                     >
-                      ✅ Konfirmo
+                      Ã¢Å“â€¦ Konfirmo
                     </button>
                   )}
                 </>
@@ -253,7 +253,7 @@ export default function LotScanner({ onResult, disabled = false }) {
             {/* Tip HTTPS */}
             {error?.includes('bllokua') && (
               <p className="px-4 pb-3 text-xs text-gray-500 text-center">
-                💡 Kamera kërkon HTTPS. Qasju me <strong>https://</strong> ose nga localhost.
+                Ã°Å¸â€™Â¡ Kamera kÃƒÂ«rkon HTTPS. Qasju me <strong>https://</strong> ose nga localhost.
               </p>
             )}
           </div>
@@ -262,3 +262,4 @@ export default function LotScanner({ onResult, disabled = false }) {
     </div>
   );
 }
+

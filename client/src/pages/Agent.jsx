@@ -4,6 +4,7 @@ import Layout from "../components/Layout";
 import { useToast } from "../components/Toast";
 import { StatusBadge, RoleBadge, SkeletonRow, Card, Pager, euro } from "../components/ui";
 import BarcodeScanner from "../components/BarcodeScanner.jsx";
+import LotScanner from "../components/LotScanner.jsx";
 import Comments from "../components/Comments.jsx";
 
 function roleForAmount(total, thresholds) {
@@ -593,13 +594,19 @@ export default function Agent() {
                       Lot Kodi
                       {!buyerCode && <span className="ml-2 text-amber-500 font-normal">⚠ Zgjidh blerësin fillimisht</span>}
                     </label>
-                    <div className="relative">
-                      <input type="text" value={lotKod}
-                        onChange={e => { setLotKod(e.target.value); setPriceData(null); setPriceErr(""); }}
+                    <div className="flex gap-2 items-center">
+                      <div className="relative flex-1">
+                        <input type="text" value={lotKod}
+                          onChange={e => { setLotKod(e.target.value); setPriceData(null); setPriceErr(""); }}
+                          disabled={!buyerCode}
+                          placeholder="p.sh. 281124IT101A"
+                          className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-sky-400/30 disabled:bg-slate-100 disabled:text-slate-400" />
+                        {priceLoading && <span className="absolute right-2 top-2 text-xs text-blue-500">⏳</span>}
+                      </div>
+                      <LotScanner
                         disabled={!buyerCode}
-                        placeholder="p.sh. 281124IT101A"
-                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-sky-400/30 disabled:bg-slate-100 disabled:text-slate-400" />
-                      {priceLoading && <span className="absolute right-2 top-2 text-xs text-blue-500">⏳</span>}
+                        onResult={text => { setLotKod(text); setPriceData(null); setPriceErr(""); }}
+                      />
                     </div>
                     {priceErr && !priceLoading && <p className="text-xs text-amber-600 mt-1">⚠ {priceErr}</p>}
                   </div>
