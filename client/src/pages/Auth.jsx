@@ -32,7 +32,7 @@ function AuthCard({ title, sub, children }) {
         </div>
 
         <p className="text-center text-white/20 text-xs mt-4">
-          Fin Approvals Enterprise &copy; {new Date().getFullYear()}
+          Fin Approvals Enterprise &copy; {new Date().getFullYear()} · Created by Fatbardh Pacolli
         </p>
       </div>
     </div>

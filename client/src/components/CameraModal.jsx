@@ -141,7 +141,7 @@ export default function CameraModal({ onCapture, disabled = false }) {
 
             {/* Video */}
             {!cameraErr && (
-              <div className="relative bg-black" style={{ aspectRatio: '16/9' }}>
+              <div className="relative bg-black" style={{ minHeight: "35vh", maxHeight: "35vh", overflow: "hidden" }}>
                 <video
                   ref={videoRef}
                   autoPlay

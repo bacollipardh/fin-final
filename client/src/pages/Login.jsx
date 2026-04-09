@@ -58,7 +58,7 @@ export default function Login() {
             <a href="/forgot-password" className="text-xs text-slate-400 hover:text-[#1e3a5f] transition-colors">Harrova fjalëkalimin</a>
           </div>
         </div>
-        <p className="text-center text-white/30 text-xs mt-6">Fin Approvals Enterprise &copy; {new Date().getFullYear()}</p>
+        <p className="text-center text-white/30 text-xs mt-6">Fin Approvals Enterprise &copy; {new Date().getFullYear()} · Created by Fatbardh Pacolli</p>
       </div>
     </div>
   );

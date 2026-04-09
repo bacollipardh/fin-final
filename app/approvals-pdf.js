@@ -157,7 +157,7 @@ function drawStatus(doc, data) {
 
   // Footer
   doc.font('regular').fontSize(8).fillColor('#aaa')
-     .text(clean(data.footerNote || ''), x, doc.page.height - 40, { width: pageW - 80, align: 'center' });
+     .text('Fin Approvals · Dokument konfidencial · Created by Fatbardh Pacolli', x, doc.page.height - 40, { width: pageW - 80, align: 'center' });
 }
 
 function buildPdf(res, data) {
