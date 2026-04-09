@@ -4,6 +4,7 @@ import Layout from "../components/Layout";
 import { useToast } from "../components/Toast";
 import { StatusBadge, RoleBadge, SkeletonRow, Card, Pager, euro } from "../components/ui";
 import BarcodeScanner from "../components/BarcodeScanner.jsx";
+import CameraModal from "../components/CameraModal.jsx";
 import LotScanner from "../components/LotScanner.jsx";
 import Comments from "../components/Comments.jsx";
 
@@ -62,9 +63,6 @@ export default function Agent() {
 
   /* ── Barcode + Camera ── */
   const [barcode, setBarcode]   = useState(false);
-  const videoRef = useRef(null), canvasRef = useRef(null), streamRef = useRef(null);
-  const [cameraOn, setCameraOn]   = useState(false);
-  const [cameraErr, setCameraErr] = useState("");
 
   /* ── History ── */
   const [commentReqId, setCommentReqId] = useState(null);
@@ -315,45 +313,6 @@ export default function Agent() {
   const totalAmount  = items.reduce((s, it) => s + Number(it.line_amount || 0), 0);
   const requiredRole = roleForAmount(totalAmount, meta?.thresholds);
 
-  /* ── Camera ── */
-  const stopCamera = () => {
-    try { streamRef.current?.getTracks().forEach(t => t.stop()); } catch {}
-    if (videoRef.current) videoRef.current.srcObject = null;
-    streamRef.current = null; setCameraOn(false);
-  };
-  const startCamera = async () => {
-    setCameraErr("");
-    if (!navigator.mediaDevices?.getUserMedia) { setCameraErr("Kamera nuk mbështetet."); return; }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ ideal:"environment" }, width:{ideal:1280}, height:{ideal:720} }, audio:false });
-      streamRef.current = stream; setCameraOn(true);
-    } catch(err) {
-      if (location.protocol === 'http:' && location.hostname !== 'localhost') {
-        setCameraErr("Kamera kërkon HTTPS. Provo nga kompjuteri ose përdor localhost.");
-      } else {
-        setCameraErr("S'u lejua kamera: " + (err.message || err.name));
-      }
-      stopCamera();
-    }
-  };
-  useEffect(() => { if (!cameraOn) return; const v=videoRef.current,s=streamRef.current; if(!v||!s) return; v.srcObject=s; v.play().catch(()=>{}); }, [cameraOn]);
-  useEffect(() => () => stopCamera(), []);
-
-  const capturePhoto = async () => {
-    setPhotoErr("");
-    const v=videoRef.current, c=canvasRef.current; if (!v||!c) return;
-    const MAX_W=1280, w=v.videoWidth||1280, h=v.videoHeight||720;
-    if (w > MAX_W) { c.width=MAX_W; c.height=Math.round(h*(MAX_W/w)); } else { c.width=w; c.height=h; }
-    const ctx=c.getContext("2d"); if (!ctx) return;
-    ctx.drawImage(v, 0, 0, c.width, c.height);
-    const blob = await new Promise(resolve => c.toBlob(resolve, "image/jpeg", 0.82));
-    if (!blob) { setPhotoErr("Nuk u arrit të merrej foto."); return; }
-    if (blob.size > 5*1024*1024) { setPhotoErr("Foto > 5MB."); return; }
-    const ts=new Date(), pad=n=>String(n).padStart(2,"0");
-    const name=`foto-${ts.getFullYear()}${pad(ts.getMonth()+1)}${pad(ts.getDate())}-${pad(ts.getHours())}${pad(ts.getMinutes())}${pad(ts.getSeconds())}.jpg`;
-    setPhotos(p => [...p, new File([blob], name, { type:"image/jpeg" })]);
-    info("Foto u shtua.");
-  };
 
   /* ── Submit ── */
   const submit = async () => {
@@ -704,25 +663,10 @@ export default function Agent() {
               {/* Photos */}
               <div className="mt-4 space-y-2">
                 <label className="text-xs font-medium text-slate-600 block">Foto e dokumentit * (e detyrueshme, ≤ 5MB secila)</label>
-                {cameraErr && <p className="text-xs text-red-600">{cameraErr}</p>}
                 <div className="flex flex-wrap gap-2 items-center">
-                  {!cameraOn ? (
-                    <button onClick={startCamera} className="flex items-center gap-2 border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white hover:bg-slate-50 transition-colors text-slate-700">📷 Aktivizo kamerën</button>
-                  ) : (
-                    <>
-                      <button onClick={capturePhoto} className="flex items-center gap-2 border border-emerald-300 rounded-lg px-3 py-2 text-sm bg-emerald-50 hover:bg-emerald-100 transition-colors text-emerald-700">📸 Shkrepe</button>
-                      <button onClick={stopCamera}   className="flex items-center gap-2 border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white hover:bg-slate-50 transition-colors text-slate-600">✕ Ndalo</button>
-                    </>
-                  )}
+                  <CameraModal onCapture={(file) => setPhotos(p => [...p, file])} />
                   {photos.length > 0 && <span className="text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-200">{photos.length} foto shtuar</span>}
                 </div>
-                {cameraOn && (
-                  <div className="border border-slate-200 rounded-xl p-2 bg-slate-50 max-w-md">
-                    <video ref={videoRef} className="w-full rounded-lg" playsInline muted />
-                    <canvas ref={canvasRef} className="hidden" />
-                    <p className="text-xs text-slate-500 mt-1.5">Kliko "Shkrepe" për të shtuar foto.</p>
-                  </div>
-                )}
                 {photos.length > 0 && (
                   <ul className="text-xs text-slate-600 space-y-1">
                     {photos.map((f, i) => (
