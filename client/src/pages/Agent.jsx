@@ -235,7 +235,7 @@ export default function Agent() {
   useEffect(() => {
     if (!pickedArticle || !buyerCode) return;
     // Lookup VETËM kur lot kodi është shkruar (min 3 karaktere)
-    if (!debouncedLot.trim() || debouncedLot.trim().length < 3) { setPriceData(null); setPriceErr(""); setPriceLoading(false); return; }
+    if (!debouncedLot.trim() || debouncedLot.trim().length < 6) { setPriceData(null); setPriceErr(""); setPriceLoading(false); return; }
     const buyer = buyersByCode.get(buyerCode);
     const sifraKup = buyer?.pb_sifra_kup || buyerCode;
 
@@ -245,7 +245,27 @@ export default function Agent() {
     if (debouncedLot.trim()) params.append("lotBr", debouncedLot.trim());
 
     api.get(`/pb/price?${params}`)
-      .then(r => setPriceData(r.data?.price || null))
+      .then(r => {
+        const price = r.data?.price || null;
+        if (!price) { setPriceData(null); setPriceErr("Çmimi nuk u gjet për këto parametra."); return; }
+        const typedLot = debouncedLot.trim().toUpperCase();
+        const returnedLot = (price.LotBr || "").trim().toUpperCase();
+        if (typedLot && returnedLot) {
+          const matchLen = [...typedLot].filter((c, i) => returnedLot[i] === c).length;
+          const pct = matchLen / Math.max(typedLot.length, returnedLot.length);
+          const exact = returnedLot === typedLot || returnedLot.startsWith(typedLot) || typedLot.startsWith(returnedLot);
+          if (!exact && pct < 0.95) {
+            setPriceData(null);
+            setPriceErr(`Lot kodi "${debouncedLot.trim()}" nuk përputhet me lot kodin e faturës ("${price.LotBr}"). Shkruaj lot kodin e plotë e saktë.`);
+            return;
+          }
+        } else if (typedLot && !returnedLot) {
+          setPriceData(null);
+          setPriceErr("Lot kodi nuk u gjet. Kontrollo dhe shkruaj lot kodin e saktë.");
+          return;
+        }
+        setPriceData(price);
+      })
       .catch(e => {
         if (e?.response?.status === 404) { setPriceData(null); setPriceErr("Çmimi nuk u gjet për këto parametra."); }
         else setPriceErr("Gabim gjatë marrjes së çmimit.");
