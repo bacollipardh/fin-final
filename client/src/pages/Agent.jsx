@@ -52,6 +52,7 @@ export default function Agent() {
   const [pickedArticle, setPicked]        = useState(null);
   const [qty, setQty]                     = useState(1);
   const [discount, setDiscount]           = useState("");
+  const [lejimAutoCalc, setLejimAutoCalc] = useState(false);
 
   /* ── Lot Kodi + çmimi ── */
   const [lotKod, setLotKod]             = useState("");
@@ -176,7 +177,7 @@ export default function Agent() {
 
   const pickArticle = useCallback((art) => {
     setPicked(art); setQuery(`${art.Sifra_Art} — ${art.ImeArt}`);
-    setPbSuggestions([]); setLotKod(""); setPriceData(null); setPriceErr("");
+    setPbSuggestions([]); setLotKod(""); setPriceData(null); setPriceErr(""); setDiscount(""); setLejimAutoCalc(false);
   }, []);
 
   /* ── Barcode scanner ── */
@@ -254,14 +255,27 @@ export default function Agent() {
       .finally(() => setPriceLoading(false));
   }, [debouncedLot, pickedArticle, buyerCode, sitePbCode]);
 
+  /* ── Auto-kalkulim i Lejimit nga Rabati i PricingBridge ── */
+  useEffect(() => {
+    if (priceData && priceData.RabatKombinuarPct != null) {
+      const rabat = Number(priceData.RabatKombinuarPct || 0);
+      // Formula: lejim = 50% - rabat% (total discount nuk tejkalon 50%)
+      const suggested = Math.max(0, Math.min(50, Math.round(50 - rabat)));
+      setDiscount(String(suggested));
+      setLejimAutoCalc(true);
+    } else {
+      setLejimAutoCalc(false);
+    }
+  }, [priceData]);
+
   /* ── Çmimi dhe shuma ── */
   const unitPrice = priceData
     ? Number(priceData.CmimiPasRabateve || priceData.CmimiBaze || 0)
     : Number(pickedArticle?.CmimiBaze || pickedArticle?.DogCena || 0);
 
   const lineTotal = (() => {
-    const q2 = Number(qty || 0), d = Number(discount || 0);  // discount = lejim manual
-    if (priceData) return Number((Number(priceData.CmimiPasRabateve || 0) * q2).toFixed(2));
+    const q2 = Number(qty || 0), d = Number(discount || 0);
+    if (priceData) return Number((Number(priceData.CmimiPasRabateve || 0) * q2 * (1 - d / 100)).toFixed(2));
     return Number((unitPrice * q2 * (1 - d / 100)).toFixed(2));
   })();
 
@@ -270,7 +284,7 @@ export default function Agent() {
     if (!pickedArticle) { toastError("Zgjidh një artikull."); return; }
     if (!qty || Number(qty) <= 0) { toastError("Sasia duhet të jetë > 0."); return; }
     if (!buyerCode) { toastError("Zgjidh blerësin para se të shtosh artikullin."); return; }
-    if (!priceData && (discount===""||Number(discount)<1||Number(discount)>50)) { toastError("Lejimi duhet të jetë mes 1% dhe 50%."); return; }
+    if (discount===""||Number(discount)<1||Number(discount)>50) { toastError("Lejimi duhet të jetë mes 1% dhe 50%."); return; }
     const buyer = buyersByCode.get(buyerCode);
     const sifraKup = buyer?.pb_sifra_kup || buyerCode;
     setItems(prev => [...prev, {
@@ -292,7 +306,7 @@ export default function Agent() {
       sifra_kup:          sifraKup,
       sifra_obj:          sitePbCode ? Number(sitePbCode) : null,
     }]);
-    setQuery(""); setPicked(null); setQty(1); setDiscount("");
+    setQuery(""); setPicked(null); setQty(1); setDiscount(""); setLejimAutoCalc(false);
     setLotKod(""); setPriceData(null); setPriceErr("");
     info("Artikulli u shtua.");
   };
@@ -385,7 +399,7 @@ export default function Agent() {
       }
       setBuyerCode(""); setBuyerId(""); setBuyerName(""); setSiteId(""); setSitePbCode("");
       setInvoiceRef(""); setReason(""); setPhotos([]); setItems([]);
-      setQuery(""); setPicked(null); setQty(1); setDiscount(0);
+      setQuery(""); setPicked(null); setQty(1); setDiscount(""); setLejimAutoCalc(false);
       setLotKod(""); setPriceData(null); setPriceErr(""); setBuyerSearch("");
       success("Kërkesa u dërgua me sukses!");
     } catch (e) {
@@ -555,13 +569,16 @@ export default function Agent() {
 
                 {/* % Lejim — disabled kur ka priceData (rabati vjen nga PB) */}
                 <div className="sm:col-span-1">
-                  <label className="block text-xs font-medium text-slate-600 mb-1">% Lejim</label>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">
+                    % Lejim
+                    {lejimAutoCalc && <span className="ml-1 text-[10px] text-emerald-600 font-normal bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">auto ✎</span>}
+                  </label>
                   <input type="number" min="1" max="50" value={discount}
-                    onChange={e => { const v=e.target.value; setDiscount(v===""?"":Math.min(50,Math.max(0,Number(v)))); }}
+                    onChange={e => { const v=e.target.value; setDiscount(v===""?"":String(Math.min(50,Math.max(0,Number(v))))); setLejimAutoCalc(false); }}
                     placeholder="1–50"
-                    disabled={!!priceData}
-                    className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30 disabled:bg-slate-50 disabled:text-slate-400 ${!priceData&&(discount===""||Number(discount)<1)?"border-red-400":"border-slate-300"}`} />
-                  {!priceData && (discount===""||Number(discount)<1) && <p className="text-xs text-red-500 mt-1">E detyrueshme (1–50%)</p>}
+                    className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30 ${(discount===""||Number(discount)<1)?"border-red-400":lejimAutoCalc?"border-emerald-400":"border-slate-300"}`} />
+                  {(discount===""||Number(discount)<1) && <p className="text-xs text-red-500 mt-1">E detyrueshme (1–50%)</p>}
+                  {lejimAutoCalc && discount && <p className="text-xs text-emerald-600 mt-1">Rabat {Number(priceData?.RabatKombinuarPct||0).toFixed(0)}% + Lejim {discount}% = 50% total</p>}
                 </div>
 
                 {/* Shuma */}
@@ -581,7 +598,7 @@ export default function Agent() {
                   )}
                   {pickedArticle.EdMera && <span>Njësia: {pickedArticle.EdMera}</span>}
                   {pickedArticle.ImeDiv && <span>Divizioni: {pickedArticle.ImeDiv}</span>}
-                  <button onClick={() => { setPicked(null); setQuery(""); setPriceData(null); setLotKod(""); setPriceErr(""); }}
+                  <button onClick={() => { setPicked(null); setQuery(""); setPriceData(null); setLotKod(""); setPriceErr(""); setDiscount(""); setLejimAutoCalc(false); }}
                     className="ml-auto text-red-400 hover:text-red-600 font-medium">✕ Pastro</button>
                 </div>
               )}
