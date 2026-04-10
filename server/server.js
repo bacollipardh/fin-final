@@ -1247,43 +1247,30 @@ app.post("/approvals/:id/rejected",requireAuth,requireRole("team_lead","division
 /* ─── Start ─── */
 /* ─────────────── ADMIN SYNC ENDPOINT ─────────────── */
 app.post("/ocr/lot", requireAuth, async (req, res) => {
-  const { image } = req.body;
-  if (!image) return res.status(400).json({ error: "Mungon imazhi" });
-  const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const { image } = req.body ?? {};
+    if (!image) return res.status(400).json({ error: "Mungon imazhi" });
+
+    const response = await fetch("http://ocr:8001/ocr", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY || "",
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 100,
-        messages: [{
-          role: "user",
-          content: [
-            {
-              type: "image",
-              source: { type: "base64", media_type: "image/jpeg", data: base64Data }
-            },
-            {
-              type: "text",
-              text: "Extract ONLY the lot code or batch number from this product image. Lot codes are typically labeled as LOT, L:, LOT NO, Lot, or similar. Return ONLY the alphanumeric code itself, nothing else. No explanations. If you see multiple codes, return the one labeled LOT or L:. Example output: 65025L71"
-            }
-          ]
-        }]
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image }),
     });
+
     const data = await response.json();
-    const text = data.content?.[0]?.text?.trim() || "";
-    res.json({ text: text.replace(/[^A-Za-z0-9\-\/\.]/g, ""), raw: text });
+    if (!response.ok) return res.status(500).json({ error: "OCR deshtoi", detail: data.error });
+
+    const text = (data.text || "").replace(/\s+/g, " ").trim();
+    console.log("[OCR PaddleOCR]", text.slice(0, 80));
+
+    if (!text) return res.json({ text: "", confidence: 0, message: "Nuk u gjet tekst. Provo serish me foto me te qarte." });
+    return res.json({ text, confidence: data.confidence || 90 });
   } catch (err) {
-    console.error("[OCR Claude]", err.message);
+    console.error("[OCR PaddleOCR]", err.message);
     res.status(500).json({ error: "OCR deshtoi", detail: err.message });
   }
 });
+
 
 app.post("/admin/pb-sync", requireAuth, requireRole("admin"), async (req, res) => {
   try {

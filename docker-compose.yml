@@ -67,6 +67,13 @@ services:
       db:
         condition: service_healthy
 
+  ocr:
+    build:
+      context: ./ocr-service
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+
 volumes:
   dbdata:
   uploads:
