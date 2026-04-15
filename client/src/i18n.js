@@ -79,6 +79,7 @@ const translations = {
     division_manager: "Menaxher Divizioni",
     sales_director:   "Drejtor Shitjesh",
     agent:            "Agjent",
+    avancues:         "Avancues",
     admin:            "Administrator",
     // Approvals
     approvals:  "Aprovime",
@@ -225,6 +226,7 @@ const translations = {
     division_manager: "Division Manager",
     sales_director:   "Sales Director",
     agent:            "Agent",
+    avancues:         "Promoter",
     admin:            "Admin",
     // Approvals
     approvals:  "Approvals",

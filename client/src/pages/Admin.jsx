@@ -5,9 +5,9 @@ import { useToast } from "../components/Toast";
 import { Card, SkeletonRow, StatCard } from "../components/ui";
 
 /* ─── helpers ─── */
-const ROLE_OPTIONS = ["agent","team_lead","division_manager","sales_director","admin"];
-const ROLE_LABEL   = { agent:"Agjent", team_lead:"Team Lead", division_manager:"Menaxher Divizioni", sales_director:"Drejtor Shitjesh", admin:"Administrator" };
-const ROLE_COLOR   = { agent:"bg-slate-100 text-slate-700 border-slate-200", team_lead:"bg-blue-100 text-blue-800 border-blue-200", division_manager:"bg-purple-100 text-purple-800 border-purple-200", sales_director:"bg-indigo-100 text-indigo-800 border-indigo-200", admin:"bg-gray-100 text-gray-700 border-gray-200" };
+const ROLE_OPTIONS = ["agent","avancues","team_lead","division_manager","sales_director","admin"];
+const ROLE_LABEL   = { agent:"Agjent", avancues:"Avancues", team_lead:"Team Lead", division_manager:"Menaxher Divizioni", sales_director:"Drejtor Shitjesh", admin:"Administrator" };
+const ROLE_COLOR   = { agent:"bg-slate-100 text-slate-700 border-slate-200", avancues:"bg-emerald-100 text-emerald-800 border-emerald-200", team_lead:"bg-blue-100 text-blue-800 border-blue-200", division_manager:"bg-purple-100 text-purple-800 border-purple-200", sales_director:"bg-indigo-100 text-indigo-800 border-indigo-200", admin:"bg-gray-100 text-gray-700 border-gray-200" };
 const inputCls  = "w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30 focus:border-sky-400/60 transition-colors";
 const selectCls = "w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-400/30 transition-colors";
 const searchCls = "border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30 w-full max-w-xs";
@@ -564,14 +564,18 @@ function UserModal({ data, divisions, users, saving, onClose, onSave }) {
 
   // Team leads per divizionin kryesor
   const primaryDivId = agentDivIds[0] || Number(f.division_id);
-  const teamLeads = f.role === "agent"
+  const teamLeads = (f.role === "agent" || f.role === "avancues")
     ? users.filter(u => u.role==="team_lead" && Number(u.division_id) === primaryDivId)
     : users.filter(u => u.role==="team_lead" && Number(u.division_id) === Number(f.division_id));
 
   const handleSave = () => {
     const payload = { ...f, team_leader_id: f.team_leader_id ? Number(f.team_leader_id) : null };
 
-    if (f.role === "agent") {
+    if (f.role === "avancues") {
+      // Avancues merr te gjitha divizionet automatikisht (server-side)
+      payload.agent_division_ids = [];
+      payload.division_id = f.division_id ? Number(f.division_id) : null;
+    } else if (f.role === "agent") {
       const finalDivIds = agentDivIds.length > 0
         ? agentDivIds
         : (f.division_id ? [Number(f.division_id)] : []);
@@ -608,7 +612,13 @@ function UserModal({ data, divisions, users, saving, onClose, onSave }) {
         </select>
       </Field>
 
-      {f.role === "agent" ? (
+      {f.role === "avancues" ? (
+        <Field label="Divizioni">
+          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm text-emerald-800">
+            <b>Te gjitha divizionet</b> — Avancuesi ka akses automatik ne te gjitha divizionet.
+          </div>
+        </Field>
+      ) : f.role === "agent" ? (
         <>
           <Field label="Divizioni (zgjedh një ose më shumë)">
             <div className="flex flex-col gap-1 max-h-44 overflow-y-auto border border-slate-200 rounded-lg p-2">
@@ -843,7 +853,7 @@ function AgentLimitsTab({ users }) {
     catch { toastError("Gabim gjatë fshirjes."); }
   };
 
-  const agents = users.filter(u => u.role === "agent");
+  const agents = users.filter(u => u.role === "agent" || u.role === "avancues");
 
   return (
     <div className="space-y-4">

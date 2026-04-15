@@ -6,6 +6,7 @@ import { ThemeProvider } from "./theme.jsx";
 import Login from "./pages/Login.jsx";
 import { ForgotPassword, ResetPassword } from "./pages/Auth.jsx";
 import Agent from "./pages/Agent.jsx";
+import Avancues from "./pages/Avancues.jsx";
 import Approvals from "./pages/Approvals.jsx";
 import Admin from "./pages/Admin.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
@@ -29,6 +30,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password"  element={<ResetPassword />} />
           <Route path="/agent"     element={<AuthRoute roles={["agent"]}><Agent /></AuthRoute>} />
+          <Route path="/avancues"  element={<AuthRoute roles={["avancues"]}><Avancues /></AuthRoute>} />
           <Route path="/approvals" element={<AuthRoute roles={["team_lead","division_manager","sales_director"]}><Approvals /></AuthRoute>} />
           <Route path="/admin"     element={<AuthRoute roles={["admin"]}><Admin /></AuthRoute>} />
           <Route path="/dashboard" element={<AuthRoute roles={["sales_director","division_manager","admin"]}><Dashboard /></AuthRoute>} />

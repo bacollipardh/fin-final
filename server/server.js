@@ -196,6 +196,29 @@ async function resolveTeamLeadAssignee({agentId,divisionId}) {
 }
 
 async function approverEmailsFor(reqRow) {
+  // Check if this request is from an avancues user
+  const agentUser = await q("SELECT role FROM users WHERE id=$1", [reqRow.agent_id]);
+  const isAvancues = agentUser.rows[0]?.role === 'avancues';
+
+  if (isAvancues) {
+    // Avancues: notify ALL team leads across ALL divisions + sales director based on threshold
+    const emails = new Set();
+    if (reqRow.required_role === 'team_lead') {
+      // All team leads from all divisions
+      const tls = await q("SELECT email FROM users WHERE role='team_lead' AND email IS NOT NULL");
+      tls.rows.forEach(x => { if(x.email) emails.add(x.email); });
+    } else if (reqRow.required_role === 'division_manager') {
+      // All division managers
+      const dms = await q("SELECT email FROM users WHERE role='division_manager' AND email IS NOT NULL");
+      dms.rows.forEach(x => { if(x.email) emails.add(x.email); });
+    }
+    // Always include sales director for avancues
+    const sds = await q("SELECT email FROM users WHERE role='sales_director' AND email IS NOT NULL");
+    sds.rows.forEach(x => { if(x.email) emails.add(x.email); });
+    return [...emails];
+  }
+
+  // Original agent logic
   if(reqRow.required_role==="team_lead"){
     const id=reqRow.assigned_to_user_id??(await resolveTeamLeadAssignee({agentId:reqRow.agent_id,divisionId:reqRow.division_id})).assigneeId;
     if(!id)return[];
@@ -453,7 +476,7 @@ app.post("/auth/login", loginLimiter, async(req,res)=>{
 
     // Check agent limit warning
     let limitWarning = null;
-    if (u.role === "agent") {
+    if (u.role === "agent" || u.role === "avancues") {
       try {
         const limits = await q("SELECT period,max_amount FROM agent_limits WHERE user_id=$1",[u.id]);
         for (const lim of limits.rows) {
@@ -650,8 +673,8 @@ app.get("/articles/search", requireAuth, async(req,res)=>{
     const params = [`%${t}%`, `%${t}%`, `%${t}%`];
     let paramIdx = 3;
 
-    // Nëse është agjent, filtro sipas divisioneve
-    if (req.user.role === "agent") {
+    // Nëse është agjent ose avancues, filtro sipas divisioneve
+    if (req.user.role === "agent" || req.user.role === "avancues") {
       const adiv = await q("SELECT division_id FROM agent_divisions WHERE agent_id=$1", [req.user.id]);
       let divIds = adiv.rows.map(r => r.division_id).filter(d => d !== 1 && d !== 8);
       if (!divIds.length) {
@@ -687,8 +710,8 @@ app.get("/pb/article", requireAuth, async(req,res)=>{
   if(!term||term.trim().length<2) return res.status(400).json({error:"term duhet >= 2 karaktere"});
   try{
     let arts=await pbSearchArticle(term.trim(), sifraOe?parseInt(sifraOe):1);
-    // Filtro sipas divisioneve te agjentit nese eshte agent
-    if(req.user.role==="agent"){
+    // Filtro sipas divisioneve te agjentit nese eshte agent ose avancues
+    if(req.user.role==="agent"||req.user.role==="avancues"){
       const adiv=await q("SELECT division_id FROM agent_divisions WHERE agent_id=$1",[req.user.id]);
       let divIds=adiv.rows.map(r=>r.division_id).filter(d=>d!==1&&d!==8);
       if(!divIds.length){
@@ -725,23 +748,32 @@ app.get("/pb/price", requireAuth, async(req,res)=>{
 
 /* ─────────────── META ─────────────── */
 app.get("/meta", requireAuth, async(req,res)=>{
-  // Merr divisionet e agjentit (mund te jete shume)
+  // Merr divisionet e agjentit/avancuesit (mund te jete shume)
   let agentDivisionIds=[];
-  if(req.user.role==="agent"){
+  if(req.user.role==="agent"||req.user.role==="avancues"){
     const adiv=await q("SELECT division_id FROM agent_divisions WHERE agent_id=$1",[req.user.id]);
     agentDivisionIds=adiv.rows.map(r=>r.division_id);
     // Fallback: nese nuk ka ne agent_divisions, perdor division_id nga users
     if(!agentDivisionIds.length){
-      const ud=await q("SELECT division_id FROM users WHERE id=$1",[req.user.id]);
-      if(ud.rows[0]?.division_id) agentDivisionIds=[ud.rows[0].division_id];
+      if(req.user.role==="avancues"){
+        // Avancues merr te gjitha divizionet automatikisht
+        const allDivs=await q("SELECT id FROM divisions ORDER BY id");
+        agentDivisionIds=allDivs.rows.map(r=>r.id);
+      } else {
+        const ud=await q("SELECT division_id FROM users WHERE id=$1",[req.user.id]);
+        if(ud.rows[0]?.division_id) agentDivisionIds=[ud.rows[0].division_id];
+      }
     }
   }
 
   // Filtro articles sipas divisioneve te agjentit (vetem divizionet me artikuj: 2-7,9)
+  // Avancues ka te gjitha divizionet, pra merr te gjitha artikujt
   const validDivIds = agentDivisionIds.filter(d => d !== 1 && d !== 8);
-  const articlesQ = validDivIds.length>0
-    ? q(`SELECT id,sku,name,sell_price FROM articles WHERE division_id = ANY($1::int[]) ORDER BY sku`,[validDivIds])
-    : q("SELECT id,sku,name,sell_price FROM articles WHERE division_id IS NOT NULL AND division_id NOT IN (1,8) ORDER BY sku");
+  const articlesQ = (req.user.role==="avancues")
+    ? q("SELECT id,sku,name,sell_price FROM articles WHERE division_id IS NOT NULL AND division_id NOT IN (1,8) ORDER BY sku")
+    : (validDivIds.length>0
+      ? q(`SELECT id,sku,name,sell_price FROM articles WHERE division_id = ANY($1::int[]) ORDER BY sku`,[validDivIds])
+      : q("SELECT id,sku,name,sell_price FROM articles WHERE division_id IS NOT NULL AND division_id NOT IN (1,8) ORDER BY sku"));
 
   const[buyers,sites,articles,me,thresholds]=await Promise.all([
     q("SELECT id,code,name FROM buyers ORDER BY code"),
@@ -752,7 +784,7 @@ app.get("/meta", requireAuth, async(req,res)=>{
   ]);
   // Agent limit info
   let agentLimit=null;
-  if(req.user.role==="agent"){
+  if(req.user.role==="agent"||req.user.role==="avancues"){
     try{
       const limits=await q("SELECT period,max_amount FROM agent_limits WHERE user_id=$1",[req.user.id]);
       if(limits.rowCount){
@@ -922,7 +954,7 @@ app.post("/requests/:id/comments", requireAuth, async(req,res)=>{
     if(!r.rowCount)return res.status(404).json({error:"not_found"});
     const row=r.rows[0];
     // Auth: agent who owns it, or any approver in same division, or admin
-    const canComment=req.user.role==="admin"||row.agent_id===req.user.id||(req.user.role!=="agent"&&(req.user.role==="sales_director"||row.division_id===req.user.division_id));
+    const canComment=req.user.role==="admin"||row.agent_id===req.user.id||(req.user.role!=="agent"&&req.user.role!=="avancues"&&(req.user.role==="sales_director"||row.division_id===req.user.division_id));
     if(!canComment)return res.status(403).json({error:"forbidden"});
     const c=await q("INSERT INTO request_comments(request_id,user_id,body) VALUES($1,$2,$3) RETURNING *",[reqId,req.user.id,body]);
     const newComment={...c.rows[0],first_name:req.user.first_name,last_name:req.user.last_name,role:req.user.role};
@@ -968,9 +1000,16 @@ app.post("/admin/users",requireAuth,requireRole("admin"),async(req,res)=>{try{
   if(tlId&&!(await q("SELECT 1 FROM users WHERE id=$1 AND role='team_lead' AND division_id=$2",[tlId,division_id||null])).rowCount)return res.status(400).json({error:"team_leader_id invalid"});
   const r=await q("INSERT INTO users(first_name,last_name,email,password_hash,role,division_id,pda_number,team_leader_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id",[first_name||"",last_name||"",email.trim(),ph,role,division_id||null,pda_number||null,tlId]);
   const userId=r.rows[0].id;
-  // Shto agent_divisions nese eshte agjent
-  if(role==="agent"){
-    const divIds=Array.isArray(agent_division_ids)&&agent_division_ids.length ? agent_division_ids : (division_id?[division_id]:[]);
+  // Shto agent_divisions nese eshte agjent ose avancues
+  if(role==="agent"||role==="avancues"){
+    let divIds;
+    if(role==="avancues"){
+      // Avancues merr te gjitha divizionet automatikisht
+      const allDivs=await q("SELECT id FROM divisions ORDER BY id");
+      divIds=allDivs.rows.map(r=>r.id);
+    } else {
+      divIds=Array.isArray(agent_division_ids)&&agent_division_ids.length ? agent_division_ids : (division_id?[division_id]:[]);
+    }
     for(const did of divIds){
       await q("INSERT INTO agent_divisions(agent_id,division_id) VALUES($1,$2) ON CONFLICT DO NOTHING",[userId,did]);
     }
@@ -993,9 +1032,16 @@ app.put("/admin/users/:id",requireAuth,requireRole("admin"),async(req,res)=>{
     }else{
       await q("UPDATE users SET first_name=$1,last_name=$2,email=$3,role=$4,division_id=$5,pda_number=$6,team_leader_id=$7 WHERE id=$8",[first_name,last_name,email,role,division_id||null,pda_number||null,tlId,id]);
     }
-    // Update agent_divisions nese eshte agjent
-    if(role==="agent"){
-      const divIds=Array.isArray(agent_division_ids)&&agent_division_ids.length ? agent_division_ids : (division_id?[division_id]:[]);
+    // Update agent_divisions nese eshte agjent ose avancues
+    if(role==="agent"||role==="avancues"){
+      let divIds;
+      if(role==="avancues"){
+        // Avancues merr te gjitha divizionet automatikisht
+        const allDivs=await q("SELECT id FROM divisions ORDER BY id");
+        divIds=allDivs.rows.map(r=>r.id);
+      } else {
+        divIds=Array.isArray(agent_division_ids)&&agent_division_ids.length ? agent_division_ids : (division_id?[division_id]:[]);
+      }
       await q("DELETE FROM agent_divisions WHERE agent_id=$1",[id]);
       for(const did of divIds){
         await q("INSERT INTO agent_divisions(agent_id,division_id) VALUES($1,$2) ON CONFLICT DO NOTHING",[id,did]);
@@ -1074,7 +1120,7 @@ app.get("/approvals/export-csv",requireAuth,requireRole("sales_director","divisi
 });
 
 /* ─────────────── REQUESTS ─────────────── */
-app.post("/requests",requireAuth,requireRole("agent","admin"),upload.array("photos",10),async(req,res)=>{
+app.post("/requests",requireAuth,requireRole("agent","avancues","admin"),upload.array("photos",10),async(req,res)=>{
   try{
     const parseMaybeJson=v=>{if(v==null||v==="")return null;if(typeof v==="string"){try{return JSON.parse(v)}catch{return v}}return v};
     const{buyer_id,site_id,article_id,quantity=1,amount,invoice_ref,reason}=req.body;
@@ -1143,13 +1189,19 @@ app.post("/requests",requireAuth,requireRole("agent","admin"),upload.array("phot
       const pdfBuf=await pdfFromRequestRows({reqRow,items:its,approvals,watermark:null});
       const{subject,html}=emailNewRequest({reqRow,totalAmount,requiredRole:needed,photoCount:photo_urls.length,appUrl:APP_URL});
       await sendMail({to,cc:reqRow.agent_email,subject,html,attachments:[{filename:`kerkes-${reqId}.pdf`,content:pdfBuf,contentType:"application/pdf"}]});
-      sseBroadcastRole(needed,division_id,"new_request",{id:reqId,amount:totalAmount,buyer:reqRow.buyer_name});
+      // For avancues: broadcast to all team leads across all divisions
+      if(req.user.role==="avancues"){
+        const allDivs=await q("SELECT id FROM divisions");
+        for(const d of allDivs.rows) sseBroadcastRole(needed,d.id,"new_request",{id:reqId,amount:totalAmount,buyer:reqRow.buyer_name});
+      } else {
+        sseBroadcastRole(needed,division_id,"new_request",{id:reqId,amount:totalAmount,buyer:reqRow.buyer_name});
+      }
     }catch(e){console.error("EMAIL_CREATE_ERR:",e?.message||e);}
     res.json({id:reqId,photos:photo_urls});
   }catch(e){console.error("REQ_CREATE_ERR:",e);res.status(500).json({error:"server",detail:e?.message||""});}
 });
 
-app.get("/requests/my",requireAuth,requireRole("agent","admin"),async(req,res)=>{
+app.get("/requests/my",requireAuth,requireRole("agent","avancues","admin"),async(req,res)=>{
   try{
     const{status,leader,date,from,to,page="1",per="10"}=req.query;
     const _page=Math.max(1,parseInt(page,10)||1),_per=Math.min(50,Math.max(1,parseInt(per,10)||10)),offset=(_page-1)*_per;
@@ -1174,8 +1226,16 @@ app.get("/approvals/pending",requireAuth,requireRole("team_lead","division_manag
   const{buyer,agent,amount_min,amount_max,page="1",per="20"}=req.query;
   const _page=Math.max(1,parseInt(page,10)||1),_per=Math.min(100,parseInt(per,10)||20),offset=(_page-1)*_per;
   const wh=["r.status='pending'","r.required_role=$1"];const params=[req.user.role];let p=1;
-  if(req.user.role==="team_lead"){wh.push(`r.assigned_to_user_id=$${++p}`);params.push(req.user.id)}
-  else if(req.user.role==="division_manager"){wh.push(`r.division_id=$${++p}`);params.push(req.user.division_id)}
+  // For team_lead: show assigned requests OR avancues requests (from any division)
+  if(req.user.role==="team_lead"){
+    wh.push(`(r.assigned_to_user_id=$${++p} OR r.agent_id IN (SELECT id FROM users WHERE role='avancues'))`);
+    params.push(req.user.id);
+  }
+  // For division_manager: show division requests OR avancues requests
+  else if(req.user.role==="division_manager"){
+    wh.push(`(r.division_id=$${++p} OR r.agent_id IN (SELECT id FROM users WHERE role='avancues'))`);
+    params.push(req.user.division_id);
+  }
   if(buyer){wh.push(`(b.code ILIKE $${++p} OR b.name ILIKE $${++p})`);params.push(`%${buyer}%`,`%${buyer}%`);p++}
   if(agent){wh.push(`(u.first_name ILIKE $${++p} OR u.last_name ILIKE $${++p})`);params.push(`%${agent}%`,`%${agent}%`);p++}
   if(amount_min){wh.push(`r.amount>=$${++p}`);params.push(Number(amount_min))}
@@ -1198,11 +1258,11 @@ app.get("/approvals/all-history",requireAuth,requireRole("sales_director"),async
 app.get("/approvals/teamlead-history",requireAuth,requireRole("division_manager"),async(req,res)=>{try{const r=await q(histQ("WHERE a.approver_role='team_lead' AND r.division_id=$1"),[req.user.division_id]);res.json(r.rows)}catch{res.status(500).json({error:"server_error"})}});
 
 app.get("/requests/:id/photos",requireAuth,async(req,res)=>{
-  try{const id=Number(req.params.id);if(!id)return res.status(400).json({error:"id"});const r0=await q("SELECT id,agent_id,division_id,required_role,assigned_to_user_id FROM requests WHERE id=$1",[id]);if(!r0.rowCount)return res.status(404).json({error:"not_found"});const reqRow=r0.rows[0];if(req.user.role==="agent"&&reqRow.agent_id!==req.user.id)return res.status(403).json({error:"forbidden"});if((req.user.role==="team_lead"||req.user.role==="division_manager")&&reqRow.division_id!==req.user.division_id)return res.status(403).json({error:"forbidden"});if(req.user.role==="team_lead"){const assigneeId=reqRow.assigned_to_user_id??(await resolveTeamLeadAssignee({agentId:reqRow.agent_id,divisionId:reqRow.division_id})).assigneeId;if(!assigneeId||assigneeId!==req.user.id)return res.status(403).json({error:"forbidden"})}const ph=await q("SELECT url FROM request_photos WHERE request_id=$1 ORDER BY id",[id]);res.json((ph.rows||[]).map(x=>x.url))}catch{res.status(500).json({error:"server_error"})}
+  try{const id=Number(req.params.id);if(!id)return res.status(400).json({error:"id"});const r0=await q("SELECT id,agent_id,division_id,required_role,assigned_to_user_id FROM requests WHERE id=$1",[id]);if(!r0.rowCount)return res.status(404).json({error:"not_found"});const reqRow=r0.rows[0];if((req.user.role==="agent"||req.user.role==="avancues")&&reqRow.agent_id!==req.user.id)return res.status(403).json({error:"forbidden"});if((req.user.role==="team_lead"||req.user.role==="division_manager")&&reqRow.division_id!==req.user.division_id){const agentRole=await q("SELECT role FROM users WHERE id=$1",[reqRow.agent_id]);if(agentRole.rows[0]?.role!=="avancues")return res.status(403).json({error:"forbidden"})}if(req.user.role==="team_lead"){const agentRole2=await q("SELECT role FROM users WHERE id=$1",[reqRow.agent_id]);if(agentRole2.rows[0]?.role!=="avancues"){const assigneeId=reqRow.assigned_to_user_id??(await resolveTeamLeadAssignee({agentId:reqRow.agent_id,divisionId:reqRow.division_id})).assigneeId;if(!assigneeId||assigneeId!==req.user.id)return res.status(403).json({error:"forbidden"})}}const ph=await q("SELECT url FROM request_photos WHERE request_id=$1 ORDER BY id",[id]);res.json((ph.rows||[]).map(x=>x.url))}catch{res.status(500).json({error:"server_error"})}
 });
 
 app.get("/requests/:id/pdf",requireAuth,async(req,res)=>{
-  try{const id=Number(req.params.id);if(!id)return res.status(400).json({error:"id"});const{reqRow,items,approvals}=await loadRequestForPdf(id);if(req.user.role==="agent"&&reqRow.agent_id!==req.user.id)return res.status(403).json({error:"forbidden"});if((req.user.role==="team_lead"||req.user.role==="division_manager")&&reqRow.division_id!==req.user.division_id)return res.status(403).json({error:"forbidden"});if(req.user.role==="team_lead"){const assigneeId=reqRow.assigned_to_user_id??(await resolveTeamLeadAssignee({agentId:reqRow.agent_id,divisionId:reqRow.division_id})).assigneeId;if(!assigneeId||assigneeId!==req.user.id)return res.status(403).json({error:"forbidden"})}const watermark=(reqRow.status==="approved"||reqRow.status==="rejected")?reqRow.status:null;const pdf=await pdfFromRequestRows({reqRow,items,approvals,watermark});res.setHeader("Content-Type","application/pdf");if(req.query.download)res.setHeader("Content-Disposition",`attachment; filename=kerkes-${id}.pdf`);return res.send(pdf)}catch(e){console.error("[PDF ERROR]",e?.message,e?.stack?.split("\n")[1]);return res.status(500).json({error:"pdf_error",detail:e?.message})}
+  try{const id=Number(req.params.id);if(!id)return res.status(400).json({error:"id"});const{reqRow,items,approvals}=await loadRequestForPdf(id);if((req.user.role==="agent"||req.user.role==="avancues")&&reqRow.agent_id!==req.user.id)return res.status(403).json({error:"forbidden"});if((req.user.role==="team_lead"||req.user.role==="division_manager")&&reqRow.division_id!==req.user.division_id){const agentRole=await q("SELECT role FROM users WHERE id=$1",[reqRow.agent_id]);if(agentRole.rows[0]?.role!=="avancues")return res.status(403).json({error:"forbidden"})}if(req.user.role==="team_lead"){const agentRole2=await q("SELECT role FROM users WHERE id=$1",[reqRow.agent_id]);if(agentRole2.rows[0]?.role!=="avancues"){const assigneeId=reqRow.assigned_to_user_id??(await resolveTeamLeadAssignee({agentId:reqRow.agent_id,divisionId:reqRow.division_id})).assigneeId;if(!assigneeId||assigneeId!==req.user.id)return res.status(403).json({error:"forbidden"})}}const watermark=(reqRow.status==="approved"||reqRow.status==="rejected")?reqRow.status:null;const pdf=await pdfFromRequestRows({reqRow,items,approvals,watermark});res.setHeader("Content-Type","application/pdf");if(req.query.download)res.setHeader("Content-Disposition",`attachment; filename=kerkes-${id}.pdf`);return res.send(pdf)}catch(e){console.error("[PDF ERROR]",e?.message,e?.stack?.split("\n")[1]);return res.status(500).json({error:"pdf_error",detail:e?.message})}
 });
 
 async function actOnRequest({reqId,action,comment,user}){
@@ -1216,8 +1276,20 @@ async function actOnRequest({reqId,action,comment,user}){
     const row=r.rows[0];
     if(row.status!=="pending"){ await client.query("ROLLBACK"); throw new Error("already_decided"); }
     if(row.required_role!==user.role){ await client.query("ROLLBACK"); throw new Error("wrong_role"); }
-    if((user.role==="team_lead"||user.role==="division_manager")&&row.division_id!==user.division_id){ await client.query("ROLLBACK"); throw new Error("forbidden"); }
-    if(user.role==="team_lead"){const assigneeId=row.assigned_to_user_id??(await resolveTeamLeadAssignee({agentId:row.agent_id,divisionId:row.division_id})).assigneeId;if(!assigneeId||assigneeId!==user.id){ await client.query("ROLLBACK"); throw new Error("forbidden"); }}
+
+    // Check if request is from avancues user
+    const agentCheck=await client.query("SELECT role FROM users WHERE id=$1",[row.agent_id]);
+    const isAvancuesRequest=agentCheck.rows[0]?.role==="avancues";
+
+    if(isAvancuesRequest){
+      // For avancues requests: any team_lead/division_manager/sales_director can approve (no division restriction)
+      // No division check or assignee check needed
+    } else {
+      // Original agent logic: division-based restrictions
+      if((user.role==="team_lead"||user.role==="division_manager")&&row.division_id!==user.division_id){ await client.query("ROLLBACK"); throw new Error("forbidden"); }
+      if(user.role==="team_lead"){const assigneeId=row.assigned_to_user_id??(await resolveTeamLeadAssignee({agentId:row.agent_id,divisionId:row.division_id})).assigneeId;if(!assigneeId||assigneeId!==user.id){ await client.query("ROLLBACK"); throw new Error("forbidden"); }}
+    }
+
     await client.query("INSERT INTO approvals(request_id,approver_id,approver_role,action,comment,acted_at) VALUES($1,$2,$3,$4,$5,NOW())",[reqId,user.id,user.role,action,trimLen(comment,"comment")||null]);
     await client.query("UPDATE requests SET status=$1 WHERE id=$2",[action,reqId]);
     await client.query("COMMIT");
@@ -1228,7 +1300,8 @@ async function actOnRequest({reqId,action,comment,user}){
       const pdfBuf=await pdfFromRequestRows({reqRow,items,approvals,watermark:action});
       const approverName=`${user.first_name||""} ${user.last_name||""}`.trim();
       const{subject,html}=emailApprovalResult({reqRow,action,approverName,approverRole:user.role,comment,appUrl:APP_URL});
-      await sendMail({to:process.env.LEJIMET_EMAIL,cc:[reqRow.agent_email,user.email].filter(Boolean),subject,html,attachments:[{filename:`kerkes-${reqId}.pdf`,content:pdfBuf,contentType:"application/pdf"}]});
+      // For avancues: send to lejimet@migros-group.com, CC agent + approver only (no other team leads notified)
+      await sendMail({to:process.env.LEJIMET_EMAIL||"lejimet@migros-group.com",cc:[reqRow.agent_email,user.email].filter(Boolean),subject,html,attachments:[{filename:`kerkes-${reqId}.pdf`,content:pdfBuf,contentType:"application/pdf"}]});
     }catch(e){console.error("FINAL_MAIL_ERR:",e?.message||e);}
     return{ok:true};
   } catch(e) {

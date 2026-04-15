@@ -8,6 +8,7 @@ const roleLabel = (r) => t(r) || r;
 
 const roleNav = {
   agent:            [{ path:"/agent",     icon:"📋", key:"newRequest" }],
+  avancues:         [{ path:"/avancues",  icon:"📋", key:"newRequest" }],
   team_lead:        [{ path:"/approvals", icon:"✅", key:"approvals"  }],
   division_manager: [{ path:"/dashboard", icon:"📊", key:"dashboard"  }, { path:"/approvals", icon:"✅", key:"approvals" }],
   sales_director:   [{ path:"/dashboard", icon:"📊", key:"dashboard"  }, { path:"/approvals", icon:"✅", key:"approvals" }],

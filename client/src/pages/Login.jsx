@@ -18,9 +18,10 @@ export default function Login() {
       localStorage.setItem("refresh_token", data.refresh_token || "");
       localStorage.setItem("role",          data.profile.role);
       localStorage.setItem("profile",       JSON.stringify(data.profile));
-      if (data.profile.role === "admin")        location.href = "/admin";
-      else if (data.profile.role === "agent")   location.href = "/agent";
-      else                                      location.href = "/approvals";
+      if (data.profile.role === "admin")           location.href = "/admin";
+      else if (data.profile.role === "agent")      location.href = "/agent";
+      else if (data.profile.role === "avancues")   location.href = "/avancues";
+      else                                         location.href = "/approvals";
     } catch (ex) {
       toastError(ex.response?.data?.error || "Hyrja dështoi. Kontro emailin dhe fjalëkalimin.");
     } finally { setLoading(false); }

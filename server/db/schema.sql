@@ -1,4 +1,4 @@
-CREATE TYPE user_role AS ENUM ('agent','team_lead','division_manager','sales_director','admin');
+CREATE TYPE user_role AS ENUM ('agent','avancues','team_lead','division_manager','sales_director','admin');
 
 CREATE TABLE divisions(
   id SERIAL PRIMARY KEY,

@@ -1,0 +1,833 @@
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import api from "../api";
+import Layout from "../components/Layout";
+import { useToast } from "../components/Toast";
+import { StatusBadge, RoleBadge, SkeletonRow, Card, Pager, euro } from "../components/ui";
+import BarcodeScanner from "../components/BarcodeScanner.jsx";
+import CameraModal from "../components/CameraModal.jsx";
+import LotScanner from "../components/LotScanner.jsx";
+import Comments from "../components/Comments.jsx";
+
+function roleForAmount(total, thresholds) {
+  const tlMax = thresholds?.team_lead_max ?? 99;
+  const dmMax = thresholds?.division_manager_max ?? 199;
+  if (total <= tlMax)  return "team_lead";
+  if (total <= dmMax) return "division_manager";
+  return "sales_director";
+}
+function roleLabel(r) {
+  return { team_lead:"Team Lead", division_manager:"Menaxher Divizioni", sales_director:"Drejtor Shitjesh" }[r] || r;
+}
+
+function useDebounce(value, delay) {
+  const [d, setD] = useState(value);
+  useEffect(() => { const t = setTimeout(() => setD(value), delay); return () => clearTimeout(t); }, [value, delay]);
+  return d;
+}
+
+export default function Avancues() {
+  const profile = useMemo(() => { try { return JSON.parse(localStorage.getItem("profile") || "{}"); } catch { return {}; } }, []);
+  const { success, error: toastError, info } = useToast();
+
+  const [activeTab, setActiveTab] = useState("form");
+  const [meta, setMeta] = useState(null);
+
+  /* ── Form state ── */
+  const [buyerCode, setBuyerCode]   = useState("");
+  const [buyerSearch, setBuyerSearch] = useState("");
+  const [buyerId, setBuyerId]       = useState("");
+  const [buyerName, setBuyerName]   = useState("");
+  const [siteId, setSiteId]         = useState(""); // id lokal (për FK)
+  const [sitePbCode, setSitePbCode] = useState(""); // site_code = Sifra_Obj nga PB
+  const [items, setItems]           = useState([]);
+  const [invoiceRef, setInvoiceRef] = useState("");
+  const [reason, setReason]         = useState("");
+  const [photos, setPhotos]         = useState([]);
+  const [photoErr, setPhotoErr]     = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  /* ── Article search (PricingBridge) ── */
+  const [query, setQuery]                 = useState("");
+  const [pbSuggestions, setPbSuggestions] = useState([]);
+  const [pbLoading, setPbLoading]         = useState(false);
+  const [pickedArticle, setPicked]        = useState(null);
+  const [qty, setQty]                     = useState(1);
+  const [discount, setDiscount]           = useState("");
+  const [lejimAutoCalc, setLejimAutoCalc] = useState(false);
+
+  /* ── Lot Kodi + çmimi ── */
+  const [lotKod, setLotKod]             = useState("");
+  const [priceData, setPriceData]       = useState(null);
+  const [priceLoading, setPriceLoading] = useState(false);
+  const [priceErr, setPriceErr]         = useState("");
+
+  /* ── Barcode + Camera ── */
+  const [barcode, setBarcode]   = useState(false);
+
+  /* ── History ── */
+  const [commentReqId, setCommentReqId] = useState(null);
+  const [limitWarning, setLimitWarning] = useState(null);
+  const [history, setHistory]   = useState([]);
+  const [histLoading, setHistL] = useState(false);
+  const [page, setPage]         = useState(1);
+  const [pages, setPages]       = useState(1);
+  const [total, setTotal]       = useState(0);
+  const per = 10;
+  const [fltStatus, setFltStatus]     = useState("");
+  const [fltLeader, setFltLeader]     = useState("");
+  const [fltDate, setFltDate]         = useState("");
+  const [searchBuyer, setSearchBuyer] = useState("");
+
+  /* ── Gallery ── */
+  const API_BASE = (api?.defaults?.baseURL || import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+  const [gallery, setGallery] = useState({ open: false, urls: [], idx: 0 });
+  const closeGallery = () => setGallery({ open: false, urls: [], idx: 0 });
+
+  /* ── Init ── */
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await api.get("/meta");
+        setMeta(data);
+        if (data.agentLimit) setLimitWarning(data.agentLimit);
+      } catch (e) {
+        if (e?.response?.status === 401) { localStorage.clear(); location.href = "/login"; }
+        else toastError("Gabim gjatë ngarkimit të të dhënave.");
+      }
+    })();
+  }, []);
+
+  /* ── History ── */
+  const buildQuery = useCallback((p = 1) => {
+    const params = new URLSearchParams({ page: String(p), per: String(per) });
+    if (fltStatus) params.set("status", fltStatus);
+    if (fltLeader) params.set("leader", fltLeader);
+    if (fltDate)   params.set("date",   fltDate);
+    return params.toString();
+  }, [fltStatus, fltLeader, fltDate]);
+
+  const reloadHistory = useCallback(async (p = 1) => {
+    setHistL(true);
+    try {
+      const { data } = await api.get(`/requests/my?${buildQuery(p)}`);
+      const rows = Array.isArray(data?.rows) ? data.rows : Array.isArray(data) ? data : [];
+      setHistory(rows); setPage(Number(data?.page || p));
+      setPages(Number(data?.pages || 1)); setTotal(Number(data?.total || rows.length));
+    } catch { toastError("Gabim gjatë ngarkimit të historikut."); }
+    finally { setHistL(false); }
+  }, [buildQuery]);
+
+  useEffect(() => { if (activeTab === "history") reloadHistory(1); }, [activeTab]);
+  useEffect(() => { if (activeTab === "history") reloadHistory(1); }, [fltStatus, fltLeader, fltDate]);
+
+  /* ── Derived ── */
+  const buyersByCode = useMemo(() => { const m = new Map(); (meta?.buyers || []).forEach(b => m.set(b.code, b)); return m; }, [meta]);
+  const buyerSites   = useMemo(() => { if (!meta || !buyerId) return []; return meta.sites.filter(s => s.buyer_id === Number(buyerId)); }, [meta, buyerId]);
+  const buyerSearchResults = useMemo(() => {
+    if (!buyerSearch || buyerSearch.length < 2) return [];
+    const q = buyerSearch.toLowerCase();
+    return (meta?.buyers || []).filter(b => b.code.toLowerCase().includes(q) || b.name.toLowerCase().includes(q)).slice(0, 20);
+  }, [buyerSearch, meta]);
+
+  useEffect(() => {
+    if (!buyerCode) { setBuyerId(""); setBuyerName(""); setSiteId(""); setSitePbCode(""); return; }
+    const b = buyersByCode.get(buyerCode);
+    if (b) { setBuyerId(String(b.id)); setBuyerName(b.name); } else { setBuyerId(""); setBuyerName(""); }
+    setSiteId("");
+  }, [buyerCode, buyersByCode]);
+
+  /* ── PricingBridge: kërkim artikulli ── */
+  const debouncedQuery = useDebounce(query, 400);
+
+  useEffect(() => {
+    if (!debouncedQuery || debouncedQuery.length < 2 || pickedArticle) { setPbSuggestions([]); return; }
+    setPbLoading(true);
+
+    // Kërko NJËKOHËSISHT: lokalisht (sku+barkod+emër) dhe PricingBridge
+    const localSearch = api.get(`/articles/search?term=${encodeURIComponent(debouncedQuery)}`)
+      .then(r => r.data?.articles || [])
+      .catch(() => []);
+    const pbSearch = api.get(`/pb/article?term=${encodeURIComponent(debouncedQuery)}&sifraOe=1`)
+      .then(r => r.data?.articles || [])
+      .catch(() => []);
+
+    Promise.all([localSearch, pbSearch]).then(([localArts, pbArts]) => {
+      // Konverto artikujt lokal në format PricingBridge për dropdown uniform
+      const localMapped = localArts.map(a => ({
+        Sifra_Art: a.sku,
+        ImeArt: a.name,
+        CmimiBaze: a.sell_price,
+        BarKodGlaven: a.barkod || "",
+        LocalId: a.id,
+        _source: "local",
+      }));
+
+      // Bashko: PB artikujt kanë përparësi, por shto lokalet që nuk janë në PB
+      const seen = new Set(pbArts.map(a => a.Sifra_Art?.trim()));
+      const merged = [
+        ...pbArts,
+        ...localMapped.filter(a => !seen.has(a.Sifra_Art?.trim())),
+      ];
+
+      setPbSuggestions(merged);
+    }).finally(() => setPbLoading(false));
+  }, [debouncedQuery, pickedArticle]);
+
+  const pickArticle = useCallback((art) => {
+    setPicked(art); setQuery(`${art.Sifra_Art} — ${art.ImeArt}`);
+    setPbSuggestions([]); setLotKod(""); setPriceData(null); setPriceErr(""); setDiscount(""); setLejimAutoCalc(false);
+  }, []);
+
+  /* ── Barcode scanner ── */
+  const handleBarcode = useCallback((code) => {
+    setBarcode(false); setQuery(code.trim()); setPicked(null); setPriceData(null); setLotKod("");
+
+    // Kërko lokal (me barkod) DHE PricingBridge njëkohësisht
+    const localSearch = api.get(`/articles/search?term=${encodeURIComponent(code.trim())}`)
+      .then(r => r.data?.articles || [])
+      .catch(() => []);
+    const pbSearch = api.get(`/pb/article?term=${encodeURIComponent(code.trim())}&sifraOe=1`)
+      .then(r => r.data?.articles || [])
+      .catch(() => []);
+
+    Promise.all([localSearch, pbSearch]).then(([localArts, pbArts]) => {
+      // Prioritet: nëse PB gjen 1 rezultat, përdore
+      if (pbArts.length === 1) {
+        pickArticle(pbArts[0]);
+        success(`Artikulli u gjet: ${pbArts[0].Sifra_Art} — ${pbArts[0].ImeArt}`);
+        return;
+      }
+
+      // Nëse PB gjen shumë, trego dropdown
+      if (pbArts.length > 1) {
+        setPbSuggestions(pbArts);
+        info(`U gjetën ${pbArts.length} artikuj. Zgjidh nga lista.`);
+        return;
+      }
+
+      // Nëse PB nuk gjen, provo lokalisht
+      if (localArts.length >= 1) {
+        const localMapped = localArts.map(a => ({
+          Sifra_Art: a.sku,
+          ImeArt: a.name,
+          CmimiBaze: a.sell_price,
+          BarKodGlaven: a.barkod || "",
+          LocalId: a.id,
+          _source: "local",
+        }));
+        if (localMapped.length === 1) {
+          pickArticle(localMapped[0]);
+          success(`Artikulli u gjet lokalisht: ${localMapped[0].Sifra_Art} — ${localMapped[0].ImeArt}`);
+        } else {
+          setPbSuggestions(localMapped);
+          info(`U gjetën ${localMapped.length} artikuj lokalisht. Zgjidh nga lista.`);
+        }
+        return;
+      }
+
+      toastError(`Barkodi "${code}" nuk u gjet as në PricingBridge as lokalisht.`);
+    });
+  }, [pickArticle]);
+
+  /* ── PricingBridge: lookup çmimi ── */
+  const debouncedLot = useDebounce(lotKod, 600);
+
+  useEffect(() => {
+    if (!pickedArticle || !buyerCode) return;
+    // Lookup VETËM kur lot kodi është shkruar (min 3 karaktere)
+    if (!debouncedLot.trim() || debouncedLot.trim().length < 6) { setPriceData(null); setPriceErr(""); setPriceLoading(false); return; }
+    const buyer = buyersByCode.get(buyerCode);
+    const sifraKup = buyer?.pb_sifra_kup || buyerCode;
+
+    setPriceLoading(true); setPriceErr("");
+    const params = new URLSearchParams({ sifraKup, sifraArt: pickedArticle.Sifra_Art });
+    if (sitePbCode) params.append("sifraObj", sitePbCode);
+    if (debouncedLot.trim()) params.append("lotBr", debouncedLot.trim());
+
+    api.get(`/pb/price?${params}`)
+      .then(r => {
+        const price = r.data?.price || null;
+        if (!price) { setPriceData(null); setPriceErr("Çmimi nuk u gjet për këto parametra."); return; }
+        const typedLot = debouncedLot.trim().toUpperCase();
+        const returnedLot = (price.LotBr || "").trim().toUpperCase();
+        if (typedLot && returnedLot) {
+          const matchLen = [...typedLot].filter((c, i) => returnedLot[i] === c).length;
+          const pct = matchLen / Math.max(typedLot.length, returnedLot.length);
+          const exact = returnedLot === typedLot || returnedLot.startsWith(typedLot) || typedLot.startsWith(returnedLot);
+          if (!exact && pct < 0.95) {
+            setPriceData(null);
+            setPriceErr(`Lot kodi "${debouncedLot.trim()}" nuk përputhet me lot kodin e faturës ("${price.LotBr}"). Shkruaj lot kodin e plotë e saktë.`);
+            return;
+          }
+        } else if (typedLot && !returnedLot) {
+          setPriceData(null);
+          setPriceErr("Lot kodi nuk u gjet. Kontrollo dhe shkruaj lot kodin e saktë.");
+          return;
+        }
+        setPriceData(price);
+      })
+      .catch(e => {
+        if (e?.response?.status === 404) { setPriceData(null); setPriceErr("Çmimi nuk u gjet për këto parametra."); }
+        else setPriceErr("Gabim gjatë marrjes së çmimit.");
+      })
+      .finally(() => setPriceLoading(false));
+  }, [debouncedLot, pickedArticle, buyerCode, sitePbCode]);
+
+  /* ── Auto-kalkulim i Lejimit nga Rabati i PricingBridge ── */
+  useEffect(() => {
+    if (priceData && priceData.RabatKombinuarPct != null) {
+      const rabat = Number(priceData.RabatKombinuarPct || 0);
+      // Formula: lejim = 50% - rabat% (total discount nuk tejkalon 50%)
+      const suggested = Math.max(0, Math.min(50, Math.round(50 - rabat)));
+      setDiscount(String(suggested));
+      setLejimAutoCalc(true);
+    } else {
+      setLejimAutoCalc(false);
+    }
+  }, [priceData]);
+
+  /* ── Çmimi dhe shuma ── */
+  const unitPrice = priceData
+    ? Number(priceData.CmimiPasRabateve || priceData.CmimiBaze || 0)
+    : Number(pickedArticle?.CmimiBaze || pickedArticle?.DogCena || 0);
+
+  const lineTotal = (() => {
+    const q2 = Number(qty || 0), d = Number(discount || 0);
+    if (priceData) return Number((Number(priceData.CmimiPasRabateve || 0) * q2 * (1 - d / 100)).toFixed(2));
+    return Number((unitPrice * q2 * (1 - d / 100)).toFixed(2));
+  })();
+
+  /* ── Shto artikull ── */
+  const addItem = () => {
+    if (!pickedArticle) { toastError("Zgjidh një artikull."); return; }
+    if (!qty || Number(qty) <= 0) { toastError("Sasia duhet të jetë > 0."); return; }
+    if (!buyerCode) { toastError("Zgjidh blerësin para se të shtosh artikullin."); return; }
+    if (discount===""||Number(discount)<1||Number(discount)>50) { toastError("Lejimi duhet të jetë mes 1% dhe 50%."); return; }
+    const buyer = buyersByCode.get(buyerCode);
+    const sifraKup = buyer?.pb_sifra_kup || buyerCode;
+    setItems(prev => [...prev, {
+      article_id:         pickedArticle.LocalId || null,
+      sku:                pickedArticle.Sifra_Art,
+      name:               pickedArticle.ImeArt,
+      price:              unitPrice,
+      quantity:           Number(qty),
+      discount:           Number(discount || 0),
+      line_amount:        Number(lineTotal.toFixed(2)),
+      barkod:             pickedArticle.BarKodGlaven || pickedArticle.BarKod2 || "",
+      lot_kod:            lotKod.trim() || null,
+      cmimi_baze:         priceData ? Number(priceData.CmimiBaze) : Number(pickedArticle.CmimiBaze || pickedArticle.DogCena || 0),
+      rabat_pct:          priceData ? Number(priceData.RabatKombinuarPct || 0) : null,
+      lejim_pct:          Number(discount || 0),
+      ddv_pct:            priceData ? Number(priceData.DDVPct || 0) : null,
+      cmimi_pas_rabateve: priceData ? Number(priceData.CmimiPasRabateve || 0) : null,
+      price_match_level:  priceData?.MatchLevel || null,
+      sifra_kup:          sifraKup,
+      sifra_obj:          sitePbCode ? Number(sitePbCode) : null,
+    }]);
+    setQuery(""); setPicked(null); setQty(1); setDiscount(""); setLejimAutoCalc(false);
+    setLotKod(""); setPriceData(null); setPriceErr("");
+    info("Artikulli u shtua.");
+  };
+
+  const removeItem = idx => setItems(p => p.filter((_, i) => i !== idx));
+  const totalAmount  = items.reduce((s, it) => s + Number(it.line_amount || 0), 0);
+  const requiredRole = roleForAmount(totalAmount, meta?.thresholds);
+
+
+  /* ── Submit ── */
+  const submit = async () => {
+    if (!buyerId)      { toastError("Zgjedh blerësin."); return; }
+    if (!items.length) { toastError("Shto të paktën një artikull."); return; }
+    // Kontrollo lejim_pct për çdo artikull
+    const badLejim = items.find(r => !r.lejim_pct || Number(r.lejim_pct) < 1 || Number(r.lejim_pct) > 50);
+    if (badLejim) { toastError(`Artikulli "${badLejim.sku}" ka lejim të pavlefshëm (1–50% e detyrueshme).`); return; }
+    // Foto e detyrueshme
+    if (!photos.length) { toastError("Foto e dokumentit është e detyrueshme."); return; }
+    if (photoErr)      { toastError(photoErr); return; }
+    setSubmitting(true);
+    try {
+      const itemsPayload = items.map(r => ({
+        article_id:         r.article_id,
+        sku:                r.sku,
+        name:               r.name,
+        quantity:           r.quantity,
+        discount_percent:   Number(r.discount || 0),
+        barkod:             r.barkod || null,
+        lot_kod:            r.lot_kod || null,
+        cmimi_baze:         r.cmimi_baze,
+        rabat_pct:          r.rabat_pct,
+        ddv_pct:            r.ddv_pct,
+        cmimi_pas_rabateve: r.cmimi_pas_rabateve,
+        lejim_pct:          r.lejim_pct,
+        price_match_level:  r.price_match_level || null,
+        sifra_kup:          r.sifra_kup || null,
+        sifra_obj:          r.sifra_obj || null,
+      }));
+
+      if (photos.length) {
+        const fd = new FormData();
+        fd.append("buyer_id", String(buyerId));
+        if (siteId) fd.append("site_id", String(siteId));
+        fd.append("invoice_ref", invoiceRef || "");
+        fd.append("reason", reason || "");
+        fd.append("items", JSON.stringify(itemsPayload));
+        photos.forEach(f => fd.append("photos", f));
+        await api.post("/requests", fd);
+      } else {
+        await api.post("/requests", { buyer_id:Number(buyerId), site_id:siteId?Number(siteId):null, invoice_ref:invoiceRef||null, reason:reason||null, items:itemsPayload });
+      }
+      setBuyerCode(""); setBuyerId(""); setBuyerName(""); setSiteId(""); setSitePbCode("");
+      setInvoiceRef(""); setReason(""); setPhotos([]); setItems([]);
+      setQuery(""); setPicked(null); setQty(1); setDiscount(""); setLejimAutoCalc(false);
+      setLotKod(""); setPriceData(null); setPriceErr(""); setBuyerSearch("");
+      success("Kërkesa u dërgua me sukses!");
+    } catch (e) {
+      toastError("Dërgimi dështoi: " + (e?.response?.data?.error || e?.response?.data?.detail || e?.message || "Gabim"));
+    } finally { setSubmitting(false); }
+  };
+
+  const openGalleryForRow = async (row) => {
+    let urls = (Array.isArray(row.photos) ? row.photos : []).map(u => typeof u==="string"?u:u?.url).filter(Boolean);
+    if (!urls.length && row.id) { try { const { data } = await api.get(`/requests/${row.id}/photos`); urls=(data||[]).map(u=>typeof u==="string"?u:u?.url).filter(Boolean); } catch {} }
+    if (!urls.length) { toastError("Kjo kërkesë nuk ka foto."); return; }
+    setGallery({ open:true, urls, idx:0 });
+  };
+
+  const openPdf = async (id, download=false) => {
+    try {
+      const { data } = await api.get(`/requests/${id}/pdf`, { responseType:"arraybuffer" });
+      const blob = new Blob([data], { type:"application/pdf" });
+      const url  = URL.createObjectURL(blob);
+      if (download) { const a=document.createElement("a"); a.href=url; a.download=`kerkes-${id}.pdf`; document.body.appendChild(a); a.click(); a.remove(); }
+      else window.open(url, "_blank", "noopener");
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch { toastError("Gabim gjatë hapjes PDF."); }
+  };
+
+  const filteredHistory = useMemo(() => {
+    if (!searchBuyer.trim()) return history;
+    const q2 = searchBuyer.toLowerCase();
+    return history.filter(r => (r.buyer_code||"").toLowerCase().includes(q2)||(r.buyer_name||"").toLowerCase().includes(q2)||(r.article_summary||"").toLowerCase().includes(q2));
+  }, [history, searchBuyer]);
+
+  if (!meta) return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-8 h-8 border-2 border-slate-300 border-t-[#1e3a5f] rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-sm text-slate-500">Duke ngarkuar…</p>
+      </div>
+    </div>
+  );
+
+  return (
+    <Layout profile={profile}>
+      <div className="max-w-4xl mx-auto space-y-5">
+
+        <div>
+          <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Kërkesat</h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            {meta.me.first_name} {meta.me.last_name}
+            {meta.me.pda_number ? ` · PDA: ${meta.me.pda_number}` : ""}
+            {meta.me.division_name ? ` · ${meta.me.division_name}` : ""}
+          </p>
+        </div>
+
+        {limitWarning && limitWarning.map && limitWarning.map(lim => (
+          <div key={lim.period} className={`rounded-xl px-4 py-3 text-sm font-medium flex items-center gap-2
+            ${lim.pct >= 100 ? "bg-red-50 border border-red-200 text-red-800" : "bg-amber-50 border border-amber-200 text-amber-800"}`}>
+            {lim.pct >= 100 ? "🚫" : "⚠️"}
+            {lim.pct >= 100
+              ? `Keni tejkaluar limitin ${lim.period==="monthly"?"mujor":"javor"} (€${lim.max.toFixed(2)}).`
+              : `${lim.pct}% e limitit ${lim.period==="monthly"?"mujor":"javor"} — €${lim.used.toFixed(2)} / €${lim.max.toFixed(2)}`}
+          </div>
+        ))}
+
+        <div className="flex border-b border-slate-200 gap-1">
+          {[{ key:"form", label:"+ Kërkesë e Re" }, { key:"history", label:`Historiku${total > 0 ? ` (${total})` : ""}` }].map(t => (
+            <button key={t.key} onClick={() => setActiveTab(t.key)}
+              className={`px-5 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px
+                ${activeTab===t.key ? "border-[#1e3a5f] text-[#1e3a5f]" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ════ TAB: KËRKESË E RE ════ */}
+        {activeTab === "form" && (
+          <>
+            {/* BLERËSI */}
+            <Card className="p-5">
+              <h2 className="text-sm font-semibold text-slate-700 mb-3">Blerësi</h2>
+              <div className="grid sm:grid-cols-3 gap-3">
+                <div className="relative">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Kodi i blerësit</label>
+                  <input value={buyerCode} onChange={e => { setBuyerCode(e.target.value); setBuyerSearch(e.target.value); }} 
+                    onFocus={() => setBuyerSearch(buyerCode)}
+                    onBlur={() => setTimeout(() => setBuyerSearch(""), 200)}
+                    placeholder="Kodi ose emri..." autoComplete="off"
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30 focus:border-sky-400/60" />
+                  {buyerSearch && buyerSearchResults.length > 0 && (
+                    <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-56 overflow-y-auto">
+                      {buyerSearchResults.map(b => (
+                        <button key={b.id} type="button"
+                          onMouseDown={() => { setBuyerCode(b.code); setBuyerSearch(""); }}
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-sky-50 border-b border-slate-100 last:border-0">
+                          <span className="font-mono text-xs text-slate-400 mr-2">{b.code}</span>{b.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Emri (auto)</label>
+                  <input value={buyerName} readOnly className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-slate-50 text-slate-600" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Objekti</label>
+                  <select value={siteId} onChange={e => { setSiteId(e.target.value); const s = buyerSites.find(x=>String(x.id)===e.target.value); setSitePbCode(s?.site_code||""); }} disabled={!buyerId}
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30 disabled:bg-slate-50 disabled:text-slate-400 bg-white">
+                    <option value="">(pa objekt)</option>
+                    {buyerSites.map(s => <option key={s.id} value={s.id}>{s.site_code} — {s.site_name}</option>)}
+                  </select>
+                </div>
+              </div>
+            </Card>
+
+            {/* ARTIKUJT */}
+            <Card className="p-5">
+              <h2 className="text-sm font-semibold text-slate-700 mb-3">Artikujt</h2>
+
+              <div className="grid sm:grid-cols-12 gap-2 items-start">
+
+                {/* Kërko + Barcode button */}
+                <div className="sm:col-span-5 relative">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Kërko artikull (PricingBridge)</label>
+                  <div className="flex gap-2">
+                    <input value={query}
+                      onChange={e => { setQuery(e.target.value); if (pickedArticle) { setPicked(null); setPriceData(null); setLotKod(""); } }}
+                      placeholder="Shifër, barkod, ose emër…"
+                      className="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30" />
+                    <button type="button" onClick={() => setBarcode(true)} title="Skano barkod"
+                      className="px-2.5 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 text-slate-600 transition-colors flex-shrink-0">📷</button>
+                  </div>
+                  {pbLoading && <p className="text-xs text-slate-400 mt-1">Duke kërkuar…</p>}
+
+                  {/* Dropdown PricingBridge */}
+                  {pbSuggestions.length > 0 && !pickedArticle && (
+                    <div className="absolute z-20 bg-white border border-slate-200 rounded-xl shadow-lg mt-1 w-full max-h-64 overflow-auto">
+                      {pbSuggestions.map(art => (
+                        <div key={art.Sifra_Art} onMouseDown={() => pickArticle(art)}
+                          className="px-3 py-2 hover:bg-slate-50 cursor-pointer text-sm flex justify-between gap-2">
+                          <div>
+                            <span className="font-mono font-semibold text-blue-700">{art.Sifra_Art}</span>
+                            <span className="ml-2 text-slate-600 truncate max-w-[180px] inline-block align-bottom">{art.ImeArt}</span>
+                          </div>
+                          <div className="text-right text-xs text-slate-500 flex-shrink-0">
+                            {(art.BarKodGlaven || art.BarKod2) && <div>🔖 {art.BarKodGlaven || art.BarKod2}</div>}
+                            {art.CmimiBaze != null && <div className="font-semibold">{Number(art.CmimiBaze || art.DogCena || 0).toFixed(2)} €</div>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Çmimi bazë */}
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Çmimi bazë €</label>
+                  <input value={pickedArticle ? Number(pickedArticle.CmimiBaze || pickedArticle.DogCena || 0).toFixed(4) : ""} readOnly
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-slate-50 text-slate-600" />
+                </div>
+
+                {/* Sasia */}
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Sasia</label>
+                  <input type="number" min="1" value={qty} onChange={e => setQty(Math.max(1, Number(e.target.value || 1)))}
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30" />
+                </div>
+
+                {/* % Lejim — disabled kur ka priceData (rabati vjen nga PB) */}
+                <div className="sm:col-span-1">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">
+                    % Lejim
+                    {lejimAutoCalc && <span className="ml-1 text-[10px] text-emerald-600 font-normal bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">auto ✎</span>}
+                  </label>
+                  <input type="number" min="1" max="50" value={discount}
+                    onChange={e => { const v=e.target.value; setDiscount(v===""?"":String(Math.min(50,Math.max(0,Number(v))))); setLejimAutoCalc(false); }}
+                    placeholder="1–50"
+                    className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30 ${(discount===""||Number(discount)<1)?"border-red-400":lejimAutoCalc?"border-emerald-400":"border-slate-300"}`} />
+                  {(discount===""||Number(discount)<1) && <p className="text-xs text-red-500 mt-1">E detyrueshme (1–50%)</p>}
+                  {lejimAutoCalc && discount && <p className="text-xs text-emerald-600 mt-1">Rabat {Number(priceData?.RabatKombinuarPct||0).toFixed(0)}% + Lejim {discount}% = 50% total</p>}
+                </div>
+
+                {/* Shuma */}
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Shuma €</label>
+                  <input value={lineTotal ? lineTotal.toFixed(2) : ""} readOnly
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-slate-50 font-semibold text-slate-800" />
+                </div>
+              </div>
+
+              {/* Info artikull i zgjedhur */}
+              {pickedArticle && (
+                <div className="mt-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-600 flex flex-wrap gap-x-4 gap-y-1 items-center">
+                  <span className="font-medium text-slate-800">{pickedArticle.ImeArt}</span>
+                  {(pickedArticle.BarKodGlaven || pickedArticle.BarKod2) && (
+                    <span>🔖 <span className="font-mono">{pickedArticle.BarKodGlaven || pickedArticle.BarKod2}</span></span>
+                  )}
+                  {pickedArticle.EdMera && <span>Njësia: {pickedArticle.EdMera}</span>}
+                  {pickedArticle.ImeDiv && <span>Divizioni: {pickedArticle.ImeDiv}</span>}
+                  <button onClick={() => { setPicked(null); setQuery(""); setPriceData(null); setLotKod(""); setPriceErr(""); setDiscount(""); setLejimAutoCalc(false); }}
+                    className="ml-auto text-red-400 hover:text-red-600 font-medium">✕ Pastro</button>
+                </div>
+              )}
+
+              {/* ── LOT KODI + Çmimi PricingBridge ── */}
+              {pickedArticle && (
+                <div className="mt-3 grid sm:grid-cols-2 gap-3 items-start">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                      Lot Kodi
+                      {!buyerCode && <span className="ml-2 text-amber-500 font-normal">⚠ Zgjidh blerësin fillimisht</span>}
+                    </label>
+                    <div className="flex gap-2 items-center">
+                      <div className="relative flex-1">
+                        <input type="text" value={lotKod}
+                          onChange={e => { setLotKod(e.target.value); setPriceData(null); setPriceErr(""); }}
+                          disabled={!buyerCode}
+                          placeholder="p.sh. 281124IT101A"
+                          className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-sky-400/30 disabled:bg-slate-100 disabled:text-slate-400" />
+                        {priceLoading && <span className="absolute right-2 top-2 text-xs text-blue-500">⏳</span>}
+                      </div>
+                      <LotScanner
+                        disabled={!buyerCode}
+                        onResult={text => { setLotKod(text); setPriceData(null); setPriceErr(""); }}
+                      />
+                    </div>
+                    {priceErr && !priceLoading && <p className="text-xs text-amber-600 mt-1">⚠ {priceErr}</p>}
+                  </div>
+
+                  {/* Panel çmimi */}
+                  {priceData && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs">
+                      <div className="font-semibold text-blue-800 flex items-center gap-2 mb-2">
+                        💰 Çmimi nga PricingBridge
+                        <span className="font-normal text-blue-500 bg-blue-100 px-2 py-0.5 rounded-full">{priceData.MatchLevel}</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-slate-700">
+                        <div><span className="text-slate-400">Blerësi: </span>{priceData.Bleresi}</div>
+                        <div><span className="text-slate-400">Objekti: </span>{priceData.ObjektiBleresit || "—"}</div>
+                        <div><span className="text-slate-400">Lot: </span><span className="font-mono">{priceData.LotBr || "—"}</span></div>
+                        <div><span className="text-slate-400">Dok: </span>{priceData.Broj_Dok} · {priceData.Datum_Dok?.slice(0,10)}</div>
+                        <div><span className="text-slate-400">Çmimi bazë: </span>{Number(priceData.CmimiBaze).toFixed(4)} €</div>
+                        <div><span className="text-slate-400">Rabat: </span>{priceData.RabatKombinuarPct ?? 0}%</div>
+                        <div><span className="text-slate-400">DDV: </span>{priceData.DDVPct ?? 0}%</div>
+                        <div className="font-bold text-blue-900"><span className="font-normal text-slate-400">Final: </span>{Number(priceData.CmimiPasRabateve).toFixed(4)} €</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <button onClick={addItem} disabled={!pickedArticle}
+                className="mt-3 text-sm font-medium text-[#1e3a5f] hover:text-sky-600 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors">
+                + Shto artikull
+              </button>
+
+              {/* Tabela artikujt */}
+              {items.length > 0 && (
+                <div className="mt-4 overflow-x-auto rounded-xl border border-slate-100">
+                  <table className="min-w-full text-sm">
+                    <thead className="bg-slate-50">
+                      <tr>{["Artikulli","Barkod","Çmimi bazë","Sasia","Rabat %","Lejim %","Lot Kodi","Çmimi PB","Shuma",""].map(h => (
+                        <th key={h} className="px-3 py-2.5 text-left text-xs font-semibold text-slate-600 whitespace-nowrap">{h}</th>
+                      ))}</tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {items.map((r, idx) => (
+                        <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                          <td className="px-3 py-2.5 font-medium text-slate-800">
+                            <div className="font-mono text-xs text-blue-700">{r.sku}</div>
+                            <div className="text-xs text-slate-500 font-normal">{r.name}</div>
+                          </td>
+                          <td className="px-3 py-2.5 font-mono text-xs text-slate-500">{r.barkod || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-600 text-xs">{r.cmimi_baze != null ? Number(r.cmimi_baze).toFixed(4) : "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-600">{r.quantity}</td>
+                          <td className="px-3 py-2.5 text-red-600 text-xs font-medium">{r.rabat_pct != null ? `${Number(r.rabat_pct).toFixed(2)}%` : "—"}</td>
+                          <td className="px-3 py-2.5 text-purple-600 text-xs font-medium">{r.lejim_pct != null ? `${Number(r.lejim_pct).toFixed(2)}%` : "—"}</td>
+                          <td className="px-3 py-2.5 font-mono text-xs text-blue-600 font-semibold">{r.lot_kod || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-700 text-xs font-semibold">{r.cmimi_pas_rabateve != null ? Number(r.cmimi_pas_rabateve).toFixed(4) : "—"}</td>
+                          <td className="px-3 py-2.5 font-semibold text-slate-800 whitespace-nowrap">{euro(r.line_amount)}</td>
+                          <td className="px-3 py-2.5"><button onClick={() => removeItem(idx)} className="text-xs text-red-400 hover:text-red-600">Fshi</button></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Invoice + Reason */}
+              <div className="grid sm:grid-cols-2 gap-3 mt-4">
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Nr. ndërlidhës i faturës</label>
+                  <input value={invoiceRef} onChange={e => setInvoiceRef(e.target.value)} maxLength={200} placeholder="Opsionale"
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Arsyeja</label>
+                  <textarea value={reason} onChange={e => setReason(e.target.value)} rows={1} maxLength={1000} placeholder="Koment opsional"
+                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30 resize-none" />
+                </div>
+              </div>
+
+              {/* Photos */}
+              <div className="mt-4 space-y-2">
+                <label className="text-xs font-medium text-slate-600 block">Foto e dokumentit * (e detyrueshme, ≤ 5MB secila)</label>
+                <div className="flex flex-wrap gap-2 items-center">
+                  <CameraModal onCapture={(file) => setPhotos(p => [...p, file])} />
+                  {photos.length > 0 && <span className="text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-200">{photos.length} foto shtuar</span>}
+                </div>
+                {photos.length > 0 && (
+                  <ul className="text-xs text-slate-600 space-y-1">
+                    {photos.map((f, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <span className="text-slate-400">📎</span>
+                        <span>{f.name} · {(f.size/(1024*1024)).toFixed(2)} MB</span>
+                        <button onClick={() => setPhotos(p => p.filter((_,idx2) => idx2!==i))} className="text-red-400 hover:text-red-600 ml-1">Fshi</button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {photoErr && <p className="text-xs text-red-600">{photoErr}</p>}
+              </div>
+
+              {/* Summary + Submit */}
+              <div className="mt-5 flex flex-col sm:flex-row sm:items-center gap-3 pt-4 border-t border-slate-100">
+                <div className="flex-1 text-sm text-slate-600">
+                  {items.length > 0 && (
+                    <>Totali: <span className="font-bold text-slate-900 text-base">{euro(totalAmount)}</span>
+                    <span className="ml-3 text-xs">→ Shkon te: <span className="font-medium text-[#1e3a5f]">{roleLabel(requiredRole)}</span></span></>
+                  )}
+                </div>
+                <button onClick={submit} disabled={submitting || !items.length || !buyerId}
+                  className="w-full sm:w-auto bg-[#1e3a5f] text-white rounded-xl px-7 py-2.5 text-sm font-medium hover:bg-[#162d4a] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                  {submitting ? "Duke dërguar…" : "Dërgo Kërkesën"}
+                </button>
+              </div>
+            </Card>
+          </>
+        )}
+
+        {/* ════ TAB: HISTORIKU ════ */}
+        {activeTab === "history" && (
+          <Card className="overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 flex-wrap gap-3">
+              <h2 className="text-sm font-semibold text-slate-700">Historiku im</h2>
+              <div className="flex items-center gap-2">
+                <input value={searchBuyer} onChange={e => setSearchBuyer(e.target.value)} placeholder="Kërko blerës ose artikull…"
+                  className="border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30 w-52" />
+                {total > 0 && <span className="text-xs text-slate-400 whitespace-nowrap">{total} gjithsej</span>}
+              </div>
+            </div>
+            <div className="px-5 py-3 bg-slate-50 border-b border-slate-100">
+              <div className="grid sm:grid-cols-3 gap-2">
+                <select value={fltStatus} onChange={e => setFltStatus(e.target.value)} className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none text-slate-700 bg-white">
+                  <option value="">Statusi — të gjithë</option>
+                  <option value="pending">Në pritje</option>
+                  <option value="approved">Aprovuar</option>
+                  <option value="rejected">Refuzuar</option>
+                </select>
+                <select value={fltLeader} onChange={e => setFltLeader(e.target.value)} className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none text-slate-700 bg-white">
+                  <option value="">Niveli — të gjithë</option>
+                  <option value="team_lead">Team Lead</option>
+                  <option value="division_manager">Menaxher Divizioni</option>
+                  <option value="sales_director">Drejtor Shitjesh</option>
+                </select>
+                <input type="date" value={fltDate} onChange={e => setFltDate(e.target.value)} className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none text-slate-700" />
+              </div>
+              {(fltStatus || fltLeader || fltDate || searchBuyer) && (
+                <button onClick={() => { setFltStatus(""); setFltLeader(""); setFltDate(""); setSearchBuyer(""); }} className="text-xs text-slate-400 hover:text-slate-600 underline mt-2 block">Pastro filtrat</button>
+              )}
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead className="bg-white border-b border-slate-100">
+                  <tr>{["ID","Blerësi","Objekti","Artikujt","Shuma","Status","Niveli","Dokumente"].map(h => (
+                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">{h}</th>
+                  ))}</tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {histLoading && Array.from({length:5}).map((_,i) => <SkeletonRow key={i} cols={8} />)}
+                  {!histLoading && filteredHistory.map(r => {
+                    const photoCount = (Array.isArray(r.photos) ? r.photos : []).length || 0;
+                    return (
+                      <tr key={r.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-4 py-3 font-medium text-slate-700">#{r.id}</td>
+                        <td className="px-4 py-3 text-slate-600 whitespace-nowrap text-xs">{r.buyer_code} {r.buyer_name}</td>
+                        <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">{r.site_name || "—"}</td>
+                        <td className="px-4 py-3 text-slate-600 text-xs max-w-[160px] truncate">
+                          {r.items?.length ? r.items.map(it => `${it.sku} ×${it.quantity}`).join(", ") : r.article_summary || "—"}
+                        </td>
+                        <td className="px-4 py-3 font-semibold text-slate-800 whitespace-nowrap">{euro(r.amount)}</td>
+                        <td className="px-4 py-3"><StatusBadge status={r.status} /></td>
+                        <td className="px-4 py-3"><RoleBadge role={r.required_role} /></td>
+                        <td className="px-4 py-3">
+                          <div className="flex gap-2 whitespace-nowrap">
+                            <button onClick={() => openPdf(r.id, false)} className="text-xs text-[#1e3a5f] hover:underline">PDF</button>
+                            <button onClick={() => openPdf(r.id, true)}  className="text-xs text-slate-400 hover:underline">⬇</button>
+                            <button onClick={() => setCommentReqId(r.id)} className="text-xs text-blue-500 hover:underline">💬</button>
+                            {photoCount > 0 && <button onClick={() => openGalleryForRow(r)} className="text-xs text-emerald-600 hover:underline">Foto ({photoCount})</button>}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {!histLoading && !filteredHistory.length && (
+                    <tr><td colSpan={8} className="py-10 text-center text-sm text-slate-400">
+                      {searchBuyer||fltStatus||fltLeader||fltDate ? "Asnjë rezultat për filtrat." : "S'ka kërkesa ende."}
+                    </td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <Pager page={page} pages={pages} total={total} per={per}
+              onPrev={() => { const p=page-1; setPage(p); reloadHistory(p); }}
+              onNext={() => { const p=page+1; setPage(p); reloadHistory(p); }} />
+          </Card>
+        )}
+      </div>
+
+      {barcode && <BarcodeScanner onResult={handleBarcode} onClose={() => setBarcode(false)} />}
+
+      {commentReqId && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setCommentReqId(null)}>
+          <div className="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-lg h-[70vh] sm:h-[500px] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700">
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">💬 Diskutim — Kërkesa #{commentReqId}</span>
+              <button onClick={() => setCommentReqId(null)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-500 text-xl">&times;</button>
+            </div>
+            <div className="flex-1 min-h-0 overflow-hidden"><Comments requestId={commentReqId} currentUser={profile} /></div>
+          </div>
+        </div>
+      )}
+
+      {gallery.open && (
+        <div className="fixed inset-0 z-50 bg-black/85 flex flex-col items-center justify-center p-4" onClick={closeGallery}>
+          <div className="w-full max-w-4xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-white/70 text-sm">Foto {gallery.idx+1} / {gallery.urls.length}</span>
+              <button onClick={closeGallery} className="w-9 h-9 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white text-xl">&times;</button>
+            </div>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setGallery(s => ({...s, idx:Math.max(0,s.idx-1)}))} disabled={gallery.idx===0}
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white text-2xl disabled:opacity-30 flex-shrink-0">‹</button>
+              <img src={`${API_BASE}${gallery.urls[gallery.idx]}`} alt="" className="flex-1 max-h-[80vh] object-contain rounded-xl" />
+              <button onClick={() => setGallery(s => ({...s, idx:Math.min(s.urls.length-1,s.idx+1)}))} disabled={gallery.idx>=gallery.urls.length-1}
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white text-2xl disabled:opacity-30 flex-shrink-0">›</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </Layout>
+  );
+}
