@@ -275,10 +275,12 @@ function pdfFromRequestRows({reqRow,items,approvals,watermark}) {
     items=(items||[]).map(it=>{
       const qty=Number(it.quantity||1);
       const base=it.cmimi_baze!=null?Number(it.cmimi_baze):Number(it.sell_price||0);
-      const line=Number(it.line_amount||0);
       const rabat=it.rabat_pct!=null?Number(it.rabat_pct):null;
       const lejim=it.lejim_pct!=null?Number(it.lejim_pct):0;
       const pbPrice=it.cmimi_pas_rabateve!=null?Number(it.cmimi_pas_rabateve):null;
+      // Gjithmone rillogaris: cmimi_pb (ose baze) * qty * (1 - lejim/100)
+      const priceForCalc=pbPrice!=null?pbPrice:base;
+      const line=Number((priceForCalc*qty*(1-lejim/100)).toFixed(2));
       return{...it,qty,base,line,rabat,lejim,pbPrice};
     });
 
