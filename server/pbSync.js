@@ -95,13 +95,22 @@ export async function syncArticles() {
       return 0;
     }
 
+    // Build pb_id -> local division id map nga DB
+    const divMapRes = await q('SELECT id, pb_id FROM divisions WHERE pb_id IS NOT NULL');
+    const pbToLocal = {};
+    for (const row of divMapRes.rows) pbToLocal[row.pb_id] = row.id;
+
     let count = 0;
     for (const art of articles) {
       if (!art.Sifra_Art || !art.ImeArt) continue;
 
       // Filtro: kalon vetem artikuj me Sifra_Div te njohur, jo OTHER (8), jo NULL
-      const divId = art.Sifra_Div ? Number(art.Sifra_Div) : null;
-      if (!divId || divId === 1 || divId === 8) continue;
+      const pbDivId = art.Sifra_Div ? Number(art.Sifra_Div) : null;
+      if (!pbDivId || pbDivId === 8) continue;
+
+      // Perdor local division id (jo PB Sifra_Div)
+      const localDivId = pbToLocal[pbDivId] || null;
+      if (!localDivId) continue; // div pa mapping (HORECA, LEDO etj) - kalo
 
       const sku    = art.Sifra_Art.trim();
       const name   = (art.ImeArt || '').trim();
@@ -116,7 +125,7 @@ export async function syncArticles() {
                sell_price  = EXCLUDED.sell_price,
                barkod      = EXCLUDED.barkod,
                division_id = EXCLUDED.division_id`,
-        [sku, name, price, barkod, divId]
+        [sku, name, price, barkod, localDivId]
       );
       count++;
     }
