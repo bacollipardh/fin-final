@@ -87,9 +87,13 @@ export async function syncArticles() {
       const price  = Number(art.CmimiBaze || art.DogCena || 0);
       const barkod = art.BarKodGlaven || art.BarKod2 || null;
 
-      // Nese PB kthen Sifra_Div, perdor mapping; ndryshe ruaj NULL
-      // (PB search zakonisht nuk kthen Sifra_Div)
-      const pbDivId  = art.Sifra_Div ? Number(art.Sifra_Div) : null;
+      // Kalo artikujt pa cmim (cmimi=0)
+      if (!price || price <= 0) continue;
+
+      // Kalo division 8 (OTHER - artikuj te vjeter)
+      const pbDivId = art.Sifra_Div ? Number(art.Sifra_Div) : null;
+      if (pbDivId === 8) continue;
+
       const localDivId = pbDivId ? (pbToLocal[pbDivId] || null) : null;
 
       // COALESCE: nese artikulli ka division_id ne DB, mos e mbishkruaj me NULL
