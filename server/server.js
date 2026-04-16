@@ -686,7 +686,7 @@ app.get("/articles/search", requireAuth, async(req,res)=>{
         if (did && did !== 1 && did !== 8) divIds = [did];
       }
       if (divIds.length > 0) {
-        divFilter = ` AND division_id = ANY($${++paramIdx}::int[])`;
+        divFilter = ` AND (division_id = ANY($${++paramIdx}::int[]) OR division_id IS NULL)`;
         params.push(divIds);
       }
     }
@@ -724,7 +724,7 @@ app.get("/pb/article", requireAuth, async(req,res)=>{
         if(did&&did!==1&&did!==8) divIds=[did];
       }
       if(divIds.length>0){
-        const localRows=await q("SELECT sku FROM articles WHERE division_id = ANY($1::int[])",[divIds]);
+        const localRows=await q("SELECT sku FROM articles WHERE division_id = ANY($1::int[]) OR division_id IS NULL",[divIds]);
         const localSkus=new Set(localRows.rows.map(r=>r.sku?.trim().toUpperCase()));
         arts=arts.filter(a=>localSkus.has(a.Sifra_Art?.trim().toUpperCase()));
       }
