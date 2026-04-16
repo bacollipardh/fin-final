@@ -723,8 +723,8 @@ app.get("/pb/article", requireAuth, async(req,res)=>{
       }
       if(divIds.length>0){
         const allowed=await q("SELECT sku FROM articles WHERE division_id = ANY($1::int[])",[divIds]);
-        const allowedSkus=new Set(allowed.rows.map(r=>r.sku));
-        arts=arts.filter(a=>allowedSkus.has(a.Sifra_Art?.trim()));
+        const allowedSkus=new Set(allowed.rows.map(r=>r.sku?.trim().toUpperCase()));
+        arts=arts.filter(a=>allowedSkus.has(a.Sifra_Art?.trim().toUpperCase()));
       }
       // Nese divIds eshte bosh (agjent pa div valide), mos filtro
     }
