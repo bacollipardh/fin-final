@@ -130,27 +130,9 @@ export async function syncArticles() {
       count++;
     }
 
-    // Sync divisions me Sifra_Div + ImeDiv nga /api/divisions
-    let divCount = 0;
-    try {
-      const divRes = await pbFetch('/api/divizions');
-      const divisions = divRes.divisions ?? [];
-      for (const div of divisions) {
-        if (!div.Sifra_Div || !div.ImeDiv) continue;
-        await q(
-          `INSERT INTO divisions(id, name) VALUES($1, $2)
-           ON CONFLICT(id) DO UPDATE SET name = EXCLUDED.name`,
-          [div.Sifra_Div, div.ImeDiv]
-        );
-        divCount++;
-      }
-      // Reset sequence pas INSERT me ID manuale
-      await q(`SELECT setval('divisions_id_seq', (SELECT MAX(id) FROM divisions))`);
-    } catch (e) {
-      console.warn('[pbSync] Divisions sync skipped:', e.message);
-    }
-
-    console.log(`[pbSync] Articles synced: ${count}, Divisions: ${divCount}`);
+    // Divisions menaxhohen manualisht - NUK sync-ohen nga PricingBridge
+    // (PB ka ID te ndryshme nga DB jone, mapping behet nepermjet pb_id kolones)
+    console.log(`[pbSync] Articles synced: ${count}, Divisions: skipped (manual)`);
     return count;
   } catch (err) {
     console.error('[pbSync] Articles sync error:', err.message);
