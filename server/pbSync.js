@@ -19,24 +19,34 @@ async function pbFetch(path) {
 }
 
 // ── 1. Sync Artikujt ─────────────────────────────────────
-// Merr artikujt nga /api/articles/search me pagination
-// dhe i ruan/update-on në tabelën articles
-const LETTERS = 'abcdefghijklmnopqrstuvwxyz0123456789'.split('');
+// Kerko me 2-karakter prefix per te kapur te gjithe artikujt
+// pa limit (1-karakter + top=2000 humbet artikuj)
+const CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789';
+
+function buildPrefixes() {
+  const prefixes = [];
+  // 2-karakter kombinime: aa, ab, ... zz, a0, ... z9, 0a, ... 9z, 00, ... 99
+  for (const c1 of CHARS) {
+    for (const c2 of CHARS) {
+      prefixes.push(c1 + c2);
+    }
+  }
+  return prefixes;
+}
 
 export async function syncArticles() {
-  console.log('[pbSync] Starting articles sync...');
+  console.log('[pbSync] Starting articles sync (2-char prefix mode)...');
   try {
-    // Bëj kërkesa paralele me germa të ndryshme fillimi për të marrë të gjithë artikujt
     const allArticles = [];
     const seen = new Set();
+    const prefixes = buildPrefixes(); // 1296 kombinime
+    const batchSize = 10; // kerkesa paralele njeresh
 
-    // Batch kërkesat me germa fillimi (a, b, c, ... z, 0-9)
-    const batchSize = 6; // kërkesa paralele njëherësh
-    for (let i = 0; i < LETTERS.length; i += batchSize) {
-      const batch = LETTERS.slice(i, i + batchSize);
+    for (let i = 0; i < prefixes.length; i += batchSize) {
+      const batch = prefixes.slice(i, i + batchSize);
       const results = await Promise.all(
-        batch.map(letter =>
-          pbFetch(`/api/articles/search?term=${letter}&top=2000&sifraOe=1`).catch(() => null)
+        batch.map(prefix =>
+          pbFetch(`/api/articles/search?term=${prefix}&top=500&sifraOe=1`).catch(() => null)
         )
       );
       for (const data of results) {
@@ -50,41 +60,9 @@ export async function syncArticles() {
           }
         }
       }
-    }
-
-    // Fallback: për divisionet 1-9 (jo 8), merr direkt sipas divisionit
-    // nëse sync me germa nuk kapi artikuj të mjaftueshëm
-    const divisionCounts = {};
-    for (const art of allArticles) {
-      const d = art.Sifra_Div;
-      if (d) divisionCounts[d] = (divisionCounts[d] || 0) + 1;
-    }
-
-    // Divisionet që duam (jo 8=OTHER)
-    const targetDivisions = [2,3,4,5,6,7,9];
-    for (const divId of targetDivisions) {
-      if ((divisionCounts[divId] || 0) < 50) {
-        // Ky division ka pak artikuj — merr direkt nga API
-        console.log(`[pbSync] Division ${divId} has only ${divisionCounts[divId]||0} articles, fetching directly...`);
-        let page = 1;
-        let hasMore = true;
-        while (hasMore) {
-          try {
-            const resp = await pbFetch(`/api/articles/by-division?sifraDiv=${divId}&page=${page}&pageSize=500`);
-            const items = resp.data ?? [];
-            for (const art of items) {
-              const key = art.Sifra_Art?.trim();
-              if (key && !allArticles.find(a => a.Sifra_Art?.trim() === key)) {
-                allArticles.push(art);
-              }
-            }
-            hasMore = items.length === 500;
-            page++;
-          } catch (e) {
-            console.warn(`[pbSync] by-division fallback failed for div ${divId}:`, e.message);
-            break;
-          }
-        }
+      // Log progress çdo 100 batch
+      if ((i / batchSize) % 10 === 0) {
+        console.log(`[pbSync] Progress: ${i+batchSize}/${prefixes.length} prefixes, ${allArticles.length} articles so far`);
       }
     }
 
