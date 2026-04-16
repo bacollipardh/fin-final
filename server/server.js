@@ -714,7 +714,7 @@ app.get("/pb/article", requireAuth, async(req,res)=>{
   if(!term||term.trim().length<2) return res.status(400).json({error:"term duhet >= 2 karaktere"});
   try{
     let arts=await pbSearchArticle(term.trim(), sifraOe?parseInt(sifraOe):1);
-    // Per agjent: filtro sipas divisionit
+    // Per agjent: filtro sipas SKU-ve nga DB lokale (case-insensitive)
     if(req.user.role==="agent"){
       const adiv=await q("SELECT division_id FROM agent_divisions WHERE agent_id=$1",[req.user.id]);
       let divIds=adiv.rows.map(r=>r.division_id).filter(d=>d!==1&&d!==8);
@@ -724,17 +724,9 @@ app.get("/pb/article", requireAuth, async(req,res)=>{
         if(did&&did!==1&&did!==8) divIds=[did];
       }
       if(divIds.length>0){
-        const divSet=new Set(divIds.map(d=>Number(d)));
-        // Merr SKU-te nga DB lokale per fallback (artikuj pa Sifra_Div ne PB)
         const localRows=await q("SELECT sku FROM articles WHERE division_id = ANY($1::int[])",[divIds]);
         const localSkus=new Set(localRows.rows.map(r=>r.sku?.trim().toUpperCase()));
-        arts=arts.filter(a=>{
-          // Prioritet: Sifra_Div nga PB; fallback: SKU ne DB lokale
-          if(a.Sifra_Div!=null){
-            return divSet.has(Number(a.Sifra_Div));
-          }
-          return localSkus.has(a.Sifra_Art?.trim().toUpperCase());
-        });
+        arts=arts.filter(a=>localSkus.has(a.Sifra_Art?.trim().toUpperCase()));
       }
       // Nese divIds eshte bosh, mos filtro
     }
