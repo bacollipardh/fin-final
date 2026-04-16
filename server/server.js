@@ -356,10 +356,10 @@ function pdfFromRequestRows({reqRow,items,approvals,watermark}) {
     // ── TABLE ──
     // col widths must sum to CW=535
     // SKU(54) Art(150) Base(54) Qty(26) Rabat%(46) PB(52) Lejim%(46) DDV%(36) Final(58) + 8 for padding ≈ 535
-    const TH=["SKU","Artikulli","Çmimi bazë","Qty","Rabat %","Çmimi PB","Lejim %","Final €"];
-    const TW=[70,164,54,26,46,52,46,58];  // DDV hequr, hapesira shperndarë te SKU+Art
-    const TA=["L","L","R","C","R","R","R","R"];
-    const TSUM=TW.reduce((a,b)=>a+b,0); // 522
+    const TH=["SKU","Artikulli","Çmimi bazë","Qty","Rabat %","Çmimi PB","Lejim %","Çm. Final","Final €"];
+    const TW=[60,140,50,24,44,50,44,50,54];  // shto kolonen Çm.Final
+    const TA=["L","L","R","C","R","R","R","R","R"];
+    const TSUM=TW.reduce((a,b)=>a+b,0); // 520
     const ROW_H=32;
     const HDR_H=18;
 
@@ -405,7 +405,10 @@ function pdfFromRequestRows({reqRow,items,approvals,watermark}) {
       cx+=TW[4];
       setB();PDFDoc.fillColor("#1e3a5f");PDFDoc.y=mid;PDFDoc.text(it.pbPrice!=null?fm4(it.pbPrice):"—",cx+3,mid,{width:TW[5]-6,align:"right",lineBreak:false});cx+=TW[5];
       PDFDoc.fillColor("#7c3aed");PDFDoc.y=mid;PDFDoc.text(`${it.lejim.toFixed(2)}%`,cx+3,mid,{width:TW[6]-6,align:"right",lineBreak:false});cx+=TW[6];
-      setB();PDFDoc.fillColor("#111");PDFDoc.y=mid;PDFDoc.text(fm2(it.line),cx+3,mid,{width:TW[7]-6,align:"right",lineBreak:false});
+      // Çmimi Final per njësi = pbPrice * (1 - lejim/100)
+      const finalUnit=it.pbPrice!=null?Number((it.pbPrice*(1-it.lejim/100)).toFixed(4)):Number((it.base*(1-it.lejim/100)).toFixed(4));
+      setB();PDFDoc.fillColor("#16a34a");PDFDoc.y=mid;PDFDoc.text(fm4(finalUnit),cx+3,mid,{width:TW[7]-6,align:"right",lineBreak:false});cx+=TW[7];
+      PDFDoc.fillColor("#111");PDFDoc.y=mid;PDFDoc.text(fm2(it.line),cx+3,mid,{width:TW[8]-6,align:"right",lineBreak:false});
 
       total+=Number(it.line||0);
       Y=rowY+ROW_H;
@@ -415,8 +418,8 @@ function pdfFromRequestRows({reqRow,items,approvals,watermark}) {
     // Total row
     PDFDoc.rect(ML,Y,TSUM,20).fill("#1e3a5f");
     setB();PDFDoc.fontSize(9.5).fillColor("#ffffff");
-    PDFDoc.text("TOTALI:",ML+3,Y+5,{width:TSUM-TW[7]-6,align:"right"});
-    PDFDoc.text(`€ ${fm2(total)}`,ML+TSUM-TW[7]+3,Y+5,{width:TW[7]-6,align:"right"});
+    PDFDoc.text("TOTALI:",ML+3,Y+5,{width:TSUM-TW[8]-6,align:"right"});
+    PDFDoc.text(`€ ${fm2(total)}`,ML+TSUM-TW[8]+3,Y+5,{width:TW[8]-6,align:"right"});
     Y+=28;
 
     // ── STATUS + APPROVAL ──
