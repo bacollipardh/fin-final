@@ -666,6 +666,7 @@ app.delete("/auth/sessions", requireAuth, async(req,res)=>{
 
 /* ── Local article search (sku + barkod + emër) ── */
 app.get("/articles/search", requireAuth, async(req,res)=>{
+  res.set("Cache-Control","no-store");
   const { term } = req.query;
   if (!term || term.trim().length < 2) return res.status(400).json({ error: "term duhet >= 2 karaktere" });
   const t = term.trim();
@@ -708,6 +709,7 @@ app.get("/articles/search", requireAuth, async(req,res)=>{
 });
 
 app.get("/pb/article", requireAuth, async(req,res)=>{
+  res.set("Cache-Control","no-store");
   const{term,sifraOe}=req.query;
   if(!term||term.trim().length<2) return res.status(400).json({error:"term duhet >= 2 karaktere"});
   try{
