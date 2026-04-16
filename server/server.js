@@ -676,20 +676,7 @@ app.get("/articles/search", requireAuth, async(req,res)=>{
     const params = [`%${t}%`, `%${t}%`, `%${t}%`];
     let paramIdx = 3;
 
-    // Nëse është agjent ose avancues, filtro sipas divisioneve
-    if (req.user.role === "agent" || req.user.role === "avancues") {
-      const adiv = await q("SELECT division_id FROM agent_divisions WHERE agent_id=$1", [req.user.id]);
-      let divIds = adiv.rows.map(r => r.division_id).filter(d => d !== 1 && d !== 8);
-      if (!divIds.length) {
-        const ud = await q("SELECT division_id FROM users WHERE id=$1", [req.user.id]);
-        const did = ud.rows[0]?.division_id;
-        if (did && did !== 1 && did !== 8) divIds = [did];
-      }
-      if (divIds.length > 0) {
-        divFilter = ` AND (division_id = ANY($${++paramIdx}::int[]) OR division_id IS NULL)`;
-        params.push(divIds);
-      }
-    }
+    // Filter-i i division-it hiqet - te gjithe agjentët shohin te gjitha artikujt
 
     const r = await q(
       `SELECT id, sku, name, sell_price, barkod, division_id
@@ -714,23 +701,8 @@ app.get("/pb/article", requireAuth, async(req,res)=>{
   if(!term||term.trim().length<2) return res.status(400).json({error:"term duhet >= 2 karaktere"});
   try{
     let arts=await pbSearchArticle(term.trim(), sifraOe?parseInt(sifraOe):1);
-    // Per agjent: filtro sipas SKU-ve nga DB lokale (case-insensitive)
-    if(req.user.role==="agent"){
-      const adiv=await q("SELECT division_id FROM agent_divisions WHERE agent_id=$1",[req.user.id]);
-      let divIds=adiv.rows.map(r=>r.division_id).filter(d=>d!==1&&d!==8);
-      if(!divIds.length){
-        const ud=await q("SELECT division_id FROM users WHERE id=$1",[req.user.id]);
-        const did=ud.rows[0]?.division_id;
-        if(did&&did!==1&&did!==8) divIds=[did];
-      }
-      if(divIds.length>0){
-        const localRows=await q("SELECT sku FROM articles WHERE division_id = ANY($1::int[]) OR division_id IS NULL",[divIds]);
-        const localSkus=new Set(localRows.rows.map(r=>r.sku?.trim().toUpperCase()));
-        arts=arts.filter(a=>localSkus.has(a.Sifra_Art?.trim().toUpperCase()));
-      }
-      // Nese divIds eshte bosh, mos filtro
-    }
-    // avancues: sheh te gjitha artikujt, asnje filter
+    // Te gjithe agjentët dhe avancues shohin te gjitha artikujt nga PricingBridge
+    // (PB nuk kthen Sifra_Div, filter-i i division-it hiqet)
     return res.json({articles:arts});
   }catch(e){
     console.error("[PB] article search:",e.message);
