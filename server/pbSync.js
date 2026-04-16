@@ -82,19 +82,17 @@ export async function syncArticles() {
     for (const art of articles) {
       if (!art.Sifra_Art || !art.ImeArt) continue;
 
-      // Filtro: kalon vetem artikuj me Sifra_Div te njohur, jo OTHER (8), jo NULL
-      const pbDivId = art.Sifra_Div ? Number(art.Sifra_Div) : null;
-      if (!pbDivId || pbDivId === 8) continue;
-
-      // Perdor local division id (jo PB Sifra_Div)
-      const localDivId = pbToLocal[pbDivId] || null;
-      if (!localDivId) continue; // div pa mapping (HORECA, LEDO etj) - kalo
-
       const sku    = art.Sifra_Art.trim();
       const name   = (art.ImeArt || '').trim();
       const price  = Number(art.CmimiBaze || art.DogCena || 0);
       const barkod = art.BarKodGlaven || art.BarKod2 || null;
 
+      // Nese PB kthen Sifra_Div, perdor mapping; ndryshe ruaj NULL
+      // (PB search zakonisht nuk kthen Sifra_Div)
+      const pbDivId  = art.Sifra_Div ? Number(art.Sifra_Div) : null;
+      const localDivId = pbDivId ? (pbToLocal[pbDivId] || null) : null;
+
+      // COALESCE: nese artikulli ka division_id ne DB, mos e mbishkruaj me NULL
       await q(
         `INSERT INTO articles(sku, name, sell_price, barkod, division_id)
          VALUES($1, $2, $3, $4, $5)
@@ -102,7 +100,7 @@ export async function syncArticles() {
            SET name        = EXCLUDED.name,
                sell_price  = EXCLUDED.sell_price,
                barkod      = EXCLUDED.barkod,
-               division_id = EXCLUDED.division_id`,
+               division_id = COALESCE(EXCLUDED.division_id, articles.division_id)`,
         [sku, name, price, barkod, localDivId]
       );
       count++;
