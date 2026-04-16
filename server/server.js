@@ -712,8 +712,8 @@ app.get("/pb/article", requireAuth, async(req,res)=>{
   if(!term||term.trim().length<2) return res.status(400).json({error:"term duhet >= 2 karaktere"});
   try{
     let arts=await pbSearchArticle(term.trim(), sifraOe?parseInt(sifraOe):1);
-    // Filtro sipas divisioneve te agjentit nese eshte agent ose avancues
-    if(req.user.role==="agent"||req.user.role==="avancues"){
+    // Per agjent: filtro direkt nga Sifra_Div e PricingBridge (jo nga DB lokale)
+    if(req.user.role==="agent"){
       const adiv=await q("SELECT division_id FROM agent_divisions WHERE agent_id=$1",[req.user.id]);
       let divIds=adiv.rows.map(r=>r.division_id).filter(d=>d!==1&&d!==8);
       if(!divIds.length){
@@ -722,12 +722,15 @@ app.get("/pb/article", requireAuth, async(req,res)=>{
         if(did&&did!==1&&did!==8) divIds=[did];
       }
       if(divIds.length>0){
-        const allowed=await q("SELECT sku FROM articles WHERE division_id = ANY($1::int[])",[divIds]);
-        const allowedSkus=new Set(allowed.rows.map(r=>r.sku?.trim().toUpperCase()));
-        arts=arts.filter(a=>allowedSkus.has(a.Sifra_Art?.trim().toUpperCase()));
+        const divSet=new Set(divIds.map(d=>Number(d)));
+        arts=arts.filter(a=>{
+          const d=a.Sifra_Div!=null?Number(a.Sifra_Div):null;
+          return d!==null&&divSet.has(d);
+        });
       }
-      // Nese divIds eshte bosh (agjent pa div valide), mos filtro
+      // Nese divIds eshte bosh, mos filtro
     }
+    // avancues: sheh te gjitha artikujt, asnje filter
     return res.json({articles:arts});
   }catch(e){
     console.error("[PB] article search:",e.message);
