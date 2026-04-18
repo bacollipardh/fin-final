@@ -465,6 +465,266 @@ function pdfFromRequestRows({reqRow,items,approvals,watermark}) {
   });
 }
 
+
+// ── Load return data for PDF ───────────────────────────────────
+async function loadReturnForPdf(returnId) {
+  const rr = await q(`
+    SELECT rr.id, rr.status, rr.required_role, rr.total_value, rr.comment, rr.reason, rr.created_at,
+           rr.financial_approval_id,
+           b.code AS buyer_code, b.name AS buyer_name,
+           s.site_code, s.site_name,
+           ag.first_name AS agent_first, ag.last_name AS agent_last,
+           ag.pda_number AS agent_pda,
+           d.name AS division_name
+    FROM return_requests rr
+    JOIN buyers b ON b.id = rr.buyer_id
+    LEFT JOIN buyer_sites s ON s.id = rr.site_id
+    JOIN users ag ON ag.id = rr.agent_id
+    LEFT JOIN divisions d ON d.id = rr.division_id
+    WHERE rr.id = $1
+  `, [returnId]);
+  if (!rr.rowCount) throw new Error("Return not found");
+  const retRow = rr.rows[0];
+
+  const lines = await q(`
+    SELECT rl.sku, rl.name, rl.lot_kod, rl.final_price,
+           rl.approved_qty, rl.already_returned_qty, rl.remaining_qty,
+           rl.requested_return_qty, rl.is_removed
+    FROM return_request_lines rl
+    WHERE rl.return_request_id = $1 AND rl.is_removed = FALSE
+    ORDER BY rl.id
+  `, [returnId]);
+
+  const approvals = await q(`
+    SELECT ra.*, u.first_name, u.last_name
+    FROM return_approvals ra
+    JOIN users u ON u.id = ra.approver_id
+    WHERE ra.return_id = $1
+    ORDER BY ra.acted_at
+  `, [returnId]);
+
+  return { retRow, lines: lines.rows, approvals: approvals.rows };
+}
+
+// ── Generate PDF for Kthim pa Afat ───────────────────────────
+function pdfFromReturnRows({ retRow, lines, approvals, watermark }) {
+  return new Promise((resolve, reject) => {
+    const PDFDoc = new PDFDocument({ size:"A4", margin:0, info:{ Title:"Kërkesë për Kthim pa Afat", Author:"Fin Approvals" } });
+    const chunks = []; PDFDoc.on("data", c=>chunks.push(c)); PDFDoc.on("end", ()=>resolve(Buffer.concat(chunks))); PDFDoc.on("error", reject);
+
+    const fontReg  = process.env.PDF_FONT_REG  || "/usr/share/fonts/dejavu/DejaVuSans.ttf";
+    const fontBold = process.env.PDF_FONT_BOLD || "/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf";
+    const hasReg = fs.existsSync(fontReg), hasBold = fs.existsSync(fontBold);
+    if (hasReg)  PDFDoc.registerFont("R", fontReg);
+    if (hasBold) PDFDoc.registerFont("B", fontBold);
+    const setR = () => { try { PDFDoc.font("R"); } catch { PDFDoc.font("Helvetica"); } };
+    const setB = () => { try { PDFDoc.font("B"); } catch { PDFDoc.font("Helvetica-Bold"); } };
+
+    const PW = PDFDoc.page.width;
+    const ML = 30, MR = 30, CW = PW - ML - MR;
+    const fmtD = d => { try { return new Date(d).toLocaleString("sq-AL"); } catch { return String(d||""); } };
+    const fm2  = n => Number(n||0).toFixed(2);
+    const cl   = s => (s??'').toString();
+
+    let Y = 0;
+
+    // ── HEADER ──
+    PDFDoc.rect(0, 0, PW, 52).fill("#1e3a5f");
+    setB(); PDFDoc.fontSize(14).fillColor("#ffffff").text("KËRKESË PËR KTHIM PA AFAT", 0, 12, { width:PW, align:"center" });
+    setR(); PDFDoc.fontSize(8.5).fillColor("rgba(255,255,255,0.72)")
+      .text(`#${retRow.id}  ·  Aprovim Financiar #${retRow.financial_approval_id}  ·  ${fmtD(retRow.created_at)}  ·  Gjeneruar automatikisht`, 0, 31, { width:PW, align:"center" });
+    Y = 62;
+
+    // ── WATERMARK ──
+    if (watermark) {
+      const wt = watermark==="approved" ? "APROVUAR" : watermark==="rejected" ? "REFUZUAR" : "";
+      if (wt) {
+        PDFDoc.save();
+        PDFDoc.opacity(0.055);
+        setB(); PDFDoc.fontSize(72).fillColor(watermark==="approved" ? "#16a34a" : "#dc2626");
+        PDFDoc.rotate(-38, { origin:[PW/2, PDFDoc.page.height/2] });
+        PDFDoc.text(wt, PW/2-180, PDFDoc.page.height/2-36, { width:360, align:"center" });
+        PDFDoc.restore();
+      }
+    }
+
+    // ── INFO GRID ──
+    const IH = 80, IW = (CW-10)/2;
+    PDFDoc.rect(ML, Y, IW, IH).fill("#f7f8fa");
+    PDFDoc.rect(ML, Y, 2.5, IH).fill("#1e3a5f");
+    PDFDoc.rect(ML+IW+10, Y, IW, IH).fill("#f7f8fa");
+    PDFDoc.rect(ML+IW+10, Y, 2.5, IH).fill("#1e3a5f");
+
+    setB(); PDFDoc.fontSize(7).fillColor("#8b9cb3").text("TË DHËNAT E AGJENTIT", ML+8, Y+7);
+    const agRows = [
+      ["Agjenti:", `${cl(retRow.agent_first)} ${cl(retRow.agent_last)}`.trim()],
+      ["PDA:",     cl(retRow.agent_pda)||"—"],
+      ["Divizioni:", cl(retRow.division_name)||"—"],
+    ];
+    agRows.forEach(([k, v], i) => {
+      const ry = Y+18+i*17;
+      setB(); PDFDoc.fontSize(8.5).fillColor("#374151").text(k, ML+8, ry, { width:52, continued:false });
+      setR(); PDFDoc.fontSize(8.5).fillColor("#111").text(v, ML+62, ry, { width:IW-70 });
+    });
+
+    const rx = ML+IW+10;
+    setB(); PDFDoc.fontSize(7).fillColor("#8b9cb3").text("TË DHËNAT E BLERJES", rx+8, Y+7);
+    const buyRows = [
+      ["Blerësi:",   `${cl(retRow.buyer_code)} ${cl(retRow.buyer_name)}`.trim()],
+      ["Objekti:",   retRow.site_name||"—"],
+      ["Arsyeja:",   cl(retRow.reason)||"—"],
+      ["Aprov. Fin:", `#${retRow.financial_approval_id}`],
+    ];
+    buyRows.forEach(([k, v], i) => {
+      const ry = Y+18+i*15;
+      setB(); PDFDoc.fontSize(8.5).fillColor("#374151").text(k, rx+8, ry, { width:58, continued:false });
+      setR(); PDFDoc.fontSize(8.5).fillColor("#111").text(v, rx+68, ry, { width:IW-76, ellipsis:true });
+    });
+    Y += IH+12;
+
+    // ── SECTION TITLE ──
+    setB(); PDFDoc.fontSize(7).fillColor("#8b9cb3").text("LINJAT E KTHIMIT", ML, Y);
+    PDFDoc.moveTo(ML+72, Y+4).lineTo(ML+CW, Y+4).lineWidth(0.5).strokeColor("#e2e8f0").stroke();
+    Y += 12;
+
+    // ── TABLE ──
+    // Cols: SKU(60) | Artikull(148) | Lot Kodi(60) | Çmimi Final(58) | Sasia Aprov.(52) | Kthim Kërkuar(58) | Vlera(54) = 490 + padding
+    const TH = ["SKU", "Artikulli", "Lot Kodi", "Çm. Final", "Sasia Aprov.", "Sasia Kthimit", "Vlera €"];
+    const TW = [58, 148, 60, 56, 54, 62, 52];
+    const TA = ["L", "L", "C", "R", "C", "C", "R"];
+    const TSUM = TW.reduce((a,b)=>a+b, 0);
+    const ROW_H = 30, HDR_H = 18;
+
+    // header
+    PDFDoc.rect(ML, Y, TSUM, HDR_H).fill("#1e3a5f");
+    let hx = ML;
+    setB(); PDFDoc.fontSize(7.5).fillColor("#ffffff");
+    TH.forEach((h, i) => {
+      const align = TA[i]==="R" ? "right" : TA[i]==="C" ? "center" : "left";
+      PDFDoc.text(h, hx+3, Y+5, { width:TW[i]-6, align });
+      hx += TW[i];
+    });
+    Y += HDR_H;
+
+    // rows
+    let total = 0;
+    lines.forEach((line, idx) => {
+      const bg = idx%2===0 ? "#ffffff" : "#f8f9fb";
+      PDFDoc.rect(ML, Y, TSUM, ROW_H).fill(bg);
+      let bx = ML;
+      TW.forEach(w => { PDFDoc.rect(bx, Y, w, ROW_H).stroke("#e5e7eb"); bx += w; });
+
+      const mid = Y + Math.round(ROW_H/2) - 5;
+      let cx = ML;
+      const lineValue = Number(line.final_price||0) * Number(line.requested_return_qty||0);
+      total += lineValue;
+
+      // SKU
+      setB(); PDFDoc.fontSize(8.5).fillColor("#1e3a5f");
+      PDFDoc.text(cl(line.sku), cx+3, Y+4, { width:TW[0]-6, lineBreak:false, ellipsis:true });
+      cx += TW[0];
+
+      // Artikull
+      setR(); PDFDoc.fontSize(8.5).fillColor("#1a1a1a");
+      PDFDoc.text(cl(line.name), cx+3, Y+4, { width:TW[1]-6, lineBreak:false, ellipsis:true });
+      cx += TW[1];
+
+      // Lot Kodi
+      setR(); PDFDoc.fontSize(8).fillColor("#1d4ed8");
+      PDFDoc.text(cl(line.lot_kod)||"—", cx+3, mid, { width:TW[2]-6, align:"center", lineBreak:false });
+      cx += TW[2];
+
+      // Çmimi Final
+      setB(); PDFDoc.fontSize(8.5).fillColor("#16a34a");
+      PDFDoc.text(`€${fm2(line.final_price)}`, cx+3, mid, { width:TW[3]-6, align:"right", lineBreak:false });
+      cx += TW[3];
+
+      // Sasia Aprovuar
+      setR(); PDFDoc.fontSize(8.5).fillColor("#374151");
+      PDFDoc.text(String(line.approved_qty||0), cx+3, mid, { width:TW[4]-6, align:"center", lineBreak:false });
+      cx += TW[4];
+
+      // Sasia Kthimit (kryesorja)
+      setB(); PDFDoc.fontSize(10).fillColor("#1e3a5f");
+      PDFDoc.text(String(line.requested_return_qty||0), cx+3, mid, { width:TW[5]-6, align:"center", lineBreak:false });
+      cx += TW[5];
+
+      // Vlera
+      setB(); PDFDoc.fontSize(8.5).fillColor("#111");
+      PDFDoc.text(`€${fm2(lineValue)}`, cx+3, mid, { width:TW[6]-6, align:"right", lineBreak:false });
+
+      Y += ROW_H;
+      PDFDoc.y = Y;
+    });
+
+    // Total row
+    PDFDoc.rect(ML, Y, TSUM, 20).fill("#1e3a5f");
+    setB(); PDFDoc.fontSize(9.5).fillColor("#ffffff");
+    PDFDoc.text("TOTALI:", ML+3, Y+5, { width:TSUM-TW[6]-6, align:"right" });
+    PDFDoc.text(`€ ${fm2(total)}`, ML+TSUM-TW[6]+3, Y+5, { width:TW[6]-6, align:"right" });
+    Y += 28;
+
+    // ── STATUS + APPROVAL ──
+    const BH = 62, BW = (CW-10)/2;
+    const st = (retRow.status||"").toLowerCase();
+    const isApp = st==="approved", isRej = st==="rejected";
+    const sbg   = isApp ? "#f0fdf4" : isRej ? "#fef2f2" : "#f8f9fa";
+    const slc   = isApp ? "#16a34a" : isRej ? "#dc2626" : "#374151";
+    const slabel= isApp ? "E aprovuar" : isRej ? "E refuzuar" : "Në pritje";
+    PDFDoc.rect(ML, Y, BW, BH).fill(sbg);
+    PDFDoc.rect(ML, Y, 2.5, BH).fill(slc);
+    setB(); PDFDoc.fontSize(7).fillColor("#8b9cb3").text("STATUSI", ML+8, Y+8);
+    setB(); PDFDoc.fontSize(13).fillColor(slc).text(slabel, ML+8, Y+20);
+    setR(); PDFDoc.fontSize(8).fillColor("#8b9cb3").text(`Niveli: ${cl(retRow.required_role)||"—"}`, ML+8, Y+42);
+
+    const ax = ML+BW+10;
+    PDFDoc.rect(ax, Y, BW, BH).fill("#f7f8fa");
+    PDFDoc.rect(ax, Y, 2.5, BH).fill("#1e3a5f");
+    setB(); PDFDoc.fontSize(7).fillColor("#8b9cb3").text("APROVIMI", ax+8, Y+8);
+    const last = Array.isArray(approvals) && approvals.length ? approvals[approvals.length-1] : null;
+    if (last) {
+      setR(); PDFDoc.fontSize(8.5).fillColor("#111");
+      PDFDoc.text(`Data: ${fmtD(last.acted_at)}`, ax+8, Y+20, { width:BW-16 });
+      PDFDoc.text(`Nga: ${cl(last.first_name)} ${cl(last.last_name)} (${cl(last.approver_role)})`, ax+8, Y+33, { width:BW-16, ellipsis:true });
+      PDFDoc.text(`Koment: ${cl(last.comment)||"—"}`, ax+8, Y+46, { width:BW-16, ellipsis:true });
+    } else {
+      setR(); PDFDoc.fontSize(8.5).fillColor("#aaa").text("S'ka aprovim ende.", ax+8, Y+30, { width:BW-16 });
+    }
+    Y += BH+20;
+
+    // ── FOOTER ──
+    const FY = PDFDoc.page.height-28;
+    PDFDoc.rect(0, FY, PW, 28).fill("#f1f5f9");
+    setR(); PDFDoc.fontSize(7.5).fillColor("#94a3b8");
+    PDFDoc.text("Fin Approvals · Kthim pa Afat · Dokument konfidencial", ML, FY+10, { width:CW/2 });
+    PDFDoc.text(`Gjeneruar: ${fmtD(new Date())} · Faqe 1/1`, ML+CW/2, FY+10, { width:CW/2, align:"right" });
+
+    PDFDoc.end();
+  });
+}
+
+// ── GET /returns/:id/pdf ───────────────────────────────────────
+app.get("/returns/:id/pdf", requireAuth, async(req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!id) return res.status(400).json({ error:"id invalid" });
+    const { retRow, lines, approvals } = await loadReturnForPdf(id);
+    // Auth: agent who owns it, or approver in same division, or admin
+    const u = req.user;
+    if (u.role === "agent" || u.role === "avancues") {
+      if (retRow.agent_id !== u.id) return res.status(403).json({ error:"forbidden" });
+    }
+    const watermark = (retRow.status==="approved"||retRow.status==="rejected") ? retRow.status : null;
+    const pdf = await pdfFromReturnRows({ retRow, lines, approvals, watermark });
+    res.setHeader("Content-Type", "application/pdf");
+    if (req.query.download) res.setHeader("Content-Disposition", `attachment; filename=kthim-${id}.pdf`);
+    return res.send(pdf);
+  } catch(e) {
+    console.error("[RETURN PDF ERROR]", e?.message);
+    return res.status(500).json({ error:"pdf_error", detail:e?.message });
+  }
+});
+
 /* ─────────────── HEALTH ─────────────── */
 app.get("/",(_, res)=>res.send("OK"));
 app.get("/health",async(_,res)=>{try{await q("SELECT 1");res.json({ok:true,db:"ok",time:new Date().toISOString()})}catch(e){res.status(503).json({ok:false,db:"down"})}});
@@ -1482,7 +1742,14 @@ async function actOnReturn({returnId,action,comment,user}){
       const buyer=buyerR.rows[0];
       const approverName=`${user.first_name||""} ${user.last_name||""}`.trim();
       const{subject,html}=emailApprovalResult({reqRow:{id:returnId,amount:ret.total_value,buyer_code:buyer?.code,buyer_name:buyer?.name},action,approverName,approverRole:user.role,comment,appUrl:APP_URL});
-      await sendMail({to:[agentR.rows[0]?.email,process.env.LEJIMET_EMAIL].filter(Boolean),subject:subject.replace("[Fin Approvals]","[Kthim pa Afat]"),html});
+      // Generate PDF and attach to email
+      let attachments=[];
+      try {
+        const{retRow,lines,approvals:retApprovals}=await loadReturnForPdf(returnId);
+        const pdfBuf=await pdfFromReturnRows({retRow,lines,approvals:retApprovals,watermark:action});
+        attachments=[{filename:`kthim-${returnId}.pdf`,content:pdfBuf,contentType:"application/pdf"}];
+      } catch(pe){console.warn("[returns/act] pdf gen:",pe?.message);}
+      await sendMail({to:[agentR.rows[0]?.email,process.env.LEJIMET_EMAIL].filter(Boolean),subject:subject.replace("[Fin Approvals]","[Kthim pa Afat]"),html,attachments});
     } catch(e){console.warn("[returns/act] email:",e?.message);}
     return{ok:true,action};
   } catch(e){await client.query("ROLLBACK").catch(()=>{});throw e;}

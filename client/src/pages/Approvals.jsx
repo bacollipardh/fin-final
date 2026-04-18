@@ -517,7 +517,12 @@ export default function Approvals() {
                     </tbody>
                   </table>
                 </div>
-                <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 flex gap-2 justify-end">
+                <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 flex gap-2 justify-end items-center">
+                  <a href={`${(api?.defaults?.baseURL||import.meta.env.VITE_API_URL||"").replace(/\/$/,"")}/returns/${r.id}/pdf`}
+                    target="_blank" rel="noreferrer"
+                    className="mr-auto text-xs px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg font-medium">
+                    📄 Shiko PDF
+                  </a>
                   <button onClick={()=>setReturnModal({id:r.id,action:"rejected"})}
                     className="px-4 py-1.5 text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors">
                     ✕ Refuzo
@@ -548,6 +553,11 @@ export default function Approvals() {
                         <span className={`text-xs font-semibold px-2 py-1 rounded-full ${r.status==="approved"?"bg-green-100 text-green-700":"bg-red-100 text-red-700"}`}>
                           {r.status==="approved"?"✓ Aprovuar":"✕ Refuzuar"}
                         </span>
+                        <a href={`${(api?.defaults?.baseURL||import.meta.env.VITE_API_URL||"").replace(/\/$/,"")}/returns/${r.id}/pdf?download=1`}
+                          target="_blank" rel="noreferrer"
+                          className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded font-medium">
+                          📄 PDF
+                        </a>
                       </div>
                     </div>
                     {r.last_approver && <p className="text-xs text-slate-400 mt-1">Vendimi nga {r.last_approver}{r.last_comment?` — "${r.last_comment}"`:""}</p>}

@@ -268,6 +268,8 @@ function MyReturns({ refresh }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
+  const API_BASE = (api?.defaults?.baseURL || import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+  const API_BASE = (api?.defaults?.baseURL || import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 
   useEffect(() => {
     api.get("/returns/my").then(r => setData(r.data)).catch(()=>{}).finally(() => setLoading(false));
@@ -292,6 +294,13 @@ function MyReturns({ refresh }) {
             <div className="flex items-center gap-3">
               <span className="text-sm font-semibold text-blue-700">€{fmt(r.total_value)}</span>
               <StatusBadge status={r.status} />
+              {(r.status === "approved" || r.status === "rejected") && (
+                <a href={`${API_BASE}/returns/${r.id}/pdf?download=1`} target="_blank" rel="noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded font-medium">
+                  📄 PDF
+                </a>
+              )}
             </div>
           </button>
           {expanded === r.id && (
