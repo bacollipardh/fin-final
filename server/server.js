@@ -469,7 +469,7 @@ function pdfFromRequestRows({reqRow,items,approvals,watermark}) {
 // ── Load return data for PDF ───────────────────────────────────
 async function loadReturnForPdf(returnId) {
   const rr = await q(`
-    SELECT rr.id, rr.status, rr.required_role, rr.total_value, rr.comment, rr.reason, rr.created_at,
+    SELECT rr.id, rr.agent_id, rr.status, rr.required_role, rr.total_value, rr.comment, rr.reason, rr.created_at,
            rr.financial_approval_id,
            b.code AS buyer_code, b.name AS buyer_name,
            s.site_code, s.site_name,

@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
 import api from "../api";
 import { useToast } from "../components/Toast";
-import { StatusBadge, euro } from "../components/ui";
+import { StatusBadge, RoleBadge } from "../components/ui";
+import { ReturnComments } from "../components/Comments.jsx";
 
 const roleLabel = r => ({ team_lead:"Team Lead", division_manager:"Menaxher Divizioni", sales_director:"Drejtor Shitjesh" }[r] || r);
 const fmt = n => Number(n||0).toFixed(2);
@@ -267,79 +268,129 @@ function ReturnForm({ approval, onSuccess, onCancel }) {
 function MyReturns({ refresh }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState(null);
-  const API_BASE = (api?.defaults?.baseURL || import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+  const [commentReturnId, setCommentReturnId] = useState(null);
+  const [fltStatus, setFltStatus] = useState("");
+  const [fltRole,   setFltRole]   = useState("");
+  const [fltDate,   setFltDate]   = useState("");
+  const [search,    setSearch]    = useState("");
+  const { error: toastError } = useToast();
 
   useEffect(() => {
     api.get("/returns/my").then(r => setData(r.data)).catch(()=>{}).finally(() => setLoading(false));
   }, [refresh]);
 
-  if (loading) return <div className="text-center py-8 text-gray-400">Duke ngarkuar...</div>;
-  if (!data.length) return <div className="text-center py-8 text-gray-400">Nuk keni kërkesa kthimi.</div>;
+  const openPdf = async (id, download=false) => {
+    try {
+      const { data: buf } = await api.get(`/returns/${id}/pdf`, { responseType:"arraybuffer" });
+      const blob = new Blob([buf], { type:"application/pdf" });
+      const url  = URL.createObjectURL(blob);
+      if (download) { const a=document.createElement("a"); a.href=url; a.download=`kthim-${id}.pdf`; document.body.appendChild(a); a.click(); a.remove(); }
+      else window.open(url, "_blank", "noopener");
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch { toastError("Gabim gjatë hapjes PDF."); }
+  };
+
+  const filtered = data.filter(r => {
+    if (fltStatus && r.status !== fltStatus) return false;
+    if (fltRole   && r.required_role !== fltRole) return false;
+    if (fltDate   && !r.created_at?.startsWith(fltDate)) return false;
+    if (search && !`${r.buyer_code} ${r.buyer_name} ${r.site_name||""}`.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
 
   return (
-    <div className="space-y-3">
-      {data.map(r => (
-        <div key={r.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <button className="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-gray-50"
-            onClick={() => setExpanded(expanded === r.id ? null : r.id)}>
-            <div>
-              <span className="font-semibold text-gray-800">Kthim #{r.id}</span>
-              <span className="mx-2 text-gray-400">·</span>
-              <span className="text-sm text-gray-600">Aprovim #{r.financial_approval_id}</span>
-              <span className="mx-2 text-gray-400">·</span>
-              <span className="text-sm text-gray-600">{r.buyer_code} — {r.buyer_name}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-semibold text-blue-700">€{fmt(r.total_value)}</span>
-              <StatusBadge status={r.status} />
-              {(r.status === "approved" || r.status === "rejected") && (
-                <>
-                  <button onClick={async e => { e.stopPropagation(); try { const {data}=await api.get(`/returns/${r.id}/pdf`,{responseType:"arraybuffer"}); const blob=new Blob([data],{type:"application/pdf"}); window.open(URL.createObjectURL(blob),"_blank","noopener"); } catch{} }}
-                    className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded font-medium" title="Shiko PDF">
-                    📄
-                  </button>
-                  <button onClick={async e => { e.stopPropagation(); try { const {data}=await api.get(`/returns/${r.id}/pdf`,{responseType:"arraybuffer"}); const blob=new Blob([data],{type:"application/pdf"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`kthim-${r.id}.pdf`; document.body.appendChild(a); a.click(); a.remove(); } catch{} }}
-                    className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded font-medium" title="Shkarko PDF">
-                    ⬇
-                  </button>
-                </>
-              )}
-            </div>
-          </button>
-          {expanded === r.id && (
-            <div className="border-t border-gray-100 px-5 py-4">
-              {r.reason && <p className="text-sm text-gray-600 mb-3"><strong>Arsyeja:</strong> {r.reason}</p>}
-              {r.last_approver && (
-                <p className="text-sm text-gray-500 mb-3">
-                  <strong>Vendimi:</strong> {r.last_action === "approved" ? "✓ Aprovuar" : "✕ Refuzuar"} nga {r.last_approver}
-                  {r.last_comment && ` — "${r.last_comment}"`}
-                </p>
-              )}
-              <table className="w-full text-xs">
-                <thead><tr className="text-gray-400">
-                  <th className="text-left pb-1">SKU</th><th className="text-left pb-1">Artikull</th>
-                  <th className="text-right pb-1">Lot</th><th className="text-right pb-1">Sasia</th><th className="text-right pb-1">Vlera</th>
-                </tr></thead>
-                <tbody className="divide-y divide-gray-50">
-                  {r.lines.filter(l=>!l.is_removed).map((l,i)=>(
-                    <tr key={i}>
-                      <td className="py-1 font-mono text-blue-700">{l.sku}</td>
-                      <td className="py-1 text-gray-700">{l.name}</td>
-                      <td className="py-1 text-right font-mono text-gray-500">{l.lot_kod||"—"}</td>
-                      <td className="py-1 text-right">{l.requested_return_qty}</td>
-                      <td className="py-1 text-right">€{fmt(Number(l.final_price)*l.requested_return_qty)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      {/* Header + search */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 flex-wrap gap-3">
+        <h2 className="text-sm font-semibold text-slate-700">Historiku im — Kthime</h2>
+        <div className="flex items-center gap-2">
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Kërko blerës ose objekt…"
+            className="border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30 w-52" />
+          {data.length > 0 && <span className="text-xs text-slate-400 whitespace-nowrap">{data.length} gjithsej</span>}
         </div>
-      ))}
+      </div>
+      {/* Filters */}
+      <div className="px-5 py-3 bg-slate-50 border-b border-slate-100">
+        <div className="grid sm:grid-cols-3 gap-2">
+          <select value={fltStatus} onChange={e=>setFltStatus(e.target.value)} className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700 bg-white">
+            <option value="">Statusi — të gjithë</option>
+            <option value="pending">Në pritje</option>
+            <option value="approved">Aprovuar</option>
+            <option value="rejected">Refuzuar</option>
+          </select>
+          <select value={fltRole} onChange={e=>setFltRole(e.target.value)} className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700 bg-white">
+            <option value="">Niveli — të gjithë</option>
+            <option value="team_lead">Team Lead</option>
+            <option value="division_manager">Menaxher Divizioni</option>
+            <option value="sales_director">Drejtor Shitjesh</option>
+          </select>
+          <input type="date" value={fltDate} onChange={e=>setFltDate(e.target.value)} className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700" />
+        </div>
+        {(fltStatus||fltRole||fltDate||search) && (
+          <button onClick={()=>{setFltStatus("");setFltRole("");setFltDate("");setSearch("");}} className="text-xs text-slate-400 hover:text-slate-600 underline mt-2 block">Pastro filtrat</button>
+        )}
+      </div>
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm">
+          <thead className="bg-white border-b border-slate-100">
+            <tr>{["ID","Blerësi","Objekti","Artikujt e Kthyer","Shuma","Status","Niveli","Dokumente"].map(h=>(
+              <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-500 whitespace-nowrap">{h}</th>
+            ))}</tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50">
+            {loading && Array.from({length:3}).map((_,i)=>(
+              <tr key={i}>{Array.from({length:8}).map((_,j)=>(
+                <td key={j} className="px-4 py-3"><div className="h-4 bg-slate-100 rounded animate-pulse w-20" /></td>
+              ))}</tr>
+            ))}
+            {!loading && filtered.map(r => {
+              const linesSummary = (r.lines||[]).filter(l=>!l.is_removed&&l.requested_return_qty>0)
+                .map(l=>`${l.sku} ×${l.requested_return_qty}`).join(", ") || "—";
+              return (
+                <tr key={r.id} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-4 py-3 font-medium text-slate-700">#{r.id}</td>
+                  <td className="px-4 py-3 text-slate-600 whitespace-nowrap text-xs">{r.buyer_code} {r.buyer_name}</td>
+                  <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">{r.site_name||"—"}</td>
+                  <td className="px-4 py-3 text-slate-600 text-xs max-w-[160px] truncate">{linesSummary}</td>
+                  <td className="px-4 py-3 font-semibold text-slate-800 whitespace-nowrap">€{fmt(r.total_value)}</td>
+                  <td className="px-4 py-3"><StatusBadge status={r.status} /></td>
+                  <td className="px-4 py-3"><RoleBadge role={r.required_role} /></td>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-2 whitespace-nowrap">
+                      <button onClick={()=>openPdf(r.id,false)} className="text-xs text-[#1e3a5f] hover:underline">PDF</button>
+                      <button onClick={()=>openPdf(r.id,true)}  className="text-xs text-slate-400 hover:underline">⬇</button>
+                      <button onClick={()=>setCommentReturnId(r.id)} className="text-xs text-blue-500 hover:underline">💬</button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+            {!loading && !filtered.length && (
+              <tr><td colSpan={8} className="py-10 text-center text-sm text-slate-400">
+                {search||fltStatus||fltRole||fltDate ? "Asnjë rezultat për filtrat." : "Nuk keni kërkesa kthimi ende."}
+              </td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Comment modal */}
+      {commentReturnId && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={()=>setCommentReturnId(null)}>
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-lg h-[70vh] sm:h-[500px] flex flex-col overflow-hidden" onClick={e=>e.stopPropagation()}>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+              <span className="text-sm font-semibold text-slate-700">💬 Diskutim — Kthim #{commentReturnId}</span>
+              <button onClick={()=>setCommentReturnId(null)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-500 text-xl">&times;</button>
+            </div>
+            <div className="flex-1 min-h-0 overflow-hidden"><ReturnComments requestId={commentReturnId} currentUser={null} /></div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
 
 // ── Main KthimiPaAfat component ───────────────────────────────
 export default function KthimiPaAfat() {
