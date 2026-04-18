@@ -138,6 +138,24 @@ export default function Approvals() {
   const [tlHistory,   setTlHistory]   = useState([]);
   const [allHistory,  setAllHistory]  = useState([]);
 
+  /* ── Kthimi pa Afat state ── */
+  const [pendingReturns, setPendingReturns] = useState([]);
+  const [returnsHistory, setReturnsHistory] = useState([]);
+  const [returnsLoading, setReturnsLoading] = useState(false);
+  const [returnModal,    setReturnModal]    = useState(null);
+  const [returnComment,  setReturnComment]  = useState("");
+  const [actingReturn,   setActingReturn]   = useState({});
+
+  const loadPendingReturns = async () => {
+    setReturnsLoading(true);
+    try { const { data } = await api.get("/returns/pending"); setPendingReturns(data); }
+    catch { /* silent */ } finally { setReturnsLoading(false); }
+  };
+  const loadReturnsHistory = async () => {
+    try { const { data } = await api.get("/returns/history"); setReturnsHistory(data); }
+    catch { /* silent */ }
+  };
+
   const [tab, setTab]         = useState("pending");
   const [loading, setLoading] = useState(false);
   const [histLoad, setHistLoad] = useState(false);
@@ -271,12 +289,31 @@ export default function Approvals() {
   }, [tab, pending]);
 
   /* ── Tabs config ── */
+  useEffect(() => {
+    if (tab === "kthimi") { loadPendingReturns(); loadReturnsHistory(); }
+  }, [tab]);
+
+  const actOnReturn = async (id, action) => {
+    setActingReturn(a => ({...a, [id]: action}));
+    try {
+      await api.post(`/returns/${id}/${action}`, { comment: returnComment });
+      success(action === "approved" ? "✓ Kthimi u aprovua!" : "✕ Kthimi u refuzua!");
+      setReturnModal(null); setReturnComment("");
+      loadPendingReturns(); loadReturnsHistory();
+    } catch(e) { toastError(e?.response?.data?.error || "Gabim"); }
+    finally { setActingReturn(a => ({...a, [id]: undefined})); }
+  };
+
+  const pendingReturnsCount = pendingReturns.length;
+
+  /* ── Tabs config ── */
   const TABS = [
     { key:"pending",    label:`Në pritje (${pendingCount})` },
     { key:"history",    label:"Historiku im" },
     ...( ["team_lead","division_manager","sales_director"].includes(role) ? [{ key:"delegation", label:"🔄 Delegim" }] : []),
     ...(role==="division_manager" ? [{ key:"teamlead", label:"Historiku Team Lead" }] : []),
     ...(role==="sales_director"   ? [{ key:"all",      label:"Të gjitha" }] : []),
+    ...(["team_lead","division_manager","sales_director"].includes(role) ? [{ key:"kthimi", label:`↩ Kthime pa Afat${pendingReturnsCount>0?` (${pendingReturnsCount})`:""}`}] : []),
   ];
 
   return (
@@ -429,6 +466,97 @@ export default function Approvals() {
           <HistoryTable rows={allHistory} loading={histLoad} onOpenPhotos={openPhotos} onOpenPdf={openPdf} setDetail={setDetail} onComment={setCommentReqId} />
         )}
         {tab==="delegation" && <DelegationTab profile={profile} />}
+
+        {/* ═══ KTHIMI PA AFAT TAB ═══ */}
+        {tab==="kthimi" && (
+          <div className="space-y-4">
+            <h2 className="text-base font-semibold text-slate-700">Kthime pa Afat — Në Pritje</h2>
+            {returnsLoading && <div className="text-center py-8 text-slate-400">Duke ngarkuar...</div>}
+            {!returnsLoading && pendingReturns.length === 0 && (
+              <Card className="p-8 text-center">
+                <div className="text-4xl mb-2">✅</div>
+                <p className="text-slate-500">Asnjë kërkesë kthimi në pritje.</p>
+              </Card>
+            )}
+            {pendingReturns.map(r => (
+              <Card key={r.id} className="overflow-hidden">
+                <div className="px-5 py-4 flex items-start justify-between border-b border-slate-100">
+                  <div>
+                    <span className="font-bold text-slate-800">Kthim #{r.id}</span>
+                    <span className="mx-2 text-slate-300">·</span>
+                    <span className="text-sm text-slate-600">Aprovim Financiar #{r.financial_approval_id}</span>
+                    <div className="text-sm text-slate-500 mt-0.5">{r.buyer_code} — {r.buyer_name}{r.site_name ? ` / ${r.site_name}` : ""}</div>
+                    <div className="text-xs text-slate-400">{r.agent_first} {r.agent_last} · {new Date(r.created_at).toLocaleDateString("sq-AL")}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-blue-700 text-lg">€{Number(r.total_value||0).toFixed(2)}</div>
+                    {r.reason && <div className="text-xs text-slate-500 mt-1 max-w-48">Arsyeja: {r.reason}</div>}
+                  </div>
+                </div>
+                <div className="px-5 py-3 overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead><tr className="text-slate-400 uppercase">
+                      <th className="text-left pb-1 pr-3">SKU</th>
+                      <th className="text-left pb-1 pr-3">Artikull</th>
+                      <th className="text-right pb-1 pr-3">Lot</th>
+                      <th className="text-right pb-1 pr-3">Çmimi</th>
+                      <th className="text-right pb-1 pr-3">Mbetet</th>
+                      <th className="text-right pb-1">Kthim</th>
+                    </tr></thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {(r.lines||[]).filter(l=>!l.is_removed).map((l,i)=>(
+                        <tr key={i}>
+                          <td className="py-1 pr-3 font-mono text-blue-700">{l.sku}</td>
+                          <td className="py-1 pr-3 text-slate-700">{l.name}</td>
+                          <td className="py-1 pr-3 text-right font-mono text-slate-500">{l.lot_kod||"—"}</td>
+                          <td className="py-1 pr-3 text-right">€{Number(l.final_price||0).toFixed(2)}</td>
+                          <td className="py-1 pr-3 text-right text-green-700">{l.remaining_qty}</td>
+                          <td className="py-1 text-right font-semibold">{l.requested_return_qty}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 flex gap-2 justify-end">
+                  <button onClick={()=>setReturnModal({id:r.id,action:"rejected"})}
+                    className="px-4 py-1.5 text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors">
+                    ✕ Refuzo
+                  </button>
+                  <button onClick={()=>setReturnModal({id:r.id,action:"approved"})}
+                    className="px-4 py-1.5 text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg transition-colors">
+                    ✓ Aprovo
+                  </button>
+                </div>
+              </Card>
+            ))}
+
+            {returnsHistory.length > 0 && (
+              <>
+                <h2 className="text-base font-semibold text-slate-700 mt-6">Historiku i Kthimeve</h2>
+                {returnsHistory.map(r => (
+                  <Card key={r.id} className="px-5 py-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold text-slate-800">Kthim #{r.id}</span>
+                        <span className="mx-2 text-slate-300">·</span>
+                        <span className="text-sm text-slate-600">{r.buyer_code} — {r.buyer_name}</span>
+                        <span className="mx-2 text-slate-300">·</span>
+                        <span className="text-sm text-slate-500">{r.agent_first} {r.agent_last}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-semibold text-blue-700">€{Number(r.total_value||0).toFixed(2)}</span>
+                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${r.status==="approved"?"bg-green-100 text-green-700":"bg-red-100 text-red-700"}`}>
+                          {r.status==="approved"?"✓ Aprovuar":"✕ Refuzuar"}
+                        </span>
+                      </div>
+                    </div>
+                    {r.last_approver && <p className="text-xs text-slate-400 mt-1">Vendimi nga {r.last_approver}{r.last_comment?` — "${r.last_comment}"`:""}</p>}
+                  </Card>
+                ))}
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Comment / Confirm Modal */}
@@ -523,6 +651,29 @@ export default function Approvals() {
               <img src={gallery.urls[gallery.idx]?.startsWith("http") ? gallery.urls[gallery.idx] : `${API_BASE}${gallery.urls[gallery.idx]}`} alt="" className="flex-1 max-h-[80vh] object-contain rounded-xl" onError={e=>{e.target.style.display="none"}} />
               <button onClick={()=>setGallery(s=>({...s,idx:Math.min(s.urls.length-1,s.idx+1)}))} disabled={gallery.idx>=gallery.urls.length-1}
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white text-2xl disabled:opacity-30 transition-colors flex-shrink-0">›</button>
+            </div>
+          </div>
+        </div>
+      )}
+    {/* ═══ RETURN APPROVAL MODAL ═══ */}
+      {returnModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm" onClick={e=>e.stopPropagation()}>
+            <h3 className="text-base font-semibold text-slate-900 mb-1">
+              {returnModal.action==="approved" ? "✓ Konfirmo Aprovimin" : "✕ Konfirmo Refuzimin"}
+            </h3>
+            <p className="text-sm text-slate-500 mb-4">Kthim #{returnModal.id}</p>
+            <textarea value={returnComment} onChange={e=>setReturnComment(e.target.value)} rows={3}
+              placeholder="Koment (opsional)..."
+              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4" />
+            <div className="flex gap-2 justify-end">
+              <button onClick={()=>{setReturnModal(null);setReturnComment("");}}
+                className="px-4 py-2 text-sm border border-slate-200 rounded-xl hover:bg-slate-50">Anulo</button>
+              <button onClick={()=>actOnReturn(returnModal.id, returnModal.action)}
+                disabled={!!actingReturn[returnModal.id]}
+                className={`px-4 py-2 text-sm font-semibold text-white rounded-xl disabled:opacity-60 ${returnModal.action==="approved"?"bg-emerald-600 hover:bg-emerald-700":"bg-red-600 hover:bg-red-700"}`}>
+                {actingReturn[returnModal.id] ? "..." : returnModal.action==="approved" ? "✓ Aprovo" : "✕ Refuzo"}
+              </button>
             </div>
           </div>
         </div>
