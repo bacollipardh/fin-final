@@ -269,7 +269,6 @@ function MyReturns({ refresh }) {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
   const API_BASE = (api?.defaults?.baseURL || import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
-  const API_BASE = (api?.defaults?.baseURL || import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 
   useEffect(() => {
     api.get("/returns/my").then(r => setData(r.data)).catch(()=>{}).finally(() => setLoading(false));
