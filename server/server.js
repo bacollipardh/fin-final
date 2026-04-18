@@ -1404,19 +1404,19 @@ app.post("/returns", requireAuth, requireRole("agent","avancues","admin"), async
     const existing=await q("SELECT id FROM return_requests WHERE financial_approval_id=$1 AND status!='rejected'",[faId]);
     if(existing.rowCount) return res.status(409).json({error:"Ky aprovim financiar tashmë ka një kërkesë kthimi"});
     for(const line of activeLines){
-      const srcLine=data.lines.find(l=>l.request_item_id===Number(line.request_item_id));
+      const srcLine=data.lines.find(l=>Number(l.request_item_id)===Number(line.request_item_id));
       if(!srcLine) return res.status(400).json({error:`Linja ${line.request_item_id} nuk u gjet`});
       const qty=Number(line.requested_return_qty);
       if(!Number.isFinite(qty)||qty<=0) return res.status(400).json({error:`Sasia e pavlefshme për ${srcLine.sku}`});
       if(qty>srcLine.remaining_qty) return res.status(400).json({error:`Sasia e kërkuar (${qty}) tejkalon të mbetur (${srcLine.remaining_qty}) për ${srcLine.sku}`});
     }
-    const totalValue=activeLines.reduce((sum,l)=>{const s=data.lines.find(dl=>dl.request_item_id===Number(l.request_item_id));return sum+(s?.final_price||0)*Number(l.requested_return_qty);},0);
+    const totalValue=activeLines.reduce((sum,l)=>{const s=data.lines.find(dl=>Number(dl.request_item_id)===Number(l.request_item_id));return sum+(s?.final_price||0)*Number(l.requested_return_qty);},0);
     const requiredRole=data.req.required_role;
     await client.query("BEGIN");
     const rr=await client.query(`INSERT INTO return_requests(financial_approval_id,agent_id,buyer_id,site_id,division_id,status,required_role,total_value,comment,reason) VALUES($1,$2,$3,$4,$5,'pending',$6,$7,$8,$9) RETURNING id`,[faId,req.user.id,data.req.buyer_id,data.req.site_id,data.req.division_id,requiredRole,totalValue,trimLen(comment,"comment")||null,trimLen(reason,"reason")||null]);
     const returnId=rr.rows[0].id;
     for(const line of lines){
-      const srcLine=data.lines.find(l=>l.request_item_id===Number(line.request_item_id));
+      const srcLine=data.lines.find(l=>Number(l.request_item_id)===Number(line.request_item_id));
       if(!srcLine) continue;
       const isRemoved=!!line.is_removed||Number(line.requested_return_qty)<=0;
       const qty=isRemoved?0:Number(line.requested_return_qty);
