@@ -294,11 +294,16 @@ function MyReturns({ refresh }) {
               <span className="text-sm font-semibold text-blue-700">€{fmt(r.total_value)}</span>
               <StatusBadge status={r.status} />
               {(r.status === "approved" || r.status === "rejected") && (
-                <a href={`${API_BASE}/returns/${r.id}/pdf?download=1`} target="_blank" rel="noreferrer"
-                  onClick={e => e.stopPropagation()}
-                  className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded font-medium">
-                  📄 PDF
-                </a>
+                <>
+                  <button onClick={async e => { e.stopPropagation(); try { const {data}=await api.get(`/returns/${r.id}/pdf`,{responseType:"arraybuffer"}); const blob=new Blob([data],{type:"application/pdf"}); window.open(URL.createObjectURL(blob),"_blank","noopener"); } catch{} }}
+                    className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded font-medium" title="Shiko PDF">
+                    📄
+                  </button>
+                  <button onClick={async e => { e.stopPropagation(); try { const {data}=await api.get(`/returns/${r.id}/pdf`,{responseType:"arraybuffer"}); const blob=new Blob([data],{type:"application/pdf"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`kthim-${r.id}.pdf`; document.body.appendChild(a); a.click(); a.remove(); } catch{} }}
+                    className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded font-medium" title="Shkarko PDF">
+                    ⬇
+                  </button>
+                </>
               )}
             </div>
           </button>

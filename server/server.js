@@ -1597,6 +1597,27 @@ app.post("/admin/pb-sync", requireAuth, requireRole("admin"), async (req, res) =
   }
 });
 
+// ── Return comments (reuses request_comments with negative IDs convention) ──
+// We store return comments in request_comments with request_id = -return_id
+// This avoids a new table while keeping the same pattern
+app.get("/returns/:id/comments", requireAuth, async(req,res)=>{
+  try {
+    const id=Number(req.params.id); if(!id) return res.status(400).json({error:"id"});
+    const r=await q(`SELECT c.*,u.first_name,u.last_name,u.role FROM return_comments c JOIN users u ON u.id=c.user_id WHERE c.return_id=$1 ORDER BY c.created_at`,[id]);
+    res.json(r.rows);
+  } catch(e){res.status(500).json({error:"server"});}
+});
+app.post("/returns/:id/comments", requireAuth, async(req,res)=>{
+  try {
+    const id=Number(req.params.id); if(!id) return res.status(400).json({error:"id"});
+    const body=trimLen(req.body?.body,"body"); if(!body) return res.status(400).json({error:"body mungon"});
+    const ret=await q("SELECT id FROM return_requests WHERE id=$1",[id]);
+    if(!ret.rowCount) return res.status(404).json({error:"not_found"});
+    await q(`INSERT INTO return_comments(return_id,user_id,body) VALUES($1,$2,$3)`,[id,req.user.id,body]);
+    res.json({ok:true});
+  } catch(e){res.status(500).json({error:"server"});}
+});
+
 // ════════════════════════════════════════════════════════════════
 // KTHIMI PA AFAT — Return Without Term Module
 // ════════════════════════════════════════════════════════════════
@@ -1610,6 +1631,9 @@ async function runKthimiMigration() {
     await q(`CREATE INDEX IF NOT EXISTS idx_return_requests_approval ON return_requests(financial_approval_id)`);
     await q(`CREATE INDEX IF NOT EXISTS idx_return_lines_return      ON return_request_lines(return_request_id)`);
     await q(`CREATE INDEX IF NOT EXISTS idx_return_approvals_return  ON return_approvals(return_id)`);
+    // Return comments table (separate from request_comments to avoid FK issues)
+    await q(`CREATE TABLE IF NOT EXISTS return_comments (id BIGSERIAL PRIMARY KEY, return_id BIGINT NOT NULL REFERENCES return_requests(id) ON DELETE CASCADE, user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE, body TEXT NOT NULL, created_at TIMESTAMPTZ DEFAULT now(), edited_at TIMESTAMPTZ)`);
+    await q(`CREATE INDEX IF NOT EXISTS idx_return_comments_return ON return_comments(return_id)`);
     console.log("[kthimi] Migration OK");
   } catch(e) { console.error("[kthimi] Migration error:", e?.message); }
 }

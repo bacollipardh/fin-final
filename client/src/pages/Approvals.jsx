@@ -4,6 +4,7 @@ import Layout from "../components/Layout";
 import { useToast } from "../components/Toast";
 import { StatusBadge, RoleBadge, SkeletonRow, Card, StatCard, euro } from "../components/ui";
 import Comments from "../components/Comments.jsx";
+import { ReturnComments } from "../components/Comments.jsx";
 
 const ROLE_LABEL = { team_lead:"Team Lead", division_manager:"Menaxher Divizioni", sales_director:"Drejtor Shitjesh" };
 const PER_PAGE = 25;
@@ -236,6 +237,17 @@ export default function Approvals() {
     } catch { toastError("Gabim gjatë hapjes PDF."); }
   };
 
+  const openReturnPdf = async (id, download=false) => {
+    try {
+      const { data } = await api.get(`/returns/${id}/pdf`, { responseType:"arraybuffer" });
+      const blob = new Blob([data], { type:"application/pdf" });
+      const url  = URL.createObjectURL(blob);
+      if (download) { const a=document.createElement("a"); a.href=url; a.download=`kthim-${id}.pdf`; document.body.appendChild(a); a.click(); a.remove(); }
+      else window.open(url, "_blank", "noopener");
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch { toastError("Gabim gjatë hapjes PDF."); }
+  };
+
   const openCommentModal = (id, action) => { setComment(""); setCommentModal({ id, action }); };
 
   const confirmAct = async () => {
@@ -271,9 +283,9 @@ export default function Approvals() {
   };
 
   /* ── Stats ── */
-  const pendingCount  = pendTotal;
-  const approvedCount = myHistory.filter(h=>h.action==="approved").length;
-  const rejectedCount = myHistory.filter(h=>h.action==="rejected").length;
+  const pendingCount  = pendTotal + pendingReturns.length;
+  const approvedCount = myHistory.filter(h=>h.action==="approved").length + returnsHistory.filter(r=>r.status==="approved").length;
+  const rejectedCount = myHistory.filter(h=>h.action==="rejected").length + returnsHistory.filter(r=>r.status==="rejected").length;
 
   /* ── Keyboard shortcuts ── */
   useEffect(() => {
@@ -518,11 +530,18 @@ export default function Approvals() {
                   </table>
                 </div>
                 <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 flex gap-2 justify-end items-center">
-                  <a href={`${(api?.defaults?.baseURL||import.meta.env.VITE_API_URL||"").replace(/\/$/,"")}/returns/${r.id}/pdf`}
-                    target="_blank" rel="noreferrer"
-                    className="mr-auto text-xs px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg font-medium">
+                  <button onClick={()=>openReturnPdf(r.id)}
+                    className="mr-auto text-xs px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg font-medium flex items-center gap-1">
                     📄 Shiko PDF
-                  </a>
+                  </button>
+                  <button onClick={()=>openReturnPdf(r.id, true)}
+                    className="text-xs px-2 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg font-medium" title="Shkarko PDF">
+                    ⬇
+                  </button>
+                  <button onClick={()=>setReturnCommentId(r.id)}
+                    className="text-xs px-2 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-blue-500 rounded-lg font-medium" title="Komente">
+                    💬
+                  </button>
                   <button onClick={()=>setReturnModal({id:r.id,action:"rejected"})}
                     className="px-4 py-1.5 text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors">
                     ✕ Refuzo
@@ -553,11 +572,14 @@ export default function Approvals() {
                         <span className={`text-xs font-semibold px-2 py-1 rounded-full ${r.status==="approved"?"bg-green-100 text-green-700":"bg-red-100 text-red-700"}`}>
                           {r.status==="approved"?"✓ Aprovuar":"✕ Refuzuar"}
                         </span>
-                        <a href={`${(api?.defaults?.baseURL||import.meta.env.VITE_API_URL||"").replace(/\/$/,"")}/returns/${r.id}/pdf?download=1`}
-                          target="_blank" rel="noreferrer"
-                          className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded font-medium">
-                          📄 PDF
-                        </a>
+                        <button onClick={()=>openReturnPdf(r.id)}
+                          className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded font-medium" title="Shiko PDF">
+                          📄
+                        </button>
+                        <button onClick={()=>openReturnPdf(r.id, true)}
+                          className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded font-medium" title="Shkarko PDF">
+                          ⬇
+                        </button>
                       </div>
                     </div>
                     {r.last_approver && <p className="text-xs text-slate-400 mt-1">Vendimi nga {r.last_approver}{r.last_comment?` — "${r.last_comment}"`:""}</p>}
@@ -665,6 +687,21 @@ export default function Approvals() {
           </div>
         </div>
       )}
+    {/* ═══ RETURN COMMENT MODAL ═══ */}
+      {returnCommentId && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setReturnCommentId(null)}>
+          <div className="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-lg p-0 overflow-hidden" onClick={e=>e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 dark:border-slate-700">
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">💬 Diskutim — Kthim #{returnCommentId}</span>
+              <button onClick={() => setReturnCommentId(null)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 text-xl">&times;</button>
+            </div>
+            <div className="p-4 max-h-[70vh] overflow-y-auto">
+              <ReturnComments requestId={returnCommentId} currentUser={profile} />
+            </div>
+          </div>
+        </div>
+      )}
+
     {/* ═══ RETURN APPROVAL MODAL ═══ */}
       {returnModal && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
