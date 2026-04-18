@@ -7,6 +7,7 @@ import BarcodeScanner from "../components/BarcodeScanner.jsx";
 import CameraModal from "../components/CameraModal.jsx";
 import LotScanner from "../components/LotScanner.jsx";
 import Comments from "../components/Comments.jsx";
+import KthimiPaAfat from "./KthimiPaAfat.jsx";
 
 function roleForAmount(total, thresholds) {
   const tlMax = thresholds?.team_lead_max ?? 99;
@@ -235,7 +236,7 @@ export default function Agent() {
   useEffect(() => {
     if (!pickedArticle || !buyerCode) return;
     // Lookup VETËM kur lot kodi është shkruar (min 3 karaktere)
-    if (!debouncedLot.trim() || debouncedLot.trim().length < 6) { setPriceData(null); setPriceErr(""); setPriceLoading(false); return; }
+    if (!debouncedLot.trim() || debouncedLot.trim().length < 1) { setPriceData(null); setPriceErr(""); setPriceLoading(false); return; }
     const buyer = buyersByCode.get(buyerCode);
     const sifraKup = buyer?.pb_sifra_kup || buyerCode;
 
@@ -443,7 +444,7 @@ export default function Agent() {
         ))}
 
         <div className="flex border-b border-slate-200 gap-1">
-          {[{ key:"form", label:"+ Kërkesë e Re" }, { key:"history", label:`Historiku${total > 0 ? ` (${total})` : ""}` }].map(t => (
+          {[{ key:"form", label:"+ Kërkesë e Re" }, { key:"history", label:`Historiku${total > 0 ? ` (${total})` : ""}` }, { key:"kthimi", label:"↩ Kthimi pa Afat" }].map(t => (
             <button key={t.key} onClick={() => setActiveTab(t.key)}
               className={`px-5 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px
                 ${activeTab===t.key ? "border-[#1e3a5f] text-[#1e3a5f]" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
@@ -810,6 +811,13 @@ export default function Agent() {
           </div>
         </div>
       )}
+
+        {/* ════ TAB: KTHIMI PA AFAT ════ */}
+        {activeTab === "kthimi" && (
+          <div className="py-4">
+            <KthimiPaAfat />
+          </div>
+        )}
 
       {gallery.open && (
         <div className="fixed inset-0 z-50 bg-black/85 flex flex-col items-center justify-center p-4" onClick={closeGallery}>

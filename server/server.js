@@ -1337,6 +1337,167 @@ app.post("/admin/pb-sync", requireAuth, requireRole("admin"), async (req, res) =
   }
 });
 
+// ════════════════════════════════════════════════════════════════
+// KTHIMI PA AFAT — Return Without Term Module
+// ════════════════════════════════════════════════════════════════
+async function runKthimiMigration() {
+  try {
+    await q(`CREATE TABLE IF NOT EXISTS return_requests (id BIGSERIAL PRIMARY KEY, financial_approval_id INT NOT NULL REFERENCES requests(id) ON DELETE RESTRICT, agent_id INT NOT NULL REFERENCES users(id), buyer_id INT REFERENCES buyers(id), site_id INT REFERENCES buyer_sites(id), division_id INT REFERENCES divisions(id), status req_status DEFAULT 'pending', required_role user_role NOT NULL, total_value NUMERIC(12,2) NOT NULL DEFAULT 0, comment TEXT, reason TEXT, created_at TIMESTAMPTZ DEFAULT now())`);
+    await q(`CREATE TABLE IF NOT EXISTS return_request_lines (id BIGSERIAL PRIMARY KEY, return_request_id BIGINT NOT NULL REFERENCES return_requests(id) ON DELETE CASCADE, request_item_id BIGINT REFERENCES request_items(id), article_id INT REFERENCES articles(id), sku TEXT NOT NULL, name TEXT NOT NULL, lot_kod TEXT, final_price NUMERIC(18,6) NOT NULL DEFAULT 0, approved_qty INT NOT NULL DEFAULT 0, already_returned_qty INT NOT NULL DEFAULT 0, remaining_qty INT NOT NULL DEFAULT 0, requested_return_qty INT NOT NULL DEFAULT 0, is_removed BOOLEAN DEFAULT FALSE, created_at TIMESTAMPTZ DEFAULT now())`);
+    await q(`CREATE TABLE IF NOT EXISTS return_approvals (id BIGSERIAL PRIMARY KEY, return_id BIGINT NOT NULL REFERENCES return_requests(id) ON DELETE CASCADE, approver_id INT NOT NULL REFERENCES users(id), approver_role user_role NOT NULL, action req_status NOT NULL, comment TEXT, acted_at TIMESTAMPTZ DEFAULT now())`);
+    await q(`CREATE INDEX IF NOT EXISTS idx_return_requests_agent    ON return_requests(agent_id)`);
+    await q(`CREATE INDEX IF NOT EXISTS idx_return_requests_status   ON return_requests(status)`);
+    await q(`CREATE INDEX IF NOT EXISTS idx_return_requests_approval ON return_requests(financial_approval_id)`);
+    await q(`CREATE INDEX IF NOT EXISTS idx_return_lines_return      ON return_request_lines(return_request_id)`);
+    await q(`CREATE INDEX IF NOT EXISTS idx_return_approvals_return  ON return_approvals(return_id)`);
+    console.log("[kthimi] Migration OK");
+  } catch(e) { console.error("[kthimi] Migration error:", e?.message); }
+}
+runKthimiMigration();
+
+async function loadFinancialApprovalForReturn(reqId) {
+  const r = await q(`SELECT r.id,r.status,r.amount,r.required_role,r.division_id,r.agent_id,r.buyer_id,r.site_id,b.code AS buyer_code,b.name AS buyer_name,s.site_name,u.first_name AS agent_first,u.last_name AS agent_last FROM requests r JOIN buyers b ON b.id=r.buyer_id LEFT JOIN buyer_sites s ON s.id=r.site_id JOIN users u ON u.id=r.agent_id WHERE r.id=$1 AND r.status='approved'`, [reqId]);
+  if (!r.rowCount) return null;
+  const req = r.rows[0];
+  const items = await q(`SELECT ri.id AS request_item_id,ri.article_id,ri.lot_kod,ri.barkod,ri.quantity AS approved_qty,ri.line_amount,ri.cmimi_pas_rabateve AS final_price,ri.lejim_pct,a.sku,a.name,COALESCE((SELECT SUM(rl.requested_return_qty) FROM return_request_lines rl JOIN return_requests rr ON rr.id=rl.return_request_id WHERE rl.request_item_id=ri.id AND rl.is_removed=FALSE AND rr.status!='rejected'),0)::int AS already_returned_qty FROM request_items ri JOIN articles a ON a.id=ri.article_id WHERE ri.request_id=$1 ORDER BY ri.id`, [reqId]);
+  const lines = items.rows.map(row => ({ ...row, final_price: Number(row.final_price || (row.line_amount / Math.max(row.approved_qty,1)) || 0), remaining_qty: Math.max(0, row.approved_qty - row.already_returned_qty) }));
+  return { req, lines };
+}
+
+app.get("/returns/approvals/search", requireAuth, requireRole("agent","avancues","admin"), async(req,res)=>{
+  try {
+    const { q: query, id } = req.query;
+    if (id) {
+      const numId=Number(id); if(!numId) return res.status(400).json({error:"ID invalid"});
+      const data=await loadFinancialApprovalForReturn(numId);
+      if(!data) return res.status(404).json({error:"Aprovimi financiar nuk u gjet ose nuk është aprovuar"});
+      return res.json([data.req]);
+    }
+    const search=(query||"").trim(); if(!search) return res.json([]);
+    const user=req.user;
+    const divFilter=user.role==="admin"?"":"AND r.division_id=$2";
+    const params=user.role==="admin"?[`%${search}%`]:[`%${search}%`,user.division_id];
+    const r=await q(`SELECT r.id,r.amount,r.created_at,b.code AS buyer_code,b.name AS buyer_name,s.site_name,u.first_name AS agent_first,u.last_name AS agent_last,r.required_role FROM requests r JOIN buyers b ON b.id=r.buyer_id LEFT JOIN buyer_sites s ON s.id=r.site_id JOIN users u ON u.id=r.agent_id WHERE r.status='approved' ${divFilter} AND (b.name ILIKE $1 OR b.code ILIKE $1 OR s.site_name ILIKE $1 OR r.id::text ILIKE $1 OR EXISTS(SELECT 1 FROM request_items ri JOIN articles a ON a.id=ri.article_id WHERE ri.request_id=r.id AND (a.sku ILIKE $1 OR a.name ILIKE $1))) AND NOT EXISTS(SELECT 1 FROM return_requests rr WHERE rr.financial_approval_id=r.id AND rr.status!='rejected') ORDER BY r.id DESC LIMIT 20`,params);
+    res.json(r.rows);
+  } catch(e){console.error("[returns/search]",e?.message);res.status(500).json({error:"server"});}
+});
+
+app.get("/returns/approvals/:id", requireAuth, requireRole("agent","avancues","admin"), async(req,res)=>{
+  try {
+    const numId=Number(req.params.id); if(!numId) return res.status(400).json({error:"ID invalid"});
+    const data=await loadFinancialApprovalForReturn(numId);
+    if(!data) return res.status(404).json({error:"Aprovimi financiar nuk u gjet ose nuk është aprovuar"});
+    res.json(data);
+  } catch(e){console.error("[returns/approvals/:id]",e?.message);res.status(500).json({error:"server"});}
+});
+
+app.post("/returns", requireAuth, requireRole("agent","avancues","admin"), async(req,res)=>{
+  const client=await getClient();
+  try {
+    const{financial_approval_id,comment,reason,lines}=req.body;
+    const faId=cleanId(financial_approval_id); if(!faId) return res.status(400).json({error:"financial_approval_id mungon"});
+    if(!Array.isArray(lines)||!lines.length) return res.status(400).json({error:"Linjat mungojnë"});
+    const activeLines=lines.filter(l=>!l.is_removed&&Number(l.requested_return_qty)>0);
+    if(!activeLines.length) return res.status(400).json({error:"Duhet të ketë të paktën një linjë aktive"});
+    const data=await loadFinancialApprovalForReturn(faId);
+    if(!data) return res.status(404).json({error:"Aprovimi financiar nuk u gjet"});
+    const existing=await q("SELECT id FROM return_requests WHERE financial_approval_id=$1 AND status!='rejected'",[faId]);
+    if(existing.rowCount) return res.status(409).json({error:"Ky aprovim financiar tashmë ka një kërkesë kthimi"});
+    for(const line of activeLines){
+      const srcLine=data.lines.find(l=>l.request_item_id===Number(line.request_item_id));
+      if(!srcLine) return res.status(400).json({error:`Linja ${line.request_item_id} nuk u gjet`});
+      const qty=Number(line.requested_return_qty);
+      if(!Number.isFinite(qty)||qty<=0) return res.status(400).json({error:`Sasia e pavlefshme për ${srcLine.sku}`});
+      if(qty>srcLine.remaining_qty) return res.status(400).json({error:`Sasia e kërkuar (${qty}) tejkalon të mbetur (${srcLine.remaining_qty}) për ${srcLine.sku}`});
+    }
+    const totalValue=activeLines.reduce((sum,l)=>{const s=data.lines.find(dl=>dl.request_item_id===Number(l.request_item_id));return sum+(s?.final_price||0)*Number(l.requested_return_qty);},0);
+    const requiredRole=data.req.required_role;
+    await client.query("BEGIN");
+    const rr=await client.query(`INSERT INTO return_requests(financial_approval_id,agent_id,buyer_id,site_id,division_id,status,required_role,total_value,comment,reason) VALUES($1,$2,$3,$4,$5,'pending',$6,$7,$8,$9) RETURNING id`,[faId,req.user.id,data.req.buyer_id,data.req.site_id,data.req.division_id,requiredRole,totalValue,trimLen(comment,"comment")||null,trimLen(reason,"reason")||null]);
+    const returnId=rr.rows[0].id;
+    for(const line of lines){
+      const srcLine=data.lines.find(l=>l.request_item_id===Number(line.request_item_id));
+      if(!srcLine) continue;
+      const isRemoved=!!line.is_removed||Number(line.requested_return_qty)<=0;
+      const qty=isRemoved?0:Number(line.requested_return_qty);
+      await client.query(`INSERT INTO return_request_lines(return_request_id,request_item_id,article_id,sku,name,lot_kod,final_price,approved_qty,already_returned_qty,remaining_qty,requested_return_qty,is_removed) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,[returnId,srcLine.request_item_id,srcLine.article_id,srcLine.sku,srcLine.name,srcLine.lot_kod||null,srcLine.final_price,srcLine.approved_qty,srcLine.already_returned_qty,srcLine.remaining_qty,qty,isRemoved]);
+    }
+    await client.query("COMMIT");
+    try {
+      const toEmails=await approverEmailsFor({...data.req,id:faId,required_role:requiredRole});
+      const{subject,html}=emailNewRequest({reqRow:{...data.req,id:returnId,reason},totalAmount:totalValue,requiredRole,photoCount:0,appUrl:APP_URL});
+      await sendMail({to:toEmails,subject:subject.replace("[Fin Approvals]","[Kthim pa Afat]"),html});
+    } catch(e){console.warn("[returns] email:",e?.message);}
+    await audit(req,"create","return_request",returnId,{financial_approval_id:faId,total_value:totalValue});
+    res.json({id:returnId,ok:true});
+  } catch(e){await client.query("ROLLBACK").catch(()=>{});console.error("[returns POST]",e?.message);res.status(500).json({error:"server"});}
+  finally{client.release();}
+});
+
+app.get("/returns/my", requireAuth, requireRole("agent","avancues","admin"), async(req,res)=>{
+  try {
+    const r=await q(`SELECT rr.id,rr.financial_approval_id,rr.status,rr.required_role,rr.total_value,rr.comment,rr.reason,rr.created_at,b.code AS buyer_code,b.name AS buyer_name,s.site_name,COALESCE((SELECT json_agg(json_build_object('id',rl.id,'sku',rl.sku,'name',rl.name,'lot_kod',rl.lot_kod,'final_price',rl.final_price,'approved_qty',rl.approved_qty,'already_returned_qty',rl.already_returned_qty,'remaining_qty',rl.remaining_qty,'requested_return_qty',rl.requested_return_qty,'is_removed',rl.is_removed) ORDER BY rl.id) FROM return_request_lines rl WHERE rl.return_request_id=rr.id),'[]'::json) AS lines,ra.action AS last_action,ra.comment AS last_comment,u2.first_name||' '||u2.last_name AS last_approver FROM return_requests rr JOIN buyers b ON b.id=rr.buyer_id LEFT JOIN buyer_sites s ON s.id=rr.site_id LEFT JOIN LATERAL(SELECT * FROM return_approvals WHERE return_id=rr.id ORDER BY acted_at DESC LIMIT 1) ra ON TRUE LEFT JOIN users u2 ON u2.id=ra.approver_id WHERE rr.agent_id=$1 ORDER BY rr.id DESC`,[req.user.id]);
+    res.json(r.rows);
+  } catch(e){console.error("[returns/my]",e?.message);res.status(500).json({error:"server"});}
+});
+
+app.get("/returns/pending", requireAuth, requireRole("team_lead","division_manager","sales_director"), async(req,res)=>{
+  try {
+    const user=req.user;
+    const isSd=user.role==="sales_director";
+    const divFilter=isSd?"":"AND rr.division_id=$2";
+    const approverParam=isSd?"$2":"$3";
+    const params=isSd?[user.role,user.id]:[user.role,user.division_id,user.id];
+    const r=await q(`SELECT rr.id,rr.financial_approval_id,rr.status,rr.required_role,rr.total_value,rr.comment,rr.reason,rr.created_at,b.code AS buyer_code,b.name AS buyer_name,s.site_name,u.first_name AS agent_first,u.last_name AS agent_last,COALESCE((SELECT json_agg(json_build_object('id',rl.id,'sku',rl.sku,'name',rl.name,'lot_kod',rl.lot_kod,'final_price',rl.final_price,'approved_qty',rl.approved_qty,'remaining_qty',rl.remaining_qty,'requested_return_qty',rl.requested_return_qty,'is_removed',rl.is_removed) ORDER BY rl.id) FROM return_request_lines rl WHERE rl.return_request_id=rr.id AND rl.is_removed=FALSE),'[]'::json) AS lines FROM return_requests rr JOIN buyers b ON b.id=rr.buyer_id LEFT JOIN buyer_sites s ON s.id=rr.site_id JOIN users u ON u.id=rr.agent_id WHERE rr.status='pending' AND rr.required_role=$1 ${divFilter} AND NOT EXISTS(SELECT 1 FROM return_approvals ra WHERE ra.return_id=rr.id AND ra.approver_id=${approverParam}) ORDER BY rr.id ASC`,params);
+    res.json(r.rows);
+  } catch(e){console.error("[returns/pending]",e?.message);res.status(500).json({error:"server"});}
+});
+
+app.get("/returns/history", requireAuth, requireRole("team_lead","division_manager","sales_director","admin"), async(req,res)=>{
+  try {
+    const user=req.user;
+    const divFilter=(user.role==="sales_director"||user.role==="admin")?"":"AND rr.division_id=$1";
+    const params=(user.role==="sales_director"||user.role==="admin")?[]:[user.division_id];
+    const r=await q(`SELECT rr.id,rr.financial_approval_id,rr.status,rr.required_role,rr.total_value,rr.comment,rr.reason,rr.created_at,b.code AS buyer_code,b.name AS buyer_name,s.site_name,u.first_name AS agent_first,u.last_name AS agent_last,ra.action AS last_action,ra.comment AS last_comment,ra.acted_at,u2.first_name||' '||u2.last_name AS last_approver FROM return_requests rr JOIN buyers b ON b.id=rr.buyer_id LEFT JOIN buyer_sites s ON s.id=rr.site_id JOIN users u ON u.id=rr.agent_id LEFT JOIN LATERAL(SELECT * FROM return_approvals WHERE return_id=rr.id ORDER BY acted_at DESC LIMIT 1) ra ON TRUE LEFT JOIN users u2 ON u2.id=ra.approver_id WHERE rr.status!='pending' ${divFilter} ORDER BY rr.id DESC LIMIT 100`,params);
+    res.json(r.rows);
+  } catch(e){console.error("[returns/history]",e?.message);res.status(500).json({error:"server"});}
+});
+
+async function actOnReturn({returnId,action,comment,user}){
+  if(!["approved","rejected"].includes(action)) throw new Error("bad_action");
+  const rr=await q("SELECT * FROM return_requests WHERE id=$1",[returnId]);
+  if(!rr.rowCount) throw new Error("not_found");
+  const ret=rr.rows[0];
+  if(ret.status!=="pending") throw new Error("already_decided");
+  if(ret.required_role!==user.role) throw new Error("wrong_role");
+  const client=await getClient();
+  try {
+    await client.query("BEGIN");
+    await client.query("UPDATE return_requests SET status=$1 WHERE id=$2",[action,returnId]);
+    await client.query("INSERT INTO return_approvals(return_id,approver_id,approver_role,action,comment,acted_at) VALUES($1,$2,$3,$4,$5,NOW())",[returnId,user.id,user.role,action,trimLen(comment,"comment")||null]);
+    await client.query("COMMIT");
+    try {
+      const agentR=await q("SELECT email FROM users WHERE id=$1",[ret.agent_id]);
+      const buyerR=await q("SELECT code,name FROM buyers WHERE id=$1",[ret.buyer_id]);
+      const buyer=buyerR.rows[0];
+      const approverName=`${user.first_name||""} ${user.last_name||""}`.trim();
+      const{subject,html}=emailApprovalResult({reqRow:{id:returnId,amount:ret.total_value,buyer_code:buyer?.code,buyer_name:buyer?.name},action,approverName,approverRole:user.role,comment,appUrl:APP_URL});
+      await sendMail({to:[agentR.rows[0]?.email,process.env.LEJIMET_EMAIL].filter(Boolean),subject:subject.replace("[Fin Approvals]","[Kthim pa Afat]"),html});
+    } catch(e){console.warn("[returns/act] email:",e?.message);}
+    return{ok:true,action};
+  } catch(e){await client.query("ROLLBACK").catch(()=>{});throw e;}
+  finally{client.release();}
+}
+
+app.post("/returns/:id/approved",requireAuth,requireRole("team_lead","division_manager","sales_director"),async(req,res)=>{
+  try{res.json(await actOnReturn({returnId:Number(req.params.id),action:"approved",comment:req.body?.comment||"",user:req.user}));}
+  catch(e){const map={not_found:404,wrong_role:403,forbidden:403,already_decided:409};res.status(map[e.message]||500).json({error:e.message});}
+});
+app.post("/returns/:id/rejected",requireAuth,requireRole("team_lead","division_manager","sales_director"),async(req,res)=>{
+  try{res.json(await actOnReturn({returnId:Number(req.params.id),action:"rejected",comment:req.body?.comment||"",user:req.user}));}
+  catch(e){const map={not_found:404,wrong_role:403,forbidden:403,already_decided:409};res.status(map[e.message]||500).json({error:e.message});}
+});
+
 // Startup security checks
 const JWT_SECRET = process.env.JWT_SECRET || "";
 if (!JWT_SECRET || JWT_SECRET.includes("ndrysho") || JWT_SECRET.length < 32) {
