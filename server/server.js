@@ -1128,6 +1128,14 @@ app.post("/requests",requireAuth,requireRole("agent","avancues","admin"),upload.
         );
         articleIdBySku.set(sku,upsert.rows[0].id);
       }
+      // Merr barkodet nga DB lokale per artikujt qe nuk e kane nga PB
+      const skusWithoutBarkod=items.filter(i=>!i.barkod).map(i=>trimLen(i.sku||i.article_id?.toString()||"","sku")).filter(Boolean);
+      const localBarkodMap=new Map();
+      if(skusWithoutBarkod.length>0){
+        const bRows=await q("SELECT sku,barkod FROM articles WHERE sku=ANY($1::text[]) AND barkod IS NOT NULL AND barkod!=\'\'",[skusWithoutBarkod]);
+        bRows.rows.forEach(r=>localBarkodMap.set(r.sku?.trim().toUpperCase(),r.barkod));
+      }
+
       normalizedItems=items.map(i=>{
         const sku=trimLen(i.sku||i.article_id?.toString()||"","sku");
         const aid=articleIdBySku.get(sku)||Number(i.article_id)||null;
@@ -1135,7 +1143,9 @@ app.post("/requests",requireAuth,requireRole("agent","avancues","admin"),upload.
         const discPct=Math.max(0,Math.min(100,Number(i.discount_percent||0)));
         const unitPrice=i.cmimi_baze!=null?Number(i.cmimi_baze):0;
         const lineAmt=i.cmimi_pas_rabateve!=null?Number((Number(i.cmimi_pas_rabateve)*qty).toFixed(2)):Number((unitPrice*qty*(1-discPct/100)).toFixed(2));
-        return{article_id:aid,quantity:qty,line_amount:lineAmt,barkod:i.barkod||null,lot_kod:i.lot_kod||null,cmimi_baze:i.cmimi_baze!=null?Number(i.cmimi_baze):null,rabat_pct:i.rabat_pct!=null?Number(i.rabat_pct):null,lejim_pct:i.lejim_pct!=null?Number(i.lejim_pct):null,ddv_pct:i.ddv_pct!=null?Number(i.ddv_pct):null,cmimi_pas_rabateve:i.cmimi_pas_rabateve!=null?Number(i.cmimi_pas_rabateve):null,price_match_level:i.price_match_level||null,sifra_kup:i.sifra_kup||null,sifra_obj:i.sifra_obj!=null?Number(i.sifra_obj):null};
+        // Barkod: nga klienti ose fallback nga DB lokale
+        const barkod=i.barkod||localBarkodMap.get(sku?.trim().toUpperCase())||null;
+        return{article_id:aid,quantity:qty,line_amount:lineAmt,barkod,lot_kod:i.lot_kod||null,cmimi_baze:i.cmimi_baze!=null?Number(i.cmimi_baze):null,rabat_pct:i.rabat_pct!=null?Number(i.rabat_pct):null,lejim_pct:i.lejim_pct!=null?Number(i.lejim_pct):null,ddv_pct:i.ddv_pct!=null?Number(i.ddv_pct):null,cmimi_pas_rabateve:i.cmimi_pas_rabateve!=null?Number(i.cmimi_pas_rabateve):null,price_match_level:i.price_match_level||null,sifra_kup:i.sifra_kup||null,sifra_obj:i.sifra_obj!=null?Number(i.sifra_obj):null};
       });
       totalAmount=normalizedItems.reduce((s,it)=>s+Number(it.line_amount||0),0);
     }else{totalAmount=Number(amount||0)}

@@ -112,7 +112,37 @@ export async function syncArticles() {
 
     // Divisions menaxhohen manualisht - NUK sync-ohen nga PricingBridge
     // (PB ka ID te ndryshme nga DB jone, mapping behet nepermjet pb_id kolones)
-    console.log(`[pbSync] Articles synced: ${count}, Divisions: skipped (manual)`);
+
+    // ── Sync barkodet nga by-division endpoint (search nuk i kthen) ──
+    console.log('[pbSync] Syncing barcodes from by-division...');
+    let barkodCount = 0;
+    const pbDivIds = Object.keys(pbToLocal).map(Number).filter(d => d !== 8);
+    for (const pbDivId of pbDivIds) {
+      let page = 1;
+      let hasMore = true;
+      while (hasMore) {
+        try {
+          const resp = await pbFetch(`/api/articles/by-division?sifraDiv=${pbDivId}&page=${page}&pageSize=500`);
+          const items = resp.data ?? [];
+          for (const art of items) {
+            const sku = art.Sifra_Art?.trim();
+            const barkod = art.BarKodGlaven?.trim() || null;
+            if (!sku || !barkod) continue;
+            await q(
+              `UPDATE articles SET barkod = $1 WHERE sku = $2 AND (barkod IS NULL OR barkod = '')`,
+              [barkod, sku]
+            );
+            barkodCount++;
+          }
+          hasMore = items.length === 500;
+          page++;
+        } catch (e) {
+          console.warn(`[pbSync] Barkod sync failed for div ${pbDivId}:`, e.message);
+          break;
+        }
+      }
+    }
+    console.log(`[pbSync] Articles synced: ${count}, Barcodes updated: ${barkodCount}, Divisions: skipped (manual)`);
     return count;
   } catch (err) {
     console.error('[pbSync] Articles sync error:', err.message);
