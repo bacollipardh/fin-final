@@ -60,6 +60,8 @@ export default function Avancues() {
   const [priceData, setPriceData]       = useState(null);
   const [priceLoading, setPriceLoading] = useState(false);
   const [priceErr, setPriceErr]         = useState("");
+  const [lotSuggestions, setLotSuggestions] = useState([]);
+  const [lotSugLoading, setLotSugLoading]   = useState(false);
 
   /* ── Barcode + Camera ── */
   const [barcode, setBarcode]   = useState(false);
@@ -175,7 +177,7 @@ export default function Avancues() {
 
   const pickArticle = useCallback((art) => {
     setPicked(art); setQuery(`${art.Sifra_Art} — ${art.ImeArt}`);
-    setPbSuggestions([]); setLotKod(""); setPriceData(null); setPriceErr(""); setDiscount(""); setLejimAutoCalc(false);
+    setPbSuggestions([]); setLotKod(""); setPriceData(null); setPriceErr(""); setDiscount(""); setLejimAutoCalc(false); setLotSuggestions([]);
   }, []);
 
   /* ── Barcode scanner ── */
@@ -232,8 +234,26 @@ export default function Avancues() {
   /* ── PricingBridge: lookup çmimi ── */
   const debouncedLot = useDebounce(lotKod, 600);
 
+  /* ── PricingBridge: lot suggestions (autocomplete) ── */
   useEffect(() => {
-    if (!pickedArticle || !buyerCode) return;
+    if (!pickedArticle || !buyerCode || debouncedLot.trim().length < 3) {
+      setLotSuggestions([]);
+      return;
+    }
+    if (lotSuggestions.some(s => s.LotBr === debouncedLot.trim())) return;
+
+    const buyer = buyersByCode.get(buyerCode);
+    const sifraKup = buyer?.pb_sifra_kup || buyerCode;
+    const params = new URLSearchParams({ sifraKup, sifraArt: pickedArticle.Sifra_Art, q: debouncedLot.trim() });
+    if (sitePbCode) params.append("sifraObj", sitePbCode);
+
+    setLotSugLoading(true);
+    api.get(`/pb/search-lots?${params}`)
+      .then(r => setLotSuggestions(Array.isArray(r.data) ? r.data : []))
+      .catch(() => setLotSuggestions([]))
+      .finally(() => setLotSugLoading(false));
+  }, [debouncedLot, pickedArticle, buyerCode, sitePbCode]);
+
     // Lookup VETËM kur lot kodi është shkruar (min 3 karaktere)
     if (!debouncedLot.trim() || debouncedLot.trim().length < 6) { setPriceData(null); setPriceErr(""); setPriceLoading(false); return; }
     const buyer = buyersByCode.get(buyerCode);
@@ -593,15 +613,40 @@ export default function Avancues() {
                     <div className="flex gap-2 items-center">
                       <div className="relative flex-1">
                         <input type="text" value={lotKod}
-                          onChange={e => { setLotKod(e.target.value); setPriceData(null); setPriceErr(""); }}
+                          onChange={e => { setLotKod(e.target.value); setPriceData(null); setPriceErr(""); setLotSuggestions([]); }}
+                          onBlur={() => setTimeout(() => setLotSuggestions([]), 200)}
                           disabled={!buyerCode}
                           placeholder="p.sh. 281124IT101A"
+                          autoComplete="off"
                           className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-sky-400/30 disabled:bg-slate-100 disabled:text-slate-400" />
-                        {priceLoading && <span className="absolute right-2 top-2 text-xs text-blue-500">⏳</span>}
+                        {(priceLoading || lotSugLoading) && <span className="absolute right-2 top-2.5 text-xs text-blue-500">⏳</span>}
+                        {lotSuggestions.length > 0 && (
+                          <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden">
+                            {lotSuggestions.map((s, i) => (
+                              <button
+                                key={i}
+                                type="button"
+                                onMouseDown={() => {
+                                  setLotKod(s.LotBr);
+                                  setLotSuggestions([]);
+                                  setPriceData(null);
+                                  setPriceErr("");
+                                }}
+                                className="w-full text-left px-3 py-2 hover:bg-sky-50 flex justify-between items-center gap-2 border-b border-slate-100 last:border-0"
+                              >
+                                <span className="font-mono text-sm font-semibold text-slate-800">{s.LotBr}</span>
+                                <span className="text-xs text-slate-400 shrink-0">
+                                  {s.Datum_Dok ? new Date(s.Datum_Dok).toLocaleDateString("sq-AL") : ""}
+                                  {s.CmimiBaze ? ` · ${Number(s.CmimiBaze).toFixed(2)}€` : ""}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                       <LotScanner
                         disabled={!buyerCode}
-                        onResult={text => { setLotKod(text); setPriceData(null); setPriceErr(""); }}
+                        onResult={text => { setLotKod(text); setPriceData(null); setPriceErr(""); setLotSuggestions([]); }}
                       />
                     </div>
                     {priceErr && !priceLoading && <p className="text-xs text-amber-600 mt-1">⚠ {priceErr}</p>}
