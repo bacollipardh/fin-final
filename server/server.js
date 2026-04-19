@@ -20,7 +20,7 @@ import { normalizeNumbers } from "./normalize-mw.js";
 import { sendMail, emailNewRequest, emailApprovalResult, emailPasswordReset } from "./mailer.js";
 import { audit } from "./audit.js";
 import { startCronJobs } from "./cron.js";
-import { pbSearchArticle, pbLookupPrice } from "./pricingBridge.js";
+import { pbSearchArticle, pbLookupPrice, pbSearchLots } from "./pricingBridge.js";
 import { runFullSync, syncArticles, syncBuyers } from "./pbSync.js";
 
 dotenv.config();
@@ -722,6 +722,19 @@ app.get("/pb/price", requireAuth, async(req,res)=>{
     return res.json({price:result});
   }catch(e){
     console.error("[PB] price lookup:",e.message);
+    return res.status(502).json({error:"PricingBridge nuk disponueshëm",detail:e.message});
+  }
+});
+
+app.get("/pb/search-lots", requireAuth, async(req,res)=>{
+  const{sifraKup,sifraObj,sifraArt,q}=req.query;
+  if(!sifraKup||!sifraArt||!q) return res.status(400).json({error:"sifraKup, sifraArt dhe q të detyrueshme"});
+  if(q.trim().length < 3) return res.json([]);
+  try{
+    const lots=await pbSearchLots({sifraKup:sifraKup.trim(),sifraObj:sifraObj?parseInt(sifraObj):null,sifraArt:sifraArt.trim(),q:q.trim()});
+    return res.json(lots);
+  }catch(e){
+    console.error("[PB] search-lots:",e.message);
     return res.status(502).json({error:"PricingBridge nuk disponueshëm",detail:e.message});
   }
 });

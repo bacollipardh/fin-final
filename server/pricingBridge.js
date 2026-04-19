@@ -59,3 +59,21 @@ export async function pbLookupPrice({ sifraKup, sifraObj, sifraArt, lotBr }) {
   }
   return raw;
 }
+
+/**
+ * Kërkon lot kodet me prefix (autocomplete)
+ * GET /api/pricing/search-lots?sifraKup=...&sifraObj=...&sifraArt=...&q=...
+ */
+export async function pbSearchLots({ sifraKup, sifraObj, sifraArt, q }) {
+  const params = new URLSearchParams({ sifraKup, sifraArt, q });
+  if (sifraObj != null) params.append('sifraObj', String(sifraObj));
+
+  const res = await fetch(`${PRICING_BRIDGE_URL}/api/pricing/search-lots?${params}`, {
+    signal: AbortSignal.timeout(5000),
+  });
+  // Nëse PricingBridge nuk e ka këtë endpoint — kthe array bosh (jo error)
+  if (res.status === 404 || res.status === 405) return [];
+  if (!res.ok) throw new Error(`PricingBridge search-lots HTTP ${res.status}`);
+  const data = await res.json();
+  return Array.isArray(data) ? data : (data.lots ?? data.data ?? []);
+}
