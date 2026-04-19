@@ -254,6 +254,8 @@ export default function Avancues() {
       .finally(() => setLotSugLoading(false));
   }, [debouncedLot, pickedArticle, buyerCode, sitePbCode]);
 
+  useEffect(() => {
+    if (!pickedArticle || !buyerCode) return;
     // Lookup VETËM kur lot kodi është shkruar (min 3 karaktere)
     if (!debouncedLot.trim() || debouncedLot.trim().length < 6) { setPriceData(null); setPriceErr(""); setPriceLoading(false); return; }
     const buyer = buyersByCode.get(buyerCode);
