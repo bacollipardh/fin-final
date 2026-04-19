@@ -732,6 +732,7 @@ app.get("/pb/search-lots", requireAuth, async(req,res)=>{
   if(q.trim().length < 3) return res.json([]);
   try{
     const lots=await pbSearchLots({sifraKup:sifraKup.trim(),sifraObj:sifraObj?parseInt(sifraObj):null,sifraArt:sifraArt.trim(),q:q.trim()});
+    res.set("Cache-Control","no-store");
     return res.json(lots);
   }catch(e){
     console.error("[PB] search-lots:",e.message);
