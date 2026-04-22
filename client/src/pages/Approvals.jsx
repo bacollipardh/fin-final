@@ -511,20 +511,39 @@ export default function Approvals() {
 
       {/* Gallery Modal */}
       {gallery.open && (
-        <div className="fixed inset-0 z-50 bg-black/85 flex flex-col items-center justify-center p-4" onClick={closeGallery}>
-          <div className="w-full max-w-4xl" onClick={e=>e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-white/70 text-sm">Foto {gallery.idx+1} / {gallery.urls.length}</span>
-              <button onClick={closeGallery} className="w-9 h-9 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white text-xl transition-colors">&times;</button>
-            </div>
-            <div className="flex items-center gap-3">
-              <button onClick={()=>setGallery(s=>({...s,idx:Math.max(0,s.idx-1)}))} disabled={gallery.idx===0}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white text-2xl disabled:opacity-30 transition-colors flex-shrink-0">‹</button>
-              <img src={gallery.urls[gallery.idx]?.startsWith("http") ? gallery.urls[gallery.idx] : `${API_BASE}${gallery.urls[gallery.idx]}`} alt="" className="flex-1 max-h-[80vh] object-contain rounded-xl" onError={e=>{e.target.style.display="none"}} />
-              <button onClick={()=>setGallery(s=>({...s,idx:Math.min(s.urls.length-1,s.idx+1)}))} disabled={gallery.idx>=gallery.urls.length-1}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white text-2xl disabled:opacity-30 transition-colors flex-shrink-0">›</button>
-            </div>
+        <div className="fixed inset-0 z-50 bg-black/90 flex flex-col" onClick={closeGallery}>
+          {/* Top bar */}
+          <div className="flex items-center justify-between px-4 py-3 flex-shrink-0" onClick={e=>e.stopPropagation()}>
+            <span className="text-white/70 text-sm font-medium">{gallery.idx+1} / {gallery.urls.length}</span>
+            <button onClick={closeGallery}
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/30 text-white text-2xl leading-none transition-colors">
+              &times;
+            </button>
           </div>
+          {/* Image area */}
+          <div className="flex-1 relative flex items-center justify-center min-h-0 px-2" onClick={closeGallery}>
+            <img
+              src={gallery.urls[gallery.idx]?.startsWith("http") ? gallery.urls[gallery.idx] : `${API_BASE}${gallery.urls[gallery.idx]}`}
+              alt="" className="max-w-full max-h-full object-contain rounded-lg select-none"
+              onClick={e=>e.stopPropagation()} onError={e=>{e.target.style.display="none"}} />
+            {gallery.idx > 0 && (
+              <button onClick={e=>{e.stopPropagation();setGallery(s=>({...s,idx:s.idx-1}));}}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 text-white text-3xl leading-none transition-colors shadow-lg">‹</button>
+            )}
+            {gallery.idx < gallery.urls.length-1 && (
+              <button onClick={e=>{e.stopPropagation();setGallery(s=>({...s,idx:s.idx+1}));}}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 text-white text-3xl leading-none transition-colors shadow-lg">›</button>
+            )}
+          </div>
+          {/* Dot indicators */}
+          {gallery.urls.length > 1 && (
+            <div className="flex justify-center gap-2 py-3 flex-shrink-0" onClick={e=>e.stopPropagation()}>
+              {gallery.urls.map((_,i)=>(
+                <button key={i} onClick={()=>setGallery(s=>({...s,idx:i}))}
+                  className={`w-2 h-2 rounded-full transition-all ${i===gallery.idx?"bg-white scale-125":"bg-white/40 hover:bg-white/70"}`} />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </Layout>
