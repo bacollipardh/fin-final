@@ -294,8 +294,14 @@ export default function Agent() {
 
   const lineTotal = (() => {
     const q2 = Number(qty || 0), d = Number(discount || 0);
-    if (priceData) return Number((Number(priceData.CmimiPasRabateve || 0) * q2 * (1 - d / 100)).toFixed(2));
-    return Number((unitPrice * q2 * (1 - d / 100)).toFixed(2));
+    // Shuma = (Çmimi PB - Çmimi Final) × Sasia = Çmimi PB × (Lejim%/100) × Sasia
+    if (priceData) {
+      const pb = Number(priceData.CmimiPasRabateve || 0);
+      const final = Number((pb * (1 - d / 100)).toFixed(4));
+      return Number(((pb - final) * q2).toFixed(2));
+    }
+    const final = Number((unitPrice * (1 - d / 100)).toFixed(4));
+    return Number(((unitPrice - final) * q2).toFixed(2));
   })();
 
   /* ── Shto artikull ── */

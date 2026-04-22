@@ -280,7 +280,9 @@ function pdfFromRequestRows({reqRow,items,approvals,watermark}) {
       const pbPrice=it.cmimi_pas_rabateve!=null?Number(it.cmimi_pas_rabateve):null;
       // Gjithmone rillogaris: cmimi_pb (ose baze) * qty * (1 - lejim/100)
       const priceForCalc=pbPrice!=null?pbPrice:base;
-      const line=Number((priceForCalc*qty*(1-lejim/100)).toFixed(2));
+      // Shuma = (Çmimi PB - Çmimi Final) × Sasia
+      const finalPricePerUnit=Number((priceForCalc*(1-lejim/100)).toFixed(4));
+      const line=Number(((priceForCalc-finalPricePerUnit)*qty).toFixed(2));
       return{...it,qty,base,line,rabat,lejim,pbPrice};
     });
 
@@ -1394,7 +1396,10 @@ app.post("/requests",requireAuth,requireRole("agent","avancues","admin"),upload.
         const qty=Math.max(1,Number(i.quantity||1));
         const discPct=Math.max(0,Math.min(100,Number(i.discount_percent||0)));
         const unitPrice=i.cmimi_baze!=null?Number(i.cmimi_baze):0;
-        const lineAmt=i.cmimi_pas_rabateve!=null?Number((Number(i.cmimi_pas_rabateve)*qty).toFixed(2)):Number((unitPrice*qty*(1-discPct/100)).toFixed(2));
+        // Shuma = (Çmimi PB - Çmimi Final) × Sasia
+        const _pb=i.cmimi_pas_rabateve!=null?Number(i.cmimi_pas_rabateve):unitPrice;
+        const _finalUnit=Number((_pb*(1-discPct/100)).toFixed(4));
+        const lineAmt=Number(((_pb-_finalUnit)*qty).toFixed(2));
         return{article_id:aid,quantity:qty,line_amount:lineAmt,barkod:i.barkod||null,lot_kod:i.lot_kod||null,cmimi_baze:i.cmimi_baze!=null?Number(i.cmimi_baze):null,rabat_pct:i.rabat_pct!=null?Number(i.rabat_pct):null,lejim_pct:i.lejim_pct!=null?Number(i.lejim_pct):null,ddv_pct:i.ddv_pct!=null?Number(i.ddv_pct):null,cmimi_pas_rabateve:i.cmimi_pas_rabateve!=null?Number(i.cmimi_pas_rabateve):null,price_match_level:i.price_match_level||null,sifra_kup:i.sifra_kup||null,sifra_obj:i.sifra_obj!=null?Number(i.sifra_obj):null};
       });
       totalAmount=normalizedItems.reduce((s,it)=>s+Number(it.line_amount||0),0);
