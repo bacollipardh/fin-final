@@ -579,14 +579,15 @@ export default function Agent() {
                 <div className="sm:col-span-1">
                   <label className="block text-xs font-medium text-slate-600 mb-1">
                     % Lejim
-                    {lejimAutoCalc && <span className="ml-1 text-[10px] text-emerald-600 font-normal bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">auto ✎</span>}
+                    {lejimAutoCalc && <span className="ml-1 text-[10px] text-emerald-600 font-normal bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">auto 🔒</span>}
                   </label>
                   <input type="number" min="1" max="50" value={discount}
-                    onChange={e => { const v=e.target.value; setDiscount(v===""?"":String(Math.min(50,Math.max(0,Number(v))))); setLejimAutoCalc(false); }}
+                    readOnly={lejimAutoCalc}
+                    onChange={lejimAutoCalc ? undefined : e => { const v=e.target.value; setDiscount(v===""?"":String(Math.min(50,Math.max(0,Number(v))))); setLejimAutoCalc(false); }}
                     placeholder="1–50"
-                    className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30 ${(discount===""||Number(discount)<1)?"border-red-400":lejimAutoCalc?"border-emerald-400":"border-slate-300"}`} />
-                  {(discount===""||Number(discount)<1) && <p className="text-xs text-red-500 mt-1">E detyrueshme (1–50%)</p>}
-                  {lejimAutoCalc && discount && <p className="text-xs text-emerald-600 mt-1">Rabat {Number(priceData?.RabatKombinuarPct||0).toFixed(0)}% + Lejim {discount}% = 50% total</p>}
+                    className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400/30 ${lejimAutoCalc ? "border-emerald-400 bg-emerald-50 text-emerald-700 cursor-not-allowed" : (discount===""||Number(discount)<1)?"border-red-400":"border-slate-300"}`} />
+                  {!lejimAutoCalc && (discount===""||Number(discount)<1) && <p className="text-xs text-red-500 mt-1">E detyrueshme (1–50%)</p>}
+                  {lejimAutoCalc && discount && <p className="text-xs text-emerald-600 mt-1">Rabat {Number(priceData?.RabatKombinuarPct||0).toFixed(0)}% + Lejim {discount}% = 50% total · 🔒 Ndrysho me ✕ Pastro</p>}
                 </div>
 
                 {/* Shuma */}
