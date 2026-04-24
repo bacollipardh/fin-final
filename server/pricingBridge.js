@@ -55,6 +55,7 @@ export async function pbLookupPrice({ sifraKup, sifraObj, sifraArt, lotBr }) {
       VleraPaDDV:        raw.vleraPaDDV,
       Sifra_Kup:         raw.sifraKup,
       Sifra_Obj:         raw.sifraObj,
+      RokRed:            raw.rokRed ?? null,
     };
   }
   return raw;
